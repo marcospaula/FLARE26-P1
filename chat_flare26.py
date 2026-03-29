@@ -4,65 +4,89 @@ import json
 import re
 
 # =====================================================================
-# 1. DEFINIÇÃO DO SCHEMA (CONTRATO DE SANGUE) COM PYDANTIC
+# 1. SCHEMA MÁXIMO-FLEXÍVEL (À PROVA DE QWEN 1.5B)
 # =====================================================================
 class AtomicClaimSchema(BaseModel):
-    sujeito: str = Field(..., description="O tema central da métrica. Ex: inflação, população, lucro")
-    relacao: str = Field(..., description="O verbo ou ação que conecta o sujeito ao objeto. Ex: atingiu, registrou")
-    objeto: str = Field(..., description="O valor numérico bruto extraído, incluindo a unidade. Ex: 4,62%, 30 bilhões de dólares")
-    escopo: str = Field(..., description="O local, região ou delimitação material. Ex: Brasil, São Paulo, América do Norte, mundiais")
-    tempo: str = Field(..., description="O momento da afirmação. Formato OBRIGATÓRIO: APENAS os 4 dígitos do ano. Ex: 2024")
+    # Aceitamos boolean, string ou Nulo. O Pydantic engole qualquer coisa.
+    dados_encontrados: bool | str | None = Field(default=False)
+    sujeito: str | None = Field(default="Não informado")
+    relacao: str | None = Field(default="Não informado")
+    objeto: str | None = Field(default="Não informado")
+    escopo: str | None = Field(default="Não informado")
+    tempo: str | None = Field(default="Não informado")
 
 # =====================================================================
-# MÓDULO M1/M2: EXTRAÇÃO ESTRUTURADA (Type-Safe)
+# MÓDULO M1/M2: EXTRAÇÃO COM FEW-SHOT PROMPTING (TUTORIAL EMBUTIDO)
 # =====================================================================
-# =====================================================================
-# MÓDULO M1/M2: EXTRAÇÃO ESTRUTURADA (Cão de Guarda Pydantic)
-# =====================================================================
-def extract_atomic_claim(texto_bruto, source_id):
-    system_prompt = """Você é um extrator de dados estrito. Extraia as informações do texto e responda EXCLUSIVAMENTE em um JSON válido.
-Use EXATAMENTE as seguintes 5 chaves, todas com valores em texto (string):
-1. "sujeito": O tema central (ex: inflação, Microsoft).
-2. "relacao": A ação (ex: atingiu, registrou).
-3. "objeto": O valor numérico e unidade (ex: 21.900.000.000 dólares, 30.000.000.000 dólares).
-4. "escopo": O local ou recorte (ex: América do Norte, globais).
-5. "tempo": O ano ou trimestre (ex: 2024).
+def extract_atomic_claim(texto_bruto, source_id, pergunta_usuario=""):
+    # Aqui aplicamos Few-Shot: Nós ensinamos a IA como jogar o jogo antes dela começar.
+    system_prompt = f"""Você é um extrator de dados lendo um texto para responder: '{pergunta_usuario}'.
+Você DEVE gerar um JSON respondendo à pergunta baseando-se nos dados.
 
-Retorne APENAS o JSON, sem markdown ou explicações.
-"""
-    
+### EXEMPLO DE COMO VOCÊ DEVE PENSAR E RESPONDER ###
+Texto: "A Microsoft atingiu 30 bilhões de dólares em receitas durante o primeiro trimestre do ano fiscal, apenas na região da América do Norte."
+Se a pergunta for 'Receita da Microsoft', o seu JSON deve ser EXATAMENTE assim:
+{{
+"dados_encontrados": true,
+"sujeito": "Microsoft",
+"relacao": "atingiu receita",
+"objeto": "30 bilhões de dólares",
+"escopo": "América do Norte",
+"tempo": "primeiro trimestre"
+}}
+
+### FIM DO EXEMPLO ###
+
+Se achar a resposta no texto abaixo, preencha seguindo o molde do exemplo.
+Se o texto for sobre política, cookies, ou não tiver a resposta, responda NADA MAIS ALÉM DE:
+{{
+"dados_encontrados": false
+}}"""
+
     try:
         response = ollama.chat(
             model='qwen2.5:1.5b',
-            # REMOVEMOS O FORMAT=SCHEMA PARA NÃO BUGAR O MODELO PEQUENO
+            format='json',
             options={'temperature': 0}, 
             messages=[
                 {'role': 'system', 'content': system_prompt},
                 {'role': 'user', 'content': f'Texto: {texto_bruto}'}
             ]
         )
-        
         conteudo = response['message']['content']
-        
-        # Limpeza rápida caso a IA adicione ```json ... ```
         conteudo = conteudo.replace('```json', '').replace('```', '').strip()
         
-        # O CÃO DE GUARDA: Pydantic valida o JSON gerado
         claim_obj = AtomicClaimSchema.model_validate_json(conteudo)
+        dados_ok = claim_obj.dados_encontrados in [True, "true", "True"]
+        dados_finais = claim_obj.model_dump()
+        dados_finais['dados_encontrados'] = dados_ok
         
-        print(f"[DEBUG M2 - {source_id}] Pydantic OK: {claim_obj.model_dump()}")
+        for k in ['sujeito', 'relacao', 'objeto', 'escopo', 'tempo']:
+            if dados_finais[k] is None:
+                dados_finais[k] = "Não informado"
+                
+        print(f"[DEBUG M2 - {source_id}] Extração Limpa OK: {dados_finais}")
         
         return {
             'source_id': source_id,
             'evidence_span': texto_bruto,
-            'claim_data': claim_obj.model_dump(),
+            'claim_data': dados_finais,
         }
     except Exception as e:
-        print(f"[ERRO M2] Falha ao extrair/validar {source_id}: {e}")
-        return None
+        print(f"[DEBUG M2 - {source_id}] IA errou a formatação. Erro: {e}")
+        return {
+            'source_id': source_id,
+            'evidence_span': texto_bruto,
+            'claim_data': {
+                'dados_encontrados': False,
+                'sujeito': 'Não informado', 'relacao': 'Não informado',
+                'objeto': 'Não informado', 'escopo': 'Não informado',
+                'tempo': 'Não informado'
+            }
+        }
 
 # =====================================================================
-# MÓDULO M4: MOTOR DE CONFLITO (Sem IA)
+# MÓDULO M4: MOTOR DE CONFLITO E GRANDEZAS
 # =====================================================================
 def normalizar_texto(valor):
     return str(valor or '').strip().lower()
@@ -72,16 +96,30 @@ def extrair_numero(valor):
     m = re.search(r'\d+[\d\.,]*', texto)
     if not m:
         return None
-    numero_sujo = m.group(0)
-    numero_limpo = numero_sujo.replace('.', '').replace(',', '.')
+    numero_sujo = m.group(0).replace('.', '').replace(',', '.')
     try:
-        return float(numero_limpo)
+        num = float(numero_sujo)
     except:
         return None
+        
+    if 'mil milhões' in texto or 'bilhões' in texto or 'bn' in texto:
+        num *= 1_000_000_000
+    elif 'milhões' in texto or 'mi' in texto:
+        num *= 1_000_000
+    elif 'mil' in texto or 'k' in texto:
+        num *= 1_000
+    return num
 
 def motor_de_conflito_m4(claim_a, claim_b):
     dados_a = claim_a['claim_data']
     dados_b = claim_b['claim_data']
+
+    obj_a = normalizar_texto(dados_a.get('objeto'))
+    obj_b = normalizar_texto(dados_b.get('objeto'))
+    
+    # Trava: se a IA respondeu "Não informado", barramos imediatamente
+    if "informado" in obj_a or "informado" in obj_b or obj_a == "" or obj_b == "":
+        return '🔀 DADOS AUSENTES OU INCOMPLETOS'
 
     tempo_a = normalizar_texto(dados_a.get('tempo'))
     tempo_b = normalizar_texto(dados_b.get('tempo'))
@@ -91,77 +129,22 @@ def motor_de_conflito_m4(claim_a, claim_b):
     num_a = extrair_numero(dados_a.get('objeto'))
     num_b = extrair_numero(dados_b.get('objeto'))
 
+    # Se a IA extraiu apenas texto puro (não achou números no texto)
+    if num_a is None or num_b is None:
+        if obj_a == obj_b:
+            return '✅ CONSENSO FATO TEXTUAL'
+        return '🔀 COEXISTENCIA (TEXTOS DIFERENTES)'
+
     escopos_similares = (escopo_a in escopo_b) or (escopo_b in escopo_a)
     
     if escopos_similares:
         if tempo_a == tempo_b:
-            if num_a is not None and num_b is not None and num_a != num_b:
+            if num_a != num_b:
                 return '🔴 DISPUTA_DETECTADA'
-            return '✅ CONSENSO'
+            return '✅ CONSENSO NUMÉRICO'
         else:
             if num_a != num_b:
                 return '🔄 ATUALIZACAO_DETECTADA'
-            else:
-                return '✅ CONSENSO'
+            return '✅ CONSENSO NUMÉRICO'
     else:
-        return '🔀 COEXISTENCIA'
-
-# =====================================================================
-# MÓDULO M5/M6: SÍNTESE DO CHATBOT (Rastreável)
-# =====================================================================
-def gerar_resposta_chat(pergunta_usuario, status, claim_a, claim_b):
-    print(f"\nUsuário: \"{pergunta_usuario}\"")
-    print("="*50)
-    
-    dados_a = claim_a['claim_data']
-    dados_b = claim_b['claim_data']
-    tema = dados_a.get('sujeito', 'Tema').title()
-    
-    print("🤖 Resposta do Assistente FLARE:")
-    
-    if status == '🔴 DISPUTA_DETECTADA':
-        print(f"Encontrei informações conflitantes sobre {tema} para o mesmo período.")
-        print("\n## 🔴 BLOCO DE DISPUTA")
-        print(f"- De acordo com {claim_a['source_id']}: {dados_a.get('objeto')}")
-        print(f"- De acordo com {claim_b['source_id']}: {dados_b.get('objeto')}")
-        
-    elif status == '🔄 ATUALIZACAO_DETECTADA':
-        print(f"Encontrei uma evolução histórica nos dados de {tema}.")
-        print("\n## 🔄 BLOCO DE ATUALIZAÇÃO")
-        print(f"- Dado antigo ({claim_a['source_id']}, {dados_a.get('tempo')}): {dados_a.get('objeto')}")
-        print(f"- Dado recente ({claim_b['source_id']}, {dados_b.get('tempo')}): {dados_b.get('objeto')}")
-        
-    elif status == '🔀 COEXISTENCIA':
-        print(f"Os dados sobre {tema} estão corretos, mas referem-se a escopos diferentes.")
-        print("\n## 🔀 BLOCO DE COEXISTÊNCIA (Divergência de Escopo)")
-        print(f"- Escopo [{dados_a.get('escopo')}]: {dados_a.get('objeto')} (Fonte: {claim_a['source_id']})")
-        print(f"- Escopo [{dados_b.get('escopo')}]: {dados_b.get('objeto')} (Fonte: {claim_b['source_id']})")
-        print("\nConclusão: Não há contradição. Os valores coexistem pois abrangem delimitações distintas.")
-        
-    else:
-        print(f"As fontes convergem sobre os dados de {tema}.")
-        print("\n## ✅ BLOCO DE CONSENSO")
-        print(f"- O valor apurado é: {dados_a.get('objeto')}")
-
-if __name__ == '__main__':
-    print("\nIniciando modo interativo Chat-FLARE26 (Blindado com Pydantic)...\n")
-    cenarios = [
-        {
-            "pergunta": "Qual foi o lucro da Microsoft no primeiro trimestre de 2024?",
-            "fonte1": {
-                "id": "Relatorio_Fiscal_EUA", 
-                "texto": "A Microsoft registrou um lucro líquido de 21.900.000.000 dólares no primeiro trimestre de 2024, referente apenas às operações na América do Norte."
-            },
-            "fonte2": {
-                "id": "Relatorio_Fiscal_Global", 
-                "texto": "Considerando as operações mundiais, a Microsoft atingiu um lucro de 30.000.000.000 dólares no primeiro trimestre de 2024."
-            }
-        }
-    ]
-    
-    for cenario in cenarios:
-        claim_1 = extract_atomic_claim(cenario["fonte1"]["texto"], cenario["fonte1"]["id"])
-        claim_2 = extract_atomic_claim(cenario["fonte2"]["texto"], cenario["fonte2"]["id"])
-        if claim_1 and claim_2:
-            status = motor_de_conflito_m4(claim_1, claim_2)
-            gerar_resposta_chat(cenario["pergunta"], status, claim_1, claim_2)
+        return '🔀 COEXISTENCIA (ESCOPOS DIFERENTES)'
