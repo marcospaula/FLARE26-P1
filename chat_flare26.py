@@ -1,75 +1,58 @@
-import ollama
+import os
+from openai import OpenAI
 from pydantic import BaseModel, Field
 import json
 import re
-from thefuzz import fuzz # NOVA DEPENDÊNCIA PARA INTELIGÊNCIA SEMÂNTICA
+from thefuzz import fuzz
+
+# Inicializa o cliente OpenAI
+client = OpenAI(api_key="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")
 
 # =====================================================================
-# 1. SCHEMA MÁXIMO-FLEXÍVEL (À PROVA DE QWEN 1.5B)
+# 1. SCHEMA MÁXIMO-FLEXÍVEL (ATUALIZADO PARA OPENAI STRUCTURED)
 # =====================================================================
 class AtomicClaimSchema(BaseModel):
-    dados_encontrados: bool | str | None = Field(default=False)
-    sujeito: str | None = Field(default="Não informado")
-    relacao: str | None = Field(default="Não informado")
-    objeto: str | None = Field(default="Não informado")
-    escopo: str | None = Field(default="Não informado")
-    tempo: str | None = Field(default="Não informado")
+    dados_encontrados: bool = Field(description="Obrigatório. True se o texto contém pelo menos parte da resposta à pergunta do usuário, False se o texto for inútil.")
+    sujeito: str = Field(default="Não informado", description="A empresa, pessoa ou entidade. Se não achar, retorne 'Não informado'.")
+    relacao: str = Field(default="Não informado", description="O que o sujeito fez. Se não achar, retorne 'Não informado'.")
+    objeto: str = Field(default="Não informado", description="O número ou valor principal (ex: $70.1 billion, R$ 4,5 bilhões). Se a pergunta pedir um número e ele não existir, marque dados_encontrados como False.")
+    escopo: str = Field(default="Não informado", description="O contexto secundário (ex: Brasil, Global). Se não achar, retorne 'Não informado'.")
+    tempo: str = Field(default="Não informado", description="O período de tempo. Se não achar, retorne 'Não informado'.")
 
 # =====================================================================
-# MÓDULO M1/M2: EXTRAÇÃO COM FEW-SHOT PROMPTING
+# MÓDULO M1/M2: EXTRAÇÃO COM OPENAI
 # =====================================================================
 def extract_atomic_claim(texto_bruto, source_id, pergunta_usuario=""):
-    system_prompt = f"""Você é um extrator de dados lendo um texto para responder: '{pergunta_usuario}'.
-Você DEVE gerar um JSON respondendo à pergunta baseando-se nos dados.
-
-### EXEMPLO DE COMO VOCÊ DEVE PENSAR E RESPONDER ###
-Texto: "A Microsoft atingiu 30 bilhões de dólares em receitas durante o primeiro trimestre do ano fiscal, apenas na região da América do Norte."
-Se a pergunta for 'Receita da Microsoft', o seu JSON deve ser EXATAMENTE assim:
-{{
-"dados_encontrados": true,
-"sujeito": "Microsoft",
-"relacao": "atingiu receita",
-"objeto": "30 bilhões de dólares",
-"escopo": "América do Norte",
-"tempo": "primeiro trimestre"
-}}
-
-### FIM DO EXEMPLO ###
-
-Se achar a resposta no texto abaixo, preencha seguindo o molde do exemplo.
-Se o texto for sobre política, cookies, ou não tiver a resposta, responda NADA MAIS ALÉM DE:
-{{
-"dados_encontrados": false
-}}"""
+    system_prompt = f"""Você é um extrator de dados de precisão focado na pergunta: '{pergunta_usuario}'.
+Leia o texto abaixo. Se houver um indício da resposta, extraia o máximo que conseguir.
+Se o texto não mencionar a métrica ou entidade perguntada, defina 'dados_encontrados' como false.
+Para os campos que você não encontrar no texto (como escopo ou tempo), preencha OBRIGATORIAMENTE com a string exata: "Não informado".
+O campo 'objeto' deve conter o número principal e sua unidade (ex: 70.1 billion).
+"""
 
     try:
-        response = ollama.chat(
-            model='qwen2.5:1.5b',
-            format='json',
-            options={'temperature': 0}, 
+        response = client.beta.chat.completions.parse(
+            model="gpt-4o-mini",
             messages=[
-                {'role': 'system', 'content': system_prompt},
-                {'role': 'user', 'content': f'Texto: {texto_bruto}'}
-            ]
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Texto: {texto_bruto}"}
+            ],
+            response_format=AtomicClaimSchema,
+            temperature=0
         )
-        conteudo = response['message']['content']
-        conteudo = conteudo.replace('```json', '').replace('```', '').strip()
         
-        claim_obj = AtomicClaimSchema.model_validate_json(conteudo)
-        dados_ok = claim_obj.dados_encontrados in [True, "true", "True"]
+        claim_obj = response.choices[0].message.parsed
         dados_finais = claim_obj.model_dump()
-        dados_finais['dados_encontrados'] = dados_ok
         
-        for k in ['sujeito', 'relacao', 'objeto', 'escopo', 'tempo']:
-            if dados_finais[k] is None:
-                dados_finais[k] = "Não informado"
-                
+        print(f"[DEBUG M2 - {source_id}] Extração GPT-4 OK: {dados_finais}")
+        
         return {
             'source_id': source_id,
             'evidence_span': texto_bruto,
             'claim_data': dados_finais,
         }
     except Exception as e:
+        print(f"[DEBUG M2] Erro na OpenAI: {e}")
         return {
             'source_id': source_id,
             'evidence_span': texto_bruto,
@@ -81,8 +64,9 @@ Se o texto for sobre política, cookies, ou não tiver a resposta, responda NADA
             }
         }
 
+
 # =====================================================================
-# MÓDULO M4: MOTOR DE CONFLITO COM FUZZY MATCHING (TOLERÂNCIA SEMÂNTICA)
+# MÓDULO M4: MOTOR DE CONFLITO COM FUZZY MATCHING
 # =====================================================================
 def normalizar_texto(valor):
     return str(valor or '').strip().lower()
@@ -126,8 +110,6 @@ def motor_de_conflito_m4(claim_a, claim_b):
     num_a = extrair_numero(dados_a.get('objeto'))
     num_b = extrair_numero(dados_b.get('objeto'))
 
-    # Lógica FUZZY para inteligência semântica: Resolve o problema do Itaú
-    # Ignora variações como "Itaú Unibanco" vs "Itaúsa" vs "4º trimestre"
     escopos_similares = (
         fuzz.partial_ratio(escopo_a, escopo_b) >= 60 or 
         escopo_a in escopo_b or escopo_b in escopo_a or
@@ -151,7 +133,6 @@ def motor_de_conflito_m4(claim_a, claim_b):
             return '🔴 DISPUTA_DETECTADA'
         return '✅ CONSENSO NUMÉRICO'
     else:
-        # Só cai aqui se o sujeito e o escopo forem completamente alheios um ao outro
         if num_a == num_b:
-             return '✅ CONSENSO NUMÉRICO' # Se os valores baterem, assume consenso apesar do texto
+             return '✅ CONSENSO NUMÉRICO'
         return '🔀 COEXISTENCIA (ESCOPOS DIFERENTES)'
