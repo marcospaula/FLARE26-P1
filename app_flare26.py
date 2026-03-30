@@ -35,6 +35,13 @@ def adicionar_claim_real(claim_texto, fonte_url, confiabilidade=1.0, conflito_co
     ledger = init_ledger()
     
     claim_id = hash_claim(claim_texto)
+    
+    # 🛑 TRAVA ANTI-DUPLICAÇÃO DE NÓS DO GRAFO
+    for claim_existente in ledger["grafo_claims"]:
+        if claim_existente["id"] == claim_id:
+            # O fato já existe no ledger! Não adiciona duplicado.
+            return claim_existente, [] 
+            
     novo_claim = {
         "id": claim_id,
         "claim": claim_texto,
