@@ -1,0 +1,28 @@
+{
+  "proveniencia": {
+    "timestamp": "2026-03-29T22:33:41.796553",
+    "alegacoes": 2,
+    "conflitos_detectados": 1,
+    "score_global": 0.0
+  },
+  "grafo_claims": [
+    {
+      "id": "003a3faa",
+      "claim": "R$ 4,45 bilhões",
+      "fonte": "Money Times",
+      "confiabilidade": 0.9,
+      "timestamp": "2026-03-29T22:38:58.028432",
+      "estado": "validada",
+      "conflito_com": []
+    },
+    {
+      "id": "de8569b7",
+      "claim": "VL-JEPA supera GPT-4 em todas tarefas",
+      "fonte": "blog-ia-fake.com",
+      "confiabilidade": 0.25,
+      "timestamp": "2026-03-29T22:52:35.539242",
+      "estado": "CONFLITO",
+      "conflito_com": []
+    }
+  ]
+}

@@ -2,12 +2,12 @@ import ollama
 from pydantic import BaseModel, Field
 import json
 import re
+from thefuzz import fuzz # NOVA DEPENDÊNCIA PARA INTELIGÊNCIA SEMÂNTICA
 
 # =====================================================================
 # 1. SCHEMA MÁXIMO-FLEXÍVEL (À PROVA DE QWEN 1.5B)
 # =====================================================================
 class AtomicClaimSchema(BaseModel):
-    # Aceitamos boolean, string ou Nulo. O Pydantic engole qualquer coisa.
     dados_encontrados: bool | str | None = Field(default=False)
     sujeito: str | None = Field(default="Não informado")
     relacao: str | None = Field(default="Não informado")
@@ -16,10 +16,9 @@ class AtomicClaimSchema(BaseModel):
     tempo: str | None = Field(default="Não informado")
 
 # =====================================================================
-# MÓDULO M1/M2: EXTRAÇÃO COM FEW-SHOT PROMPTING (TUTORIAL EMBUTIDO)
+# MÓDULO M1/M2: EXTRAÇÃO COM FEW-SHOT PROMPTING
 # =====================================================================
 def extract_atomic_claim(texto_bruto, source_id, pergunta_usuario=""):
-    # Aqui aplicamos Few-Shot: Nós ensinamos a IA como jogar o jogo antes dela começar.
     system_prompt = f"""Você é um extrator de dados lendo um texto para responder: '{pergunta_usuario}'.
 Você DEVE gerar um JSON respondendo à pergunta baseando-se nos dados.
 
@@ -65,15 +64,12 @@ Se o texto for sobre política, cookies, ou não tiver a resposta, responda NADA
             if dados_finais[k] is None:
                 dados_finais[k] = "Não informado"
                 
-        print(f"[DEBUG M2 - {source_id}] Extração Limpa OK: {dados_finais}")
-        
         return {
             'source_id': source_id,
             'evidence_span': texto_bruto,
             'claim_data': dados_finais,
         }
     except Exception as e:
-        print(f"[DEBUG M2 - {source_id}] IA errou a formatação. Erro: {e}")
         return {
             'source_id': source_id,
             'evidence_span': texto_bruto,
@@ -86,7 +82,7 @@ Se o texto for sobre política, cookies, ou não tiver a resposta, responda NADA
         }
 
 # =====================================================================
-# MÓDULO M4: MOTOR DE CONFLITO E GRANDEZAS
+# MÓDULO M4: MOTOR DE CONFLITO COM FUZZY MATCHING (TOLERÂNCIA SEMÂNTICA)
 # =====================================================================
 def normalizar_texto(valor):
     return str(valor or '').strip().lower()
@@ -117,7 +113,6 @@ def motor_de_conflito_m4(claim_a, claim_b):
     obj_a = normalizar_texto(dados_a.get('objeto'))
     obj_b = normalizar_texto(dados_b.get('objeto'))
     
-    # Trava: se a IA respondeu "Não informado", barramos imediatamente
     if "informado" in obj_a or "informado" in obj_b or obj_a == "" or obj_b == "":
         return '🔀 DADOS AUSENTES OU INCOMPLETOS'
 
@@ -125,26 +120,38 @@ def motor_de_conflito_m4(claim_a, claim_b):
     tempo_b = normalizar_texto(dados_b.get('tempo'))
     escopo_a = normalizar_texto(dados_a.get('escopo'))
     escopo_b = normalizar_texto(dados_b.get('escopo'))
+    sujeito_a = normalizar_texto(dados_a.get('sujeito'))
+    sujeito_b = normalizar_texto(dados_b.get('sujeito'))
     
     num_a = extrair_numero(dados_a.get('objeto'))
     num_b = extrair_numero(dados_b.get('objeto'))
 
-    # Se a IA extraiu apenas texto puro (não achou números no texto)
+    # Lógica FUZZY para inteligência semântica: Resolve o problema do Itaú
+    # Ignora variações como "Itaú Unibanco" vs "Itaúsa" vs "4º trimestre"
+    escopos_similares = (
+        fuzz.partial_ratio(escopo_a, escopo_b) >= 60 or 
+        escopo_a in escopo_b or escopo_b in escopo_a or
+        escopo_a == "não informado" or escopo_b == "não informado"
+    )
+    
+    sujeitos_similares = (
+        fuzz.partial_ratio(sujeito_a, sujeito_b) >= 60 or 
+        sujeito_a in sujeito_b or sujeito_b in sujeito_a
+    )
+
+    contexto_valido = escopos_similares or sujeitos_similares
+
     if num_a is None or num_b is None:
-        if obj_a == obj_b:
+        if fuzz.ratio(obj_a, obj_b) > 80:
             return '✅ CONSENSO FATO TEXTUAL'
         return '🔀 COEXISTENCIA (TEXTOS DIFERENTES)'
 
-    escopos_similares = (escopo_a in escopo_b) or (escopo_b in escopo_a)
-    
-    if escopos_similares:
-        if tempo_a == tempo_b:
-            if num_a != num_b:
-                return '🔴 DISPUTA_DETECTADA'
-            return '✅ CONSENSO NUMÉRICO'
-        else:
-            if num_a != num_b:
-                return '🔄 ATUALIZACAO_DETECTADA'
-            return '✅ CONSENSO NUMÉRICO'
+    if contexto_valido:
+        if num_a != num_b:
+            return '🔴 DISPUTA_DETECTADA'
+        return '✅ CONSENSO NUMÉRICO'
     else:
+        # Só cai aqui se o sujeito e o escopo forem completamente alheios um ao outro
+        if num_a == num_b:
+             return '✅ CONSENSO NUMÉRICO' # Se os valores baterem, assume consenso apesar do texto
         return '🔀 COEXISTENCIA (ESCOPOS DIFERENTES)'
