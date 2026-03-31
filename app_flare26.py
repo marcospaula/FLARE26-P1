@@ -1,6 +1,7 @@
 import streamlit as st
 from ddgs import DDGS
 from goose3 import Goose
+from chat_flare26 import extract_atomic_claim, motor_de_conflito_m4, fallback_cognitivo_m5
 from chat_flare26 import extract_atomic_claim, motor_de_conflito_m4
 import time
 import json
@@ -186,9 +187,18 @@ if st.button("Buscar e Analisar Evidências", type="primary", use_container_widt
         tema = str(da.get('sujeito') or 'Tema').title()
 
         if resultado_m4 == "FALHA_TOTAL":
-            st.error("🛑 Aviso Anti-Alucinação: Nenhuma das fontes conteve a resposta explícita. O Motor impediu a invenção de dados.")
-            st.info(f"**Contexto da Fonte 1:** {da.get('contexto_da_fonte')}")
-            st.info(f"**Contexto da Fonte 2:** {db.get('contexto_da_fonte')}")
+            st.error("🛑 **FALHA NO GLASS BOX (Busca Insuficiente)**: O Motor M4 bloqueou a síntese certificada pois os sites lidos não continham a resposta.")
+            st.info(f"**O que a Fonte 1 dizia:** {da.get('contexto_da_fonte')}")
+            st.info(f"**O que a Fonte 2 dizia:** {db.get('contexto_da_fonte')}")
+            
+            st.divider()
+            
+            # ACIONA O MOTOR M5 DE EMERGÊNCIA
+            st.warning("⚠️ **AVISO DE DEGRADAÇÃO (MODO BLACK BOX ATIVADO)** ⚠️\n\nA busca auditável falhou. A resposta abaixo foi gerada a partir da memória interna da IA (GPT-4o). **Ela NÃO possui proveniência garantida e não foi registrada no Ledger.** Use com cautela.")
+            
+            with st.spinner("Acionando memória paramétrica..."):
+                resposta_fallback = fallback_cognitivo_m5(tema_busca)
+                st.markdown(f"> 🤖 **Resposta (Sem Garantia de Fonte):**\n\n{resposta_fallback}")
             
         elif resultado_m4 == "COMPLEMENTO_ASSIMETRICO_A":
             st.success("🧩 Síntese Complementar: A resposta foi encontrada e enriquecida por contexto periférico da outra fonte.")

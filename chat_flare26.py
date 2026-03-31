@@ -7,18 +7,15 @@ from dotenv import load_dotenv
 # Carrega as variáveis do arquivo .env
 load_dotenv()
 
-# Inicializa o cliente OpenAI usando a variável de ambiente de forma segura
-# (O cliente OpenAI automaticamente procura por OPENAI_API_KEY no ambiente)
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-
 
 # ========================================
 # ESTRUTURA DE DADOS M2 (Agnóstica e Inteligente)
 # ========================================
 class AtomicClaim(BaseModel):
     dados_encontrados: bool = Field(description="O texto responde diretamente ao que o usuário quer saber?")
-    contexto_da_fonte: str = Field(description="Se achou a resposta, resuma o fato. Se NÃO achou, explique sobre o que a fonte está falando (ex: 'É uma biografia focada no início da carreira').")
-    sujeito: str = Field(description="A entidade principal da busca (ex: Microsoft, Michael B Jordan).")
+    contexto_da_fonte: str = Field(description="Se achou a resposta, resuma o fato. Se NÃO achou, explique sobre o que a fonte está falando.")
+    sujeito: str = Field(description="A entidade principal da busca.")
     objeto: str = Field(description="A resposta exata encontrada. Se não encontrou, preencha com 'Ausente'.")
     tempo: str = Field(description="Quando aconteceu. Se não houver, 'N/A'.")
     escopo: str = Field(description="O recorte/cenário do fato. Se não houver, 'Geral'.")
@@ -32,7 +29,7 @@ Sua missão é ler o texto recebido e buscar informações sobre: '{tema_busca}'
 
 REGRAS DE INTELIGÊNCIA:
 1. Se a resposta exata estiver no texto, dados_encontrados = True.
-2. Se a resposta não estiver, dados_encontrados = False, MAS você deve preencher 'contexto_da_fonte' explicando o que o texto aborda para que o usuário não perca a informação de contexto.
+2. Se a resposta não estiver, dados_encontrados = False, MAS você deve preencher 'contexto_da_fonte' explicando o que o texto aborda.
 3. Não invente NADA. Extraia apenas o que está no texto."""
 
     try:
@@ -64,18 +61,14 @@ def motor_de_conflito_m4(claim_a, claim_b):
     achou_a = da.get('dados_encontrados')
     achou_b = db.get('dados_encontrados')
 
-    # CASO 1: Nenhuma fonte tem o dado (Falha total real)
     if not achou_a and not achou_b:
         return "FALHA_TOTAL"
         
-    # CASO 2: Assimetria (Uma tem o dado alvo, a outra traz apenas contexto)
     if achou_a and not achou_b:
         return "COMPLEMENTO_ASSIMETRICO_A"
     if achou_b and not achou_a:
         return "COMPLEMENTO_ASSIMETRICO_B"
 
-    # CASO 3: Ambas têm o dado alvo (Análise de Conflito)
-    # Compara normalização
     obj_a = str(da.get('objeto')).lower().strip()
     obj_b = str(db.get('objeto')).lower().strip()
 
@@ -89,3 +82,24 @@ def motor_de_conflito_m4(claim_a, claim_b):
         return "COEXISTENCIA_ESCOPO"
         
     return "DISPUTA_DIRETA"
+
+# ========================================
+# M5 - FALLBACK COGNITIVO (BLACK BOX)
+# ========================================
+def fallback_cognitivo_m5(pergunta):
+    """
+    Acionado APENAS quando a busca web falha. 
+    Usa a memória paramétrica do LLM de forma tradicional (Caixa Preta).
+    """
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "Você é uma IA respondendo a partir de sua base de treinamento. Seja direto, conciso e evite inventar referências bibliográficas que você não pode provar."},
+                {"role": "user", "content": pergunta}
+            ],
+            temperature=0.3
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"Falha na comunicação com o LLM: {e}"
