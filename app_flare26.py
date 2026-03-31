@@ -1,13 +1,17 @@
 import streamlit as st
-from ddgs import DDGS
-from goose3 import Goose
-from chat_flare26 import extract_atomic_claim, motor_de_conflito_m4, fallback_cognitivo_m5
-from chat_flare26 import extract_atomic_claim, motor_de_conflito_m4
 import time
 import json
 from datetime import datetime
 from pathlib import Path
 import hashlib
+import wikipedia
+from chat_flare26 import extract_atomic_claim, motor_de_conflito_m4, fallback_cognitivo_m5
+
+# ========================================
+# CONFIGURAÇÕES DA WIKIPÉDIA
+# ========================================
+# Define o idioma da Wikipédia para Português
+wikipedia.set_lang("pt")
 
 # ========================================
 # CONFIGURAÇÕES STREAMLIT
@@ -49,7 +53,6 @@ def adicionar_claim_real(claim_texto, fonte_url, confiabilidade=1.0, conflito_co
     ledger = init_ledger()
     claim_id = hash_claim(claim_texto)
     
-    # 🛑 TRAVA ANTI-DUPLICAÇÃO
     for claim_existente in ledger["grafo_claims"]:
         if claim_existente["id"] == claim_id:
             return claim_existente, []
@@ -81,71 +84,90 @@ def adicionar_claim_real(claim_texto, fonte_url, confiabilidade=1.0, conflito_co
     
     return novo_claim, conflitos
 
-
 # ========================================
-# BUSCA E ANÁLISE
+# FUNÇÃO DE OTIMIZAÇÃO (IA DE BUSCA)
 # ========================================
-def ler_texto_completo(url, fallback_snippet):
+def otimizar_query(pergunta):
     try:
-        g = Goose({'browser_user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'})
-        article = g.extract(url=url)
-        if article.cleaned_text and len(article.cleaned_text) > 150:
-            return article.cleaned_text
-        return fallback_snippet + " " + (article.meta_description or "")
+        from openai import OpenAI
+        import os
+        cliente_rapido = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        resposta = cliente_rapido.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "Você é um assistente de busca. Extraia apenas as 1 ou 2 entidades/palavras-chave principais da pergunta do usuário para usar numa busca na Wikipedia. Ex: se a pergunta for 'quem inventou o chatgpt', responda apenas 'ChatGPT'. Não use frases completas."},
+                {"role": "user", "content": pergunta}
+            ],
+            temperature=0.0
+        )
+        return resposta.choices[0].message.content.strip()
     except:
-        return fallback_snippet
+        return pergunta
 
+# ========================================
+# INTERFACE PRINCIPAL E NOVO MOTOR M1
+# ========================================
 tema_busca = st.text_input(
     "🔍 Qual assunto ou métrica você deseja pesquisar na internet hoje?",
-    placeholder="Ex: quem ganhou o oscar de melhor ator em 2024"
+    placeholder="Ex: quem inventou o chatgpt"
 )
 
 if st.button("Buscar e Analisar Evidências", type="primary", use_container_width=True):
     if not tema_busca:
         st.warning("Por favor, digite um tema para pesquisar.")
     else:
-        with st.status("Iniciando varredura profunda e segura...", expanded=True) as status:
+        with st.status("Iniciando varredura profunda e segura (Wikipédia)...", expanded=True) as status:
             try:
-                st.write("📡 Conectando ao DuckDuckGo (Nova API)...")
-                ddgs = DDGS()
+                st.write("🧠 Otimizando intenção de busca para o Motor M1...")
+                query_otimizada = otimizar_query(tema_busca)
+                st.write(f"🎯 Buscando na Enciclopédia por: **'{query_otimizada}'**")
+                
                 time.sleep(1)
 
-                resultados = []
+                # Busca as páginas na Wikipédia usando os termos otimizados
+                resultados_busca = wikipedia.search(query_otimizada, results=2)
+
+                # Se não achar nada em Português, tenta em Inglês
+                if len(resultados_busca) < 2:
+                    wikipedia.set_lang("en")
+                    resultados_busca = wikipedia.search(query_otimizada, results=2)
+                    if len(resultados_busca) < 2:
+                        status.update(label="Falha na Busca Web", state="error", expanded=True)
+                        st.error("🛑 A Wikipédia não encontrou páginas suficientes sobre este tema.")
+                        st.stop()
+
+                st.write(f"✅ Encontrado: {resultados_busca[0]} e {resultados_busca[1]}")
+                st.write("📖 Extraindo conteúdo enciclopédico auditável...")
+
                 try:
-                    resultados = list(ddgs.news(query=tema_busca, max_results=4))
-                except Exception:
-                    pass
+                    # Usar auto_suggest=False para garantir precisão e .content para pegar tudo
+                    pagina_1 = wikipedia.page(resultados_busca[0], auto_suggest=False)
+                    texto_1 = pagina_1.content
+                    f1_id = pagina_1.title
+                except wikipedia.exceptions.DisambiguationError as e:
+                    pagina_1 = wikipedia.page(e.options[0], auto_suggest=False)
+                    texto_1 = pagina_1.content
+                    f1_id = pagina_1.title
+                except:
+                    texto_1 = wikipedia.summary(resultados_busca[0])
+                    f1_id = resultados_busca[0]
 
-                if len(resultados) < 2:
-                    st.write("⚠️ Poucas notícias. Tentando web geral...")
-                    try:
-                        resultados = list(ddgs.text(query=tema_busca, max_results=4))
-                    except Exception:
-                        pass
-
-                if len(resultados) < 2:
-                    status.update(label="Falha na Busca Web", state="error", expanded=True)
-                    st.error("🛑 O DuckDuckGo bloqueou nossa pesquisa ou não encontrou nada.")
-                    st.stop()
-
-                resultados = resultados[:2]
-                st.write("✅ Extraindo links...")
-
-                url_1 = resultados[0].get('url', resultados[0].get('href', ''))
-                url_2 = resultados[1].get('url', resultados[1].get('href', ''))
-                body_1 = resultados[0].get('body', resultados[0].get('title', ''))
-                body_2 = resultados[1].get('body', resultados[1].get('title', ''))
-
-                st.write("📖 Lendo texto integral (Fallback Seguro)...")
-                texto_1 = ler_texto_completo(url_1, body_1)
-                texto_2 = ler_texto_completo(url_2, body_2)
-
-                f1_id = resultados[0].get('source', resultados[0].get('title', 'Fonte 1'))
-                f2_id = resultados[1].get('source', resultados[1].get('title', 'Fonte 2'))
+                try:
+                    pagina_2 = wikipedia.page(resultados_busca[1], auto_suggest=False)
+                    texto_2 = pagina_2.content
+                    f2_id = pagina_2.title
+                except wikipedia.exceptions.DisambiguationError as e:
+                    pagina_2 = wikipedia.page(e.options[0], auto_suggest=False)
+                    texto_2 = pagina_2.content
+                    f2_id = pagina_2.title
+                except:
+                    texto_2 = wikipedia.summary(resultados_busca[1])
+                    f2_id = resultados_busca[1]
 
                 st.write("🧠 Acionando OpenAI GPT-4o-mini (Extração de Precisão)...")
-                claim_1 = extract_atomic_claim(texto_1[:2000], f1_id, tema_busca)
-                claim_2 = extract_atomic_claim(texto_2[:2000], f2_id, tema_busca)
+                # Aumentamos o escopo de leitura para 8000 caracteres (pega a história/desenvolvimento)
+                claim_1 = extract_atomic_claim(texto_1[:8000], f1_id, tema_busca)
+                claim_2 = extract_atomic_claim(texto_2[:8000], f2_id, tema_busca)
 
                 if not claim_1 or not claim_2:
                     status.update(label="Erro Pydantic", state="error", expanded=True)
@@ -154,8 +176,6 @@ if st.button("Buscar e Analisar Evidências", type="primary", use_container_widt
 
                 st.write(f"🔍 DEBUG M2 Fonte 1 Encontrou: {claim_1['claim_data'].get('dados_encontrados')}")
                 st.write(f"🔍 DEBUG M2 Fonte 2 Encontrou: {claim_2['claim_data'].get('dados_encontrados')}")
-
-                # ATENÇÃO: Retiramos o st.stop() agressivo daqui e delegamos a inteligência pro M4!
 
                 st.write("🪙 Registrando claims no Ledger Providência...")
                 if claim_1['claim_data'].get('dados_encontrados'):
@@ -171,29 +191,30 @@ if st.button("Buscar e Analisar Evidências", type="primary", use_container_widt
                 st.error(f"Erro inesperado no sistema principal: {e}")
                 st.stop()
 
+        # ========================================
+        # RENDERIZAÇÃO DE RESULTADOS E M4
+        # ========================================
         col1, col2 = st.columns(2)
         with col1:
-            st.info(f"**{f1_id}**\n\n{texto_1[:300]}...")
+            st.info(f"**Fonte: {f1_id} (Wikipédia)**\n\n{texto_1[:400]}...")
         with col2:
-            st.info(f"**{f2_id}**\n\n{texto_2[:300]}...")
+            st.info(f"**Fonte: {f2_id} (Wikipédia)**\n\n{texto_2[:400]}...")
 
         st.divider()
         st.subheader("🤖 Diagnóstico do Motor M4")
 
-        # Chama a nova inteligência que detecta as assimetrias e falhas totais
         resultado_m4 = motor_de_conflito_m4(claim_1, claim_2)
         da = claim_1['claim_data']
         db = claim_2['claim_data']
         tema = str(da.get('sujeito') or 'Tema').title()
 
         if resultado_m4 == "FALHA_TOTAL":
-            st.error("🛑 **FALHA NO GLASS BOX (Busca Insuficiente)**: O Motor M4 bloqueou a síntese certificada pois os sites lidos não continham a resposta.")
-            st.info(f"**O que a Fonte 1 dizia:** {da.get('contexto_da_fonte')}")
-            st.info(f"**O que a Fonte 2 dizia:** {db.get('contexto_da_fonte')}")
+            st.error("🛑 **FALHA NO GLASS BOX (Busca Insuficiente)**: O Motor M4 bloqueou a síntese certificada pois os textos enciclopédicos não continham a resposta explícita.")
+            st.info(f"**Contexto da Fonte 1:** {da.get('contexto_da_fonte')}")
+            st.info(f"**Contexto da Fonte 2:** {db.get('contexto_da_fonte')}")
             
             st.divider()
             
-            # ACIONA O MOTOR M5 DE EMERGÊNCIA
             st.warning("⚠️ **AVISO DE DEGRADAÇÃO (MODO BLACK BOX ATIVADO)** ⚠️\n\nA busca auditável falhou. A resposta abaixo foi gerada a partir da memória interna da IA (GPT-4o). **Ela NÃO possui proveniência garantida e não foi registrada no Ledger.** Use com cautela.")
             
             with st.spinner("Acionando memória paramétrica..."):

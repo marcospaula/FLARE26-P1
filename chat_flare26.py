@@ -25,13 +25,14 @@ class AtomicClaim(BaseModel):
 # ========================================
 def extract_atomic_claim(texto_fonte, fonte_id, tema_busca):
     prompt_system = f"""Você é o Motor M2 de Extração Atômica do projeto FLARE26 (Glass Box).
-Sua missão é ler o texto recebido e buscar informações sobre: '{tema_busca}'.
+Sua missão é ler o texto recebido e buscar informações que respondam semanticamente a: '{tema_busca}'.
 
-REGRAS DE INTELIGÊNCIA:
-1. Se a resposta exata estiver no texto, dados_encontrados = True.
-2. Se a resposta não estiver, dados_encontrados = False, MAS você deve preencher 'contexto_da_fonte' explicando o que o texto aborda.
-3. Não invente NADA. Extraia apenas o que está no texto."""
-
+REGRAS DE INTELIGÊNCIA SEMÂNTICA:
+1. Seja flexível com sinônimos: se o usuário perguntar por "inventor", e o texto citar "criador", "desenvolvedor" ou a "empresa responsável", considere como uma resposta válida (dados_encontrados = True).
+2. Se a resposta exata ou seu equivalente semântico direto estiver no texto, extraia-a e coloque dados_encontrados = True.
+3. Se a resposta realmente não estiver no texto sob nenhuma interpretação, coloque dados_encontrados = False, MAS preencha 'contexto_da_fonte' explicando o que o texto aborda.
+4. Não invente fatos de memória. Extraia apenas as informações baseadas no que está escrito no texto fornecido."""
+    
     try:
         response = client.beta.chat.completions.parse(
             model="gpt-4o-mini",
