@@ -28,10 +28,11 @@ def extract_atomic_claim(texto_fonte, fonte_id, tema_busca):
 Sua missão é ler o texto recebido e buscar informações que respondam semanticamente a: '{tema_busca}'.
 
 REGRAS DE INTELIGÊNCIA SEMÂNTICA:
-1. Seja flexível com sinônimos: se o usuário perguntar por "inventor", e o texto citar "criador", "desenvolvedor" ou a "empresa responsável", considere como uma resposta válida (dados_encontrados = True).
-2. Se a resposta exata ou seu equivalente semântico direto estiver no texto, extraia-a e coloque dados_encontrados = True.
-3. Se a resposta realmente não estiver no texto sob nenhuma interpretação, coloque dados_encontrados = False, MAS preencha 'contexto_da_fonte' explicando o que o texto aborda.
-4. Não invente fatos de memória. Extraia apenas as informações baseadas no que está escrito no texto fornecido."""
+1. Seja flexível com sinônimos: se o usuário perguntar por "inventor", considere "criador", "desenvolvedor" ou "pioneiro".
+2. FOCO CIRÚRGICO NO OBJETO: Se a pergunta busca 'quem' (uma pessoa/empresa), o campo 'objeto' deve conter APENAS o nome dessa entidade. Se busca um valor/número, o 'objeto' deve ser APENAS o número. Não coloque frases no objeto.
+3. Se a resposta exata estiver no texto, coloque dados_encontrados = True.
+4. Se o texto abordar o tema mas não trouxer a resposta explícita, coloque dados_encontrados = False, MAS preencha 'contexto_da_fonte'.
+5. Não invente fatos. Extraia apenas as informações baseadas no que está escrito no texto fornecido. Se o texto citar múltiplos possíveis criadores (ex: uma disputa histórica), extraia os nomes envolvidos na disputa."""
     
     try:
         response = client.beta.chat.completions.parse(
