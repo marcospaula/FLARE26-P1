@@ -147,7 +147,7 @@ with col_a: doc_a = st.file_uploader("Documento Base (A):", type=["pdf"], key="d
 with col_b: doc_b = st.file_uploader("Documento Comparativo (B):", type=["pdf"], key="doc_b")
 
 pergunta = st.text_input("O que você quer auditar?", placeholder="Ex: valor da multa por rescisão")
-LIMITE_SEMANTICO = 0.550 # Ajuste fino: Se a similaridade for menor que isso, é Lacuna.
+LIMITE_SEMANTICO = 0.500 # Ajuste fino: Se a similaridade for menor que isso, é Lacuna.
 
 if st.button("🚀 Iniciar Auditoria", type="primary"):
     if doc_a and doc_b and pergunta:
