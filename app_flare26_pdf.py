@@ -4,6 +4,7 @@ import os
 import uuid
 import PyPDF2
 import requests
+import math
 from datetime import datetime
 from pydantic import BaseModel, Field
 
@@ -64,6 +65,34 @@ def extrair_texto_pdf(arquivo):
     return texto
 
 # ==========================================
+# 📐 GATILHO VETORIAL (M1.5) - EMBEDDINGS
+# ==========================================
+def obter_embedding_ollama(texto):
+    """Transforma o texto em um vetor matemático usando o Qwen"""
+    url = "http://localhost:11434/api/embeddings"
+    payload = {
+        "model": "qwen2.5:1.5b",
+        "prompt": texto[:2000], # Avalia o início do documento para velocidade
+        "keep_alive": "10m"
+    }
+    try:
+        response = requests.post(url, json=payload)
+        if response.status_code == 200:
+            return response.json().get("embedding", [])
+        return []
+    except:
+        return []
+
+def calcular_similaridade_cosseno(vec1, vec2):
+    """Calcula a distância matemática O(1) entre dois vetores"""
+    if not vec1 or not vec2: return 0.0
+    dot_product = sum(a * b for a, b in zip(vec1, vec2))
+    magnitude1 = math.sqrt(sum(a * a for a in vec1))
+    magnitude2 = math.sqrt(sum(b * b for b in vec2))
+    if magnitude1 == 0 or magnitude2 == 0: return 0.0
+    return dot_product / (magnitude1 * magnitude2)
+
+# ==========================================
 # 🤖 EXTRATOR DE IA (M2)
 # ==========================================
 def extrair_dado_com_ia(texto, pergunta):
@@ -71,33 +100,19 @@ def extrair_dado_com_ia(texto, pergunta):
     prompt = f"""
     Você é um auditor forense. Responda APENAS em JSON válido.
     REGRA CRÍTICA: Se a informação exata NÃO estiver no texto, retorne "NÃO LOCALIZADO" no campo valor_encontrado.
-    
     PERGUNTA: {pergunta}
-    
-    FORMATO ESPERADO:
-    {json.dumps(schema_json)}
-    
-    DOCUMENTO:
-    {texto[:4000]}
+    FORMATO ESPERADO: {json.dumps(schema_json)}
+    DOCUMENTO: {texto[:4000]}
     """
-    
     url = "http://localhost:11434/api/generate"
-    payload = {
-        "model": "qwen2.5:1.5b",
-        "prompt": prompt,
-        "format": "json",
-        "stream": False,
-        "keep_alive": "10m",
-        "options": {"temperature": 0.0, "num_ctx": 4096}
-    }
+    payload = {"model": "qwen2.5:1.5b", "prompt": prompt, "format": "json", "stream": False, "keep_alive": "10m", "options": {"temperature": 0.0, "num_ctx": 4096}}
     try:
         response = requests.post(url, json=payload)
         if response.status_code == 200:
             resposta_texto = response.json().get("response", "{}")
             return ExtracaoAtomica(**json.loads(resposta_texto))
         return None
-    except Exception as e:
-        st.error(f"Erro: {e}")
+    except:
         return None
 
 # ==========================================
@@ -105,71 +120,65 @@ def extrair_dado_com_ia(texto, pergunta):
 # ==========================================
 def gerar_sintese_m5(pergunta, doc_a, val_a, ctx_a, doc_b, val_b, ctx_b, status):
     prompt = f"""
-    Você é um auditor jurídico sênior. 
-    Escreva UM ÚNICO PARÁGRAFO (máx 4 linhas) sintetizando o resultado para a pergunta: "{pergunta}".
-    
-    STATUS DA AUDITORIA: {status}
+    Você é um auditor jurídico sênior. Escreva UM PARÁGRAFO (máx 4 linhas) sintetizando: "{pergunta}".
+    STATUS: {status}
     Doc A ({doc_a}): {val_a} (Contexto: {ctx_a})
     Doc B ({doc_b}): {val_b} (Contexto: {ctx_b})
-    
-    REGRAS DE REDAÇÃO:
-    1. Se houver LACUNA DE EVIDÊNCIA, diga qual documento é omisso.
-    2. NÃO INVENTE DADOS.
-    3. MANTENHA O SÍMBOLO MONETÁRIO EXATO (ex: escreva "R$ 5.000", não engula o cifrão "R$" nem escreva apenas "R").
+    REGRAS: 1. Se LACUNA, diga qual é omisso. 2. Não invente. 3. MANTENHA O SÍMBOLO R$.
     """
     url = "http://localhost:11434/api/generate"
-    payload = {
-        "model": "qwen2.5:1.5b",
-        "prompt": prompt,
-        "stream": False,
-        "keep_alive": "10m",
-        "options": {"temperature": 0.1, "num_ctx": 2048}
-    }
+    payload = {"model": "qwen2.5:1.5b", "prompt": prompt, "stream": False, "keep_alive": "10m", "options": {"temperature": 0.1, "num_ctx": 2048}}
     try:
         response = requests.post(url, json=payload)
         if response.status_code == 200:
             return response.json().get("response", "Erro na geração.")
         return "Erro na API."
-    except Exception as e:
-        return f"Erro: {e}"
+    except:
+        return "Erro de conexão."
 
 # ==========================================
 # 🖥️ INTERFACE E MOTOR M4 (M6)
 # ==========================================
 st.title("FLARE26: RAG Auditor (Caixa de Vidro Corporativa)")
-st.markdown("Auditoria Cruzada de Contratos com Validação M4 e Síntese M5.")
+st.markdown("Auditoria Neuro-Simbólica com Filtro Vetorial M1.5.")
 
-st.header("1. Selecione os Documentos")
 col_a, col_b = st.columns(2)
-with col_a:
-    doc_a = st.file_uploader("Documento Base (A):", type=["pdf"], key="doc_a")
-with col_b:
-    doc_b = st.file_uploader("Documento para Comparar (B):", type=["pdf"], key="doc_b")
+with col_a: doc_a = st.file_uploader("Documento Base (A):", type=["pdf"], key="doc_a")
+with col_b: doc_b = st.file_uploader("Documento Comparativo (B):", type=["pdf"], key="doc_b")
 
-st.header("2. O que você quer auditar?")
-pergunta = st.text_input("Ex: valor da multa por rescisão")
+pergunta = st.text_input("O que você quer auditar?", placeholder="Ex: valor da multa por rescisão")
+LIMITE_SEMANTICO = 0.550 # Ajuste fino: Se a similaridade for menor que isso, é Lacuna.
 
 if st.button("🚀 Iniciar Auditoria", type="primary"):
     if doc_a and doc_b and pergunta:
-        with st.status("Auditoria em andamento...", expanded=True) as status_ui:
-            st.write("📖 Lendo Documentos...")
+        with st.status("Auditoria Vetorial em andamento...", expanded=True) as status_ui:
             texto_a = extrair_texto_pdf(doc_a)
             texto_b = extrair_texto_pdf(doc_b)
             
-            # FILTRO SEMÂNTICO (Anti-alucinação)
-            # Pega as palavras da pergunta ignorando "valor", "da", "por", "qual", "o"
-            palavras_pergunta = [p for p in pergunta.lower().split() if len(p) > 3 and p not in ["qual", "valor"]]
-            palavra_chave = palavras_pergunta[0] if palavras_pergunta else "multa"
+            st.write("📐 M1.5: Calculando Embeddings Matemáticos (O(1))...")
+            emb_pergunta = obter_embedding_ollama(pergunta)
+            emb_doc_a = obter_embedding_ollama(texto_a)
+            emb_doc_b = obter_embedding_ollama(texto_b)
             
-            st.write("🧠 Acionando Extrator Atômico (M2)...")
+            sim_a = calcular_similaridade_cosseno(emb_pergunta, emb_doc_a)
+            sim_b = calcular_similaridade_cosseno(emb_pergunta, emb_doc_b)
             
-            if palavra_chave not in texto_a.lower():
+            # Exibe os scores matemáticos na tela para provar a tese
+            st.write(f"📊 Score Semântico Doc A: `{sim_a:.3f}`")
+            st.write(f"📊 Score Semântico Doc B: `{sim_b:.3f}`")
+            
+            st.write("🧠 Acionando Extrator Atômico (M2) seletivamente...")
+            
+            # O Gatilho Arquitetural!
+            if sim_a < LIMITE_SEMANTICO:
                 resultado_A = ExtracaoAtomica(valor_encontrado="NÃO LOCALIZADO", contexto_da_clausula="LACUNA DE EVIDÊNCIA", confiabilidade=0.0)
+                st.write("🛑 Inferência M2 abortada para Doc A (Baixa Similaridade).")
             else:
                 resultado_A = extrair_dado_com_ia(texto_a, pergunta)
                 
-            if palavra_chave not in texto_b.lower():
+            if sim_b < LIMITE_SEMANTICO:
                 resultado_B = ExtracaoAtomica(valor_encontrado="NÃO LOCALIZADO", contexto_da_clausula="LACUNA DE EVIDÊNCIA", confiabilidade=0.0)
+                st.write("🛑 Inferência M2 abortada para Doc B (Baixa Similaridade).")
             else:
                 resultado_B = extrair_dado_com_ia(texto_b, pergunta)
                 
@@ -178,35 +187,27 @@ if st.button("🚀 Iniciar Auditoria", type="primary"):
             
         if resultado_A and resultado_B:
             st.header("🤖 Diagnóstico Forense M4")
-            
             valor_A = str(resultado_A.valor_encontrado).strip().upper()
             valor_B = str(resultado_B.valor_encontrado).strip().upper()
-            status_conflito = "" # Variável inicializada para evitar o NameError
+            status_conflito = ""
 
-            # REGRA 1: LACUNA
             if "NÃO LOCALIZADO" in valor_A or "NÃO LOCALIZADO" in valor_B:
                 status_conflito = "LACUNA DE EVIDÊNCIA"
                 st.warning("⚠️ **LACUNA DE EVIDÊNCIA DETECTADA:** A informação não existe em um dos documentos.")
                 col1, col2 = st.columns(2)
-                with col1:
-                    st.info(f"📄 **{doc_a.name}**\n\n**Valor:** `{resultado_A.valor_encontrado}`\n\n_{resultado_A.contexto_da_clausula}_")
-                with col2:
-                    st.info(f"📄 **{doc_b.name}**\n\n**Valor:** `{resultado_B.valor_encontrado}`\n\n_{resultado_B.contexto_da_clausula}_")
+                with col1: st.info(f"📄 **{doc_a.name}**\n\n**Valor:** `{resultado_A.valor_encontrado}`\n\n_{resultado_A.contexto_da_clausula}_")
+                with col2: st.info(f"📄 **{doc_b.name}**\n\n**Valor:** `{resultado_B.valor_encontrado}`\n\n_{resultado_B.contexto_da_clausula}_")
                 gravar_no_ledger(pergunta, f"{doc_a.name} / {doc_b.name}", "Falta de dados", "lacuna_evidencia")
 
-            # REGRA 2: DIVERGÊNCIA
             elif valor_A != valor_B:
                 status_conflito = "DIVERGÊNCIA CRÍTICA"
                 st.error("⚔️ **DIVERGÊNCIA CRÍTICA DETECTADA:** Os documentos contradizem-se.")
                 col1, col2 = st.columns(2)
-                with col1:
-                    st.error(f"📄 **{doc_a.name}**\n\n**Valor:** `{resultado_A.valor_encontrado}`\n\n_{resultado_A.contexto_da_clausula}_")
-                with col2:
-                    st.error(f"📄 **{doc_b.name}**\n\n**Valor:** `{resultado_B.valor_encontrado}`\n\n_{resultado_B.contexto_da_clausula}_")
+                with col1: st.error(f"📄 **{doc_a.name}**\n\n**Valor:** `{resultado_A.valor_encontrado}`\n\n_{resultado_A.contexto_da_clausula}_")
+                with col2: st.error(f"📄 **{doc_b.name}**\n\n**Valor:** `{resultado_B.valor_encontrado}`\n\n_{resultado_B.contexto_da_clausula}_")
                 gravar_no_ledger(resultado_A.valor_encontrado, doc_a.name, resultado_A.contexto_da_clausula, "em_conflito", [doc_b.name])
                 gravar_no_ledger(resultado_B.valor_encontrado, doc_b.name, resultado_B.contexto_da_clausula, "em_conflito", [doc_a.name])
 
-            # REGRA 3: CONSENSO
             else:
                 status_conflito = "CONSENSO"
                 st.success("✅ **CONCORDÂNCIA CONFIRMADA:** Mesma informação em ambos.")
@@ -214,18 +215,10 @@ if st.button("🚀 Iniciar Auditoria", type="primary"):
                 st.info(f"_{resultado_A.contexto_da_clausula}_")
                 gravar_no_ledger(resultado_A.valor_encontrado, f"{doc_a.name} e {doc_b.name}", resultado_A.contexto_da_clausula, "validada")
 
-            # ==========================================
-            # 📝 SÍNTESE EXECUTIVA (M5)
-            # ==========================================
             st.divider()
             st.subheader("📝 Parecer Executivo (M5 Sintetizador)")
             with st.spinner("Redigindo síntese executiva baseada em evidências..."):
-                texto_sintese = gerar_sintese_m5(
-                    pergunta=pergunta,
-                    doc_a=doc_a.name, val_a=resultado_A.valor_encontrado, ctx_a=resultado_A.contexto_da_clausula,
-                    doc_b=doc_b.name, val_b=resultado_B.valor_encontrado, ctx_b=resultado_B.contexto_da_clausula,
-                    status=status_conflito
-                )
+                texto_sintese = gerar_sintese_m5(pergunta, doc_a.name, resultado_A.valor_encontrado, resultado_A.contexto_da_clausula, doc_b.name, resultado_B.valor_encontrado, resultado_B.contexto_da_clausula, status_conflito)
                 st.info(texto_sintese)
     else:
         st.warning("⚠️ Preencha a pergunta e carregue os dois PDFs para iniciar.")
