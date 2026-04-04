@@ -72,7 +72,7 @@ def obter_embedding_ollama(texto):
     url = "http://localhost:11434/api/embeddings"
     payload = {
         "model": "qwen2.5:1.5b",
-        "prompt": texto[:2000], # Avalia o início do documento para velocidade
+        "prompt": texto[:2000],
         "keep_alive": "10m"
     }
     try:
@@ -147,7 +147,7 @@ with col_a: doc_a = st.file_uploader("Documento Base (A):", type=["pdf"], key="d
 with col_b: doc_b = st.file_uploader("Documento Comparativo (B):", type=["pdf"], key="doc_b")
 
 pergunta = st.text_input("O que você quer auditar?", placeholder="Ex: valor da multa por rescisão")
-LIMITE_SEMANTICO = 0.500 # Ajuste fino: Se a similaridade for menor que isso, é Lacuna.
+LIMITE_SEMANTICO = 0.500 # Ajuste fino da precisão matemática
 
 if st.button("🚀 Iniciar Auditoria", type="primary"):
     if doc_a and doc_b and pergunta:
@@ -163,13 +163,11 @@ if st.button("🚀 Iniciar Auditoria", type="primary"):
             sim_a = calcular_similaridade_cosseno(emb_pergunta, emb_doc_a)
             sim_b = calcular_similaridade_cosseno(emb_pergunta, emb_doc_b)
             
-            # Exibe os scores matemáticos na tela para provar a tese
             st.write(f"📊 Score Semântico Doc A: `{sim_a:.3f}`")
             st.write(f"📊 Score Semântico Doc B: `{sim_b:.3f}`")
             
             st.write("🧠 Acionando Extrator Atômico (M2) seletivamente...")
             
-            # O Gatilho Arquitetural!
             if sim_a < LIMITE_SEMANTICO:
                 resultado_A = ExtracaoAtomica(valor_encontrado="NÃO LOCALIZADO", contexto_da_clausula="LACUNA DE EVIDÊNCIA", confiabilidade=0.0)
                 st.write("🛑 Inferência M2 abortada para Doc A (Baixa Similaridade).")
@@ -220,5 +218,30 @@ if st.button("🚀 Iniciar Auditoria", type="primary"):
             with st.spinner("Redigindo síntese executiva baseada em evidências..."):
                 texto_sintese = gerar_sintese_m5(pergunta, doc_a.name, resultado_A.valor_encontrado, resultado_A.contexto_da_clausula, doc_b.name, resultado_B.valor_encontrado, resultado_B.contexto_da_clausula, status_conflito)
                 st.info(texto_sintese)
+                
+            # --- NOVA SEÇÃO: CAIXA DE VIDRO (LEDGER M3) ---
+            st.markdown("---")
+            st.subheader("🕵️‍♂️ Trilha de Auditoria Forense (Caixa de Vidro)")
+            
+            with st.expander("Ver JSON de Proveniência (Ledger M3 e M4)", expanded=False):
+                st.markdown("Registro imutável das decisões tomadas pelos módulos neuro-simbólicos:")
+                try:
+                    ledger_transparencia = {
+                        "M1.5_Filtro_Vetorial": {
+                            "limite_corte": LIMITE_SEMANTICO,
+                            "score_doc_base": round(sim_a, 3) if sim_a else None,
+                            "score_doc_comparativo": round(sim_b, 3) if sim_b else None
+                        },
+                        "M2_Extrator_Atomico": {
+                            "doc_A_extraido": resultado_A.valor_encontrado,
+                            "doc_B_extraido": resultado_B.valor_encontrado
+                        },
+                        "M4_Juiz_Deterministico": {
+                            "diagnostico": status_conflito
+                        }
+                    }
+                    st.json(ledger_transparencia)
+                except Exception as e:
+                    st.error(f"Erro ao montar Ledger na tela: {e}")
     else:
         st.warning("⚠️ Preencha a pergunta e carregue os dois PDFs para iniciar.")
