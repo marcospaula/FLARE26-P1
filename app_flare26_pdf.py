@@ -68,7 +68,6 @@ def extrair_texto_pdf(arquivo):
 # 📐 GATILHO VETORIAL (M1.5) - EMBEDDINGS
 # ==========================================
 def obter_embedding_ollama(texto):
-    """Transforma o texto em um vetor matemático usando o Qwen"""
     url = "http://localhost:11434/api/embeddings"
     payload = {
         "model": "qwen2.5:1.5b",
@@ -84,7 +83,6 @@ def obter_embedding_ollama(texto):
         return []
 
 def calcular_similaridade_cosseno(vec1, vec2):
-    """Calcula a distância matemática O(1) entre dois vetores"""
     if not vec1 or not vec2: return 0.0
     dot_product = sum(a * b for a, b in zip(vec1, vec2))
     magnitude1 = math.sqrt(sum(a * a for a in vec1))
@@ -147,7 +145,7 @@ with col_a: doc_a = st.file_uploader("Documento Base (A):", type=["pdf"], key="d
 with col_b: doc_b = st.file_uploader("Documento Comparativo (B):", type=["pdf"], key="doc_b")
 
 pergunta = st.text_input("O que você quer auditar?", placeholder="Ex: valor da multa por rescisão")
-LIMITE_SEMANTICO = 0.500 # Ajuste fino da precisão matemática
+LIMITE_SEMANTICO = 0.450 # REDUZIDO PARA EVITAR LACUNA FALSA NO CONTRATO D
 
 if st.button("🚀 Iniciar Auditoria", type="primary"):
     if doc_a and doc_b and pergunta:
@@ -219,29 +217,35 @@ if st.button("🚀 Iniciar Auditoria", type="primary"):
                 texto_sintese = gerar_sintese_m5(pergunta, doc_a.name, resultado_A.valor_encontrado, resultado_A.contexto_da_clausula, doc_b.name, resultado_B.valor_encontrado, resultado_B.contexto_da_clausula, status_conflito)
                 st.info(texto_sintese)
                 
-            # --- NOVA SEÇÃO: CAIXA DE VIDRO (LEDGER M3) ---
+            # --- NOVA SEÇÃO: CAIXA DE VIDRO (TABELA CORPORATIVA) ---
             st.markdown("---")
             st.subheader("🕵️‍♂️ Trilha de Auditoria Forense (Caixa de Vidro)")
             
-            with st.expander("Ver JSON de Proveniência (Ledger M3 e M4)", expanded=False):
+            with st.expander("Ver Provas Matemáticas e Extrações (Ledger M3 e M4)", expanded=False):
                 st.markdown("Registro imutável das decisões tomadas pelos módulos neuro-simbólicos:")
-                try:
-                    ledger_transparencia = {
-                        "M1.5_Filtro_Vetorial": {
-                            "limite_corte": LIMITE_SEMANTICO,
-                            "score_doc_base": round(sim_a, 3) if sim_a else None,
-                            "score_doc_comparativo": round(sim_b, 3) if sim_b else None
-                        },
-                        "M2_Extrator_Atomico": {
-                            "doc_A_extraido": resultado_A.valor_encontrado,
-                            "doc_B_extraido": resultado_B.valor_encontrado
-                        },
-                        "M4_Juiz_Deterministico": {
-                            "diagnostico": status_conflito
-                        }
-                    }
-                    st.json(ledger_transparencia)
-                except Exception as e:
-                    st.error(f"Erro ao montar Ledger na tela: {e}")
+                
+                # 1. LINHA DE MÉTRICAS (M1.5)
+                st.markdown("##### 1. Filtro Vetorial (M1.5)")
+                col_m1, col_m2, col_m3 = st.columns(3)
+                col_m1.metric(label="Limite de Corte (Threshold)", value=f"{LIMITE_SEMANTICO:.3f}")
+                col_m2.metric(label="Aderência Doc A", value=f"{sim_a:.3f}", delta="Aprovado" if sim_a >= LIMITE_SEMANTICO else "Bloqueado", delta_color="normal" if sim_a >= LIMITE_SEMANTICO else "inverse")
+                col_m3.metric(label="Aderência Doc B", value=f"{sim_b:.3f}", delta="Aprovado" if sim_b >= LIMITE_SEMANTICO else "Bloqueado", delta_color="normal" if sim_b >= LIMITE_SEMANTICO else "inverse")
+                
+                # 2. TABELA DE EXTRAÇÃO (M2 e M4)
+                st.markdown("##### 2. Dados Atômicos e Veredito (M2 e M4)")
+                dados_tabela = [
+                    {"Documento": doc_a.name, "Dado Extraído": resultado_A.valor_encontrado, "Status": "Analisado"},
+                    {"Documento": doc_b.name, "Dado Extraído": resultado_B.valor_encontrado, "Status": "Analisado"},
+                    {"Documento": "Conclusão (M4)", "Dado Extraído": status_conflito, "Status": "Veredito Final"}
+                ]
+                st.dataframe(dados_tabela, use_container_width=True, hide_index=True)
+                
+                # 3. JSON ORIGINAL (Escondido para devs no Streamlit)
+                with st.popover("Ver código-fonte (JSON)"):
+                    st.json({
+                        "M1.5_Filtro": {"corte": LIMITE_SEMANTICO, "A": sim_a, "B": sim_b},
+                        "M2_Extrator": {"A": resultado_A.valor_encontrado, "B": resultado_B.valor_encontrado},
+                        "M4_Juiz": {"status": status_conflito}
+                    })
     else:
         st.warning("⚠️ Preencha a pergunta e carregue os dois PDFs para iniciar.")
