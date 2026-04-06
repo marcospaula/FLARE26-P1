@@ -1,251 +1,387 @@
 import streamlit as st
-import json
+import tempfile
 import os
-import uuid
-import PyPDF2
 import requests
+import json
+import statistics
 import math
-from datetime import datetime
+import re
 from pydantic import BaseModel, Field
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.vectorstores import Chroma
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # ==========================================
-# ⚙️ CONFIGURAÇÃO DA PÁGINA
+# CONFIGURAÇÕES GERAIS E MODELOS
 # ==========================================
-st.set_page_config(page_title="FLARE26: RAG Auditor", page_icon="⚖️", layout="wide")
+st.set_page_config(page_title="FLARE26: Caixa de Vidro", layout="wide")
+
+OLLAMA_URL = "http://localhost:11434"
+MODEL_GERACAO = "qwen2.5:1.5b"  # M2 e M5
+MODEL_EMBEDDING = "all-MiniLM-L6-v2"  # M1
 
 # ==========================================
-# 💾 SISTEMA DE PROVENIÊNCIA (LEDGER M3)
+# ESTRUTURA DE DADOS (PYDANTIC) - M2
 # ==========================================
-def gravar_no_ledger(claim, fonte, contexto, estado, conflito_com=None):
-    arquivo_ledger = "flare26_ledger.json"
-    if not os.path.exists(arquivo_ledger):
-        ledger = {"proveniencia": {"timestamp": "", "alegacoes": 0, "conflitos_detectados": 0}, "grafo_claims": []}
-    else:
-        with open(arquivo_ledger, "r", encoding="utf-8") as f:
-            try:
-                ledger = json.load(f)
-            except json.JSONDecodeError:
-                ledger = {"proveniencia": {"timestamp": "", "alegacoes": 0, "conflitos_detectados": 0}, "grafo_claims": []}
+class ExtracaoMultivariavel(BaseModel):
+    valor_formatado: str = Field(description="O valor exato como aparece no texto")
+    valor_numerico: str = Field(description="Apenas os números convertidos do valor")
+    unidade_ou_moeda: str = Field(description="A unidade de medida ou moeda do valor")
+    condicao_ou_prazo: str = Field(description="Condição de tempo, prazo ou evento de cobrança")
+    contexto_da_clausula: str = Field(description="Cópia literal do trecho que baseou a resposta")
+    confiabilidade: float = Field(description="Nota de 0.0 a 1.0 sobre a certeza da extração")
 
-    novo_registro = {
-        "id": str(uuid.uuid4())[:8],
-        "claim": claim,
-        "fonte": fonte,
-        "contexto_original": contexto,
-        "timestamp": datetime.now().isoformat(),
-        "estado": estado,
-        "conflito_com": conflito_com if conflito_com else []
-    }
+def resultado_vazio():
+    return ExtracaoMultivariavel(
+        valor_formatado="NÃO LOCALIZADO",
+        valor_numerico="NÃO LOCALIZADO",
+        unidade_ou_moeda="NÃO LOCALIZADO",
+        condicao_ou_prazo="NÃO LOCALIZADO",
+        contexto_da_clausula="LACUNA DE EVIDÊNCIA",
+        confiabilidade=0.0
+    )
+
+# ==========================================
+# MOTOR VETORIAL E RAG (M1 E M1.5)
+# ==========================================
+@st.cache_resource
+def iniciar_banco_vetorial():
+    # Normalizamos na raiz para garantir que L2 vire Cosine real de 0 a 1
+    embeddings = HuggingFaceEmbeddings(
+        model_name=MODEL_EMBEDDING,
+        encode_kwargs={'normalize_embeddings': True}
+    )
+    vector_store = Chroma(
+        embedding_function=embeddings,
+        collection_metadata={"hnsw:space": "cosine"}
+    )
+    return vector_store, embeddings
+
+vector_store, _ = iniciar_banco_vetorial()
+
+def processar_pdf(arquivo_pdf):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+        tmp_file.write(arquivo_pdf.getvalue())
+        tmp_path = tmp_file.name
+
+    loader = PyPDFLoader(tmp_path)
+    documentos = loader.load()
     
-    ledger["grafo_claims"].append(novo_registro)
-    ledger["proveniencia"]["alegacoes"] = len(ledger["grafo_claims"])
-    ledger["proveniencia"]["timestamp"] = datetime.now().isoformat()
-    if estado == "em_conflito":
-        ledger["proveniencia"]["conflitos_detectados"] = sum(1 for c in ledger["grafo_claims"] if c["estado"] == "em_conflito")
+    for doc in documentos:
+        doc.metadata["source"] = arquivo_pdf.name
 
-    with open(arquivo_ledger, "w", encoding="utf-8") as f:
-        json.dump(ledger, f, indent=2, ensure_ascii=False)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    chunks = text_splitter.split_documents(documentos)
 
-# ==========================================
-# 🧠 LENTE PYDANTIC (M2)
-# ==========================================
-class ExtracaoAtomica(BaseModel):
-    valor_encontrado: str = Field(description="O dado exato. Se não achar, escreva APENAS: 'NÃO LOCALIZADO'")
-    contexto_da_clausula: str = Field(description="O texto que comprova. Se não achar, escreva: 'LACUNA DE EVIDÊNCIA'")
-    confiabilidade: float = Field(description="Nível de certeza de 0.0 a 1.0")
+    vector_store.add_documents(chunks)
+    os.remove(tmp_path)
 
-# ==========================================
-# 📄 LEITOR DE PDF (M1)
-# ==========================================
-def extrair_texto_pdf(arquivo):
-    texto = ""
-    leitor = PyPDF2.PdfReader(arquivo)
-    for pagina in leitor.pages:
-        texto += pagina.extract_text() + "\n"
-    return texto
+def recuperar_contexto_filtrado(pergunta, nome_documento, top_k=5):
+    """
+    Módulo M1.5: Filtro Vetorial Adaptativo (Threshold Dinâmico Estatístico)
+    Calcula matematicamente o limite dinâmico Z-Score.
+    """
+    if not vector_store:
+        return ""
 
-# ==========================================
-# 📐 GATILHO VETORIAL (M1.5) - EMBEDDINGS
-# ==========================================
-def obter_embedding_ollama(texto):
-    url = "http://localhost:11434/api/embeddings"
-    payload = {
-        "model": "qwen2.5:1.5b",
-        "prompt": texto[:2000],
-        "keep_alive": "10m"
+    resultados_brutos = vector_store.similarity_search_with_score(
+        pergunta, k=top_k, filter={"source": nome_documento}
+    )
+
+    if not resultados_brutos:
+        return ""
+
+    resultados = []
+    for doc, distancia in resultados_brutos:
+        # Reversão matemática da distância para escore de similaridade (0 a 1)
+        similaridade = max(0.0, 1.0 - distancia)
+        resultados.append((doc, similaridade))
+
+    scores = [score for _, score in resultados]
+    
+    if len(scores) < 2:
+        limite_corte = max(0.0, scores[0] - 0.05)
+    else:
+        media_scores = statistics.mean(scores)
+        desvio_padrao = statistics.stdev(scores)
+        limite_corte = media_scores + (desvio_padrao * 0.5)
+
+    limite_corte = max(0.35, limite_corte) # Piso mínimo
+
+    contextos_validos = []
+    maior_score = 0.0
+
+    for doc, score in resultados:
+        if score >= limite_corte:
+            contextos_validos.append(doc.page_content)
+            if score > maior_score:
+                maior_score = score
+
+    # Registro de Auditoria M1.5
+    if 'm1_5_ledger' not in st.session_state:
+        st.session_state['m1_5_ledger'] = {}
+    
+    st.session_state['m1_5_ledger'][nome_documento] = {
+        "limite_corte_calculado": round(limite_corte, 3),
+        "maior_score_encontrado": round(maior_score, 3),
+        "status": "Aprovado" if contextos_validos else "Reprovado"
     }
-    try:
-        response = requests.post(url, json=payload)
-        if response.status_code == 200:
-            return response.json().get("embedding", [])
-        return []
-    except:
-        return []
 
-def calcular_similaridade_cosseno(vec1, vec2):
-    if not vec1 or not vec2: return 0.0
-    dot_product = sum(a * b for a, b in zip(vec1, vec2))
-    magnitude1 = math.sqrt(sum(a * a for a in vec1))
-    magnitude2 = math.sqrt(sum(b * b for b in vec2))
-    if magnitude1 == 0 or magnitude2 == 0: return 0.0
-    return dot_product / (magnitude1 * magnitude2)
+    return "\n\n".join(contextos_validos)
 
 # ==========================================
-# 🤖 EXTRATOR DE IA (M2)
+# EXTRATOR NEURAL (M2) - HÍBRIDO E BLINDADO
 # ==========================================
 def extrair_dado_com_ia(texto, pergunta):
-    schema_json = ExtracaoAtomica.model_json_schema()
+    if not texto.strip():
+        return resultado_vazio()
+
     prompt = f"""
-    Você é um auditor forense. Responda APENAS em JSON válido.
-    REGRA CRÍTICA: Se a informação exata NÃO estiver no texto, retorne "NÃO LOCALIZADO" no campo valor_encontrado.
-    PERGUNTA: {pergunta}
-    FORMATO ESPERADO: {json.dumps(schema_json)}
-    DOCUMENTO: {texto[:4000]}
-    """
-    url = "http://localhost:11434/api/generate"
-    payload = {"model": "qwen2.5:1.5b", "prompt": prompt, "format": "json", "stream": False, "keep_alive": "10m", "options": {"temperature": 0.0, "num_ctx": 4096}}
+Sua tarefa é extrair dados em formato JSON estrito.
+NÃO ESCREVA NENHUM TEXTO ANTES OU DEPOIS DO JSON.
+
+PERGUNTA: {pergunta}
+
+Crie um JSON exatamente com as chaves abaixo. Se não achar algo, responda "NÃO LOCALIZADO".
+{{
+  "valor_formatado": "",
+  "valor_numerico": "",
+  "unidade_ou_moeda": "",
+  "condicao_ou_prazo": "", // OBRIGATÓRIO: Extraia regras como "por evento", "por cada mês de atraso", "por dia", etc. Se não houver, escreva "NÃO LOCALIZADO".
+  "contexto_da_clausula": "",
+  "confiabilidade": 0.0
+}}
+
+TEXTO:
+{texto[:3000]}
+"""
+    
+    url = f"{OLLAMA_URL}/api/generate"
+    payload = {
+        "model": MODEL_GERACAO,
+        "prompt": prompt,
+        "stream": False,
+        "options": {
+            "temperature": 0.0,
+            "num_ctx": 4096,
+            "top_k": 10,
+            "top_p": 0.5
+        }
+    }
+
     try:
-        response = requests.post(url, json=payload)
+        response = requests.post(url, json=payload, timeout=300)
+        
         if response.status_code == 200:
-            resposta_texto = response.json().get("response", "{}")
-            return ExtracaoAtomica(**json.loads(resposta_texto))
-        return None
-    except:
-        return None
+            raw_response = response.json().get("response", "")
+            
+            print("====================================")
+            print("RESPOSTA CRUA DO QWEN 1.5B (M2):")
+            print(raw_response)
+            print("====================================")
+            
+            clean_text = raw_response.strip()
+            if clean_text.startswith("```json"): clean_text = clean_text[7:]
+            elif clean_text.startswith("```"): clean_text = clean_text[3:]
+            if clean_text.endswith("```"): clean_text = clean_text[:-3]
+            clean_text = clean_text.strip()
+            
+            match = re.search(r'\{.*\}', clean_text, re.DOTALL)
+            if match:
+                try:
+                    data = json.loads(match.group(0))
+                    
+                    dados_finais = {
+                        "valor_formatado": str(data.get("valor_formatado", "NÃO LOCALIZADO")),
+                        "valor_numerico": str(data.get("valor_numerico", "NÃO LOCALIZADO")),
+                        "unidade_ou_moeda": str(data.get("unidade_ou_moeda", "NÃO LOCALIZADO")),
+                        "condicao_ou_prazo": str(data.get("condicao_ou_prazo", "NÃO LOCALIZADO")),
+                        "contexto_da_clausula": str(data.get("contexto_da_clausula", "LACUNA DE EVIDÊNCIA")),
+                        "confiabilidade": float(data.get("confiabilidade", 0.0))
+                    }
+                    return ExtracaoMultivariavel(**dados_finais)
+                except json.JSONDecodeError as je:
+                    print(f"Erro de Parse do JSON: {je}")
+            
+            print("M2 Falhou: Não encontrou bloco JSON válido na resposta.")
+            return resultado_vazio()
+            
+        else:
+            # BLINDAGEM: Se a API deu erro HTTP, retorna vazio em vez de None
+            print(f"Erro da API do Ollama: HTTP {response.status_code} - {response.text}")
+            return resultado_vazio()
+            
+    except Exception as e:
+        # BLINDAGEM: Se a requisição explodir, retorna vazio em vez de None
+        print(f"Erro Fatal M2: {e}")
+        return resultado_vazio()
 
 # ==========================================
-# 📝 SINTETIZADOR CONDICIONADO (M5)
+# JUIZ DETERMINÍSTICO (M4)
 # ==========================================
-def gerar_sintese_m5(pergunta, doc_a, val_a, ctx_a, doc_b, val_b, ctx_b, status):
-    prompt = f"""
-    Você é um auditor jurídico sênior. Escreva UM PARÁGRAFO (máx 4 linhas) sintetizando: "{pergunta}".
-    STATUS: {status}
-    Doc A ({doc_a}): {val_a} (Contexto: {ctx_a})
-    Doc B ({doc_b}): {val_b} (Contexto: {ctx_b})
-    REGRAS: 1. Se LACUNA, diga qual é omisso. 2. Não invente. 3. MANTENHA O SÍMBOLO R$.
-    """
-    url = "http://localhost:11434/api/generate"
-    payload = {"model": "qwen2.5:1.5b", "prompt": prompt, "stream": False, "keep_alive": "10m", "options": {"temperature": 0.1, "num_ctx": 2048}}
-    try:
-        response = requests.post(url, json=payload)
-        if response.status_code == 200:
-            return response.json().get("response", "Erro na geração.")
-        return "Erro na API."
-    except:
-        return "Erro de conexão."
+def comparar_documentos(dado_A: ExtracaoMultivariavel, dado_B: ExtracaoMultivariavel):
+    if dado_A.valor_numerico == "NÃO LOCALIZADO" and dado_B.valor_numerico == "NÃO LOCALIZADO":
+        return "LACUNA DE EVIDÊNCIA", ["Documento A sem evidência localizável.", "Documento B sem evidência localizável."]
+    
+    if dado_A.valor_numerico == "NÃO LOCALIZADO":
+        return "DIVERGÊNCIA CRÍTICA", ["Apenas Documento B contém a informação."]
+        
+    if dado_B.valor_numerico == "NÃO LOCALIZADO":
+        return "DIVERGÊNCIA CRÍTICA", ["Apenas Documento A contém a informação."]
+
+    motivos_divergencia = []
+    
+    if dado_A.valor_numerico != dado_B.valor_numerico:
+        motivos_divergencia.append(f"Valor numérico divergente: {dado_A.valor_numerico} vs {dado_B.valor_numerico}.")
+        
+    if dado_A.unidade_ou_moeda != dado_B.unidade_ou_moeda:
+        motivos_divergencia.append(f"Moeda/unidade divergente: {dado_A.unidade_ou_moeda} vs {dado_B.unidade_ou_moeda}.")
+        
+    if dado_A.condicao_ou_prazo.lower() != dado_B.condicao_ou_prazo.lower():
+        motivos_divergencia.append(f"Condição/prazo divergente: '{dado_A.condicao_ou_prazo}' vs '{dado_B.condicao_ou_prazo}'.")
+
+    if motivos_divergencia:
+        return "DIVERGÊNCIA CRÍTICA", motivos_divergencia
+    
+    return "CONSENSO TOTAL", ["Os documentos são equivalentes em todas as dimensões analisadas."]
 
 # ==========================================
-# 🖥️ INTERFACE E MOTOR M4 (M6)
+# SINTETIZADOR DE PARECER (M5)
+# ==========================================
+def gerar_parecer_executivo(pergunta, doc_a_nome, dado_a, doc_b_nome, dado_b, veredito, motivos):
+    if veredito == "LACUNA DE EVIDÊNCIA":
+        return "A auditoria identificou uma lacuna de evidência. A informação solicitada não foi localizada nos documentos avaliados, impossibilitando a análise de divergência ou consenso."
+        
+    prompt = f"""
+Você é um auditor sênior emitindo um parecer executivo sobre um contrato.
+Escreva um parágrafo curto (máximo 4 linhas), profissional e direto explicando o resultado da auditoria abaixo.
+Não use jargões de programação. Foque no impacto jurídico e na regra de negócio do contrato.
+NUNCA INVENTE NÚMEROS. Use APENAS os valores exatos que estão no JSON de entrada. Se você inventar um valor, a auditoria será invalidada.
+
+Pergunta da Auditoria: {pergunta}
+Veredito Final do Juiz M4: {veredito}
+Motivos Analisados: {', '.join(motivos)}
+
+Dados extraídos do {doc_a_nome}: 
+- Valor: {dado_a.valor_formatado}
+- Condição/Prazo: {dado_a.condicao_ou_prazo}
+
+Dados extraídos do {doc_b_nome}: 
+- Valor: {dado_b.valor_formatado}
+- Condição/Prazo: {dado_b.condicao_ou_prazo}
+"""
+    url = f"{OLLAMA_URL}/api/generate"
+    payload = {
+        "model": MODEL_GERACAO,
+        "prompt": prompt,
+        "stream": False,
+        "keep_alive": "5m",
+        "options": {"temperature": 0.3}
+    }
+
+    try:
+        response = requests.post(url, json=payload, timeout=120)
+        if response.status_code == 200:
+            return response.json().get("response", "Erro na geração do parecer.")
+        return "Parecer executivo não pôde ser gerado devido a erro de API."
+    except Exception as e:
+        return f"Falha ao contatar M5: {str(e)}"
+
+# ==========================================
+# INTERFACE DO USUÁRIO (STREAMLIT)
 # ==========================================
 st.title("FLARE26: RAG Auditor (Caixa de Vidro Corporativa)")
-st.markdown("Auditoria Neuro-Simbólica com Filtro Vetorial M1.5.")
+st.markdown("Auditoria Neuro-Simbólica com Filtro Vetorial Inteligente e Extração Multivariável.")
 
-col_a, col_b = st.columns(2)
-with col_a: doc_a = st.file_uploader("Documento Base (A):", type=["pdf"], key="doc_a")
-with col_b: doc_b = st.file_uploader("Documento Comparativo (B):", type=["pdf"], key="doc_b")
+col1, col2 = st.columns(2)
 
-pergunta = st.text_input("O que você quer auditar?", placeholder="Ex: valor da multa por rescisão")
-LIMITE_SEMANTICO = 0.450 # REDUZIDO PARA EVITAR LACUNA FALSA NO CONTRATO D
+with col1:
+    st.subheader("Documento Base (A)")
+    arquivo_a = st.file_uploader("Contrato A", type=["pdf"], key="file_a")
 
-if st.button("🚀 Iniciar Auditoria", type="primary"):
-    if doc_a and doc_b and pergunta:
-        with st.status("Auditoria Vetorial em andamento...", expanded=True) as status_ui:
-            texto_a = extrair_texto_pdf(doc_a)
-            texto_b = extrair_texto_pdf(doc_b)
-            
-            st.write("📐 M1.5: Calculando Embeddings Matemáticos (O(1))...")
-            emb_pergunta = obter_embedding_ollama(pergunta)
-            emb_doc_a = obter_embedding_ollama(texto_a)
-            emb_doc_b = obter_embedding_ollama(texto_b)
-            
-            sim_a = calcular_similaridade_cosseno(emb_pergunta, emb_doc_a)
-            sim_b = calcular_similaridade_cosseno(emb_pergunta, emb_doc_b)
-            
-            st.write(f"📊 Score Semântico Doc A: `{sim_a:.3f}`")
-            st.write(f"📊 Score Semântico Doc B: `{sim_b:.3f}`")
-            
-            st.write("🧠 Acionando Extrator Atômico (M2) seletivamente...")
-            
-            if sim_a < LIMITE_SEMANTICO:
-                resultado_A = ExtracaoAtomica(valor_encontrado="NÃO LOCALIZADO", contexto_da_clausula="LACUNA DE EVIDÊNCIA", confiabilidade=0.0)
-                st.write("🛑 Inferência M2 abortada para Doc A (Baixa Similaridade).")
-            else:
-                resultado_A = extrair_dado_com_ia(texto_a, pergunta)
-                
-            if sim_b < LIMITE_SEMANTICO:
-                resultado_B = ExtracaoAtomica(valor_encontrado="NÃO LOCALIZADO", contexto_da_clausula="LACUNA DE EVIDÊNCIA", confiabilidade=0.0)
-                st.write("🛑 Inferência M2 abortada para Doc B (Baixa Similaridade).")
-            else:
-                resultado_B = extrair_dado_com_ia(texto_b, pergunta)
-                
-            st.write("⚖️ Passando os dados no Juiz de Conflito M4...")
-            status_ui.update(label="Auditoria Concluída!", state="complete", expanded=False)
-            
-        if resultado_A and resultado_B:
-            st.header("🤖 Diagnóstico Forense M4")
-            valor_A = str(resultado_A.valor_encontrado).strip().upper()
-            valor_B = str(resultado_B.valor_encontrado).strip().upper()
-            status_conflito = ""
+with col2:
+    st.subheader("Documento Comparativo (B)")
+    arquivo_b = st.file_uploader("Contrato B", type=["pdf"], key="file_b")
 
-            if "NÃO LOCALIZADO" in valor_A or "NÃO LOCALIZADO" in valor_B:
-                status_conflito = "LACUNA DE EVIDÊNCIA"
-                st.warning("⚠️ **LACUNA DE EVIDÊNCIA DETECTADA:** A informação não existe em um dos documentos.")
-                col1, col2 = st.columns(2)
-                with col1: st.info(f"📄 **{doc_a.name}**\n\n**Valor:** `{resultado_A.valor_encontrado}`\n\n_{resultado_A.contexto_da_clausula}_")
-                with col2: st.info(f"📄 **{doc_b.name}**\n\n**Valor:** `{resultado_B.valor_encontrado}`\n\n_{resultado_B.contexto_da_clausula}_")
-                gravar_no_ledger(pergunta, f"{doc_a.name} / {doc_b.name}", "Falta de dados", "lacuna_evidencia")
+pergunta_auditoria = st.text_input("O que você quer auditar?", placeholder="Ex: Qual é o valor da multa compensatória e sua condição de cobrança?")
 
-            elif valor_A != valor_B:
-                status_conflito = "DIVERGÊNCIA CRÍTICA"
-                st.error("⚔️ **DIVERGÊNCIA CRÍTICA DETECTADA:** Os documentos contradizem-se.")
-                col1, col2 = st.columns(2)
-                with col1: st.error(f"📄 **{doc_a.name}**\n\n**Valor:** `{resultado_A.valor_encontrado}`\n\n_{resultado_A.contexto_da_clausula}_")
-                with col2: st.error(f"📄 **{doc_b.name}**\n\n**Valor:** `{resultado_B.valor_encontrado}`\n\n_{resultado_B.contexto_da_clausula}_")
-                gravar_no_ledger(resultado_A.valor_encontrado, doc_a.name, resultado_A.contexto_da_clausula, "em_conflito", [doc_b.name])
-                gravar_no_ledger(resultado_B.valor_encontrado, doc_b.name, resultado_B.contexto_da_clausula, "em_conflito", [doc_a.name])
+if st.button("Executar Auditoria Forense", type="primary"):
+    if arquivo_a and arquivo_b and pergunta_auditoria:
+        
+        st.session_state['m1_5_ledger'] = {}
+        
+        with st.spinner("Inicializando motores neuro-simbólicos..."):
+            processar_pdf(arquivo_a)
+            processar_pdf(arquivo_b)
 
-            else:
-                status_conflito = "CONSENSO"
-                st.success("✅ **CONCORDÂNCIA CONFIRMADA:** Mesma informação em ambos.")
-                st.markdown(f"**Valor Validado:** `{resultado_A.valor_encontrado}`")
-                st.info(f"_{resultado_A.contexto_da_clausula}_")
-                gravar_no_ledger(resultado_A.valor_encontrado, f"{doc_a.name} e {doc_b.name}", resultado_A.contexto_da_clausula, "validada")
+        with st.spinner("M1.5: Aplicando Limites Vetoriais Dinâmicos..."):
+            contexto_a = recuperar_contexto_filtrado(pergunta_auditoria, arquivo_a.name)
+            contexto_b = recuperar_contexto_filtrado(pergunta_auditoria, arquivo_b.name)
 
-            st.divider()
-            st.subheader("📝 Parecer Executivo (M5 Sintetizador)")
-            with st.spinner("Redigindo síntese executiva baseada em evidências..."):
-                texto_sintese = gerar_sintese_m5(pergunta, doc_a.name, resultado_A.valor_encontrado, resultado_A.contexto_da_clausula, doc_b.name, resultado_B.valor_encontrado, resultado_B.contexto_da_clausula, status_conflito)
-                st.info(texto_sintese)
-                
-            # --- NOVA SEÇÃO: CAIXA DE VIDRO (TABELA CORPORATIVA) ---
-            st.markdown("---")
-            st.subheader("🕵️‍♂️ Trilha de Auditoria Forense (Caixa de Vidro)")
+        with st.spinner("M2: Extraindo Matriz de Dados..."):
+            extracao_a = extrair_dado_com_ia(contexto_a, pergunta_auditoria)
+            extracao_b = extrair_dado_com_ia(contexto_b, pergunta_auditoria)
+
+        with st.spinner("M4: Julgamento Determinístico..."):
+            veredito, motivos = comparar_documentos(extracao_a, extracao_b)
             
-            with st.expander("Ver Provas Matemáticas e Extrações (Ledger M3 e M4)", expanded=False):
-                st.markdown("Registro imutável das decisões tomadas pelos módulos neuro-simbólicos:")
-                
-                # 1. LINHA DE MÉTRICAS (M1.5)
-                st.markdown("##### 1. Filtro Vetorial (M1.5)")
-                col_m1, col_m2, col_m3 = st.columns(3)
-                col_m1.metric(label="Limite de Corte (Threshold)", value=f"{LIMITE_SEMANTICO:.3f}")
-                col_m2.metric(label="Aderência Doc A", value=f"{sim_a:.3f}", delta="Aprovado" if sim_a >= LIMITE_SEMANTICO else "Bloqueado", delta_color="normal" if sim_a >= LIMITE_SEMANTICO else "inverse")
-                col_m3.metric(label="Aderência Doc B", value=f"{sim_b:.3f}", delta="Aprovado" if sim_b >= LIMITE_SEMANTICO else "Bloqueado", delta_color="normal" if sim_b >= LIMITE_SEMANTICO else "inverse")
-                
-                # 2. TABELA DE EXTRAÇÃO (M2 e M4)
-                st.markdown("##### 2. Dados Atômicos e Veredito (M2 e M4)")
-                dados_tabela = [
-                    {"Documento": doc_a.name, "Dado Extraído": resultado_A.valor_encontrado, "Status": "Analisado"},
-                    {"Documento": doc_b.name, "Dado Extraído": resultado_B.valor_encontrado, "Status": "Analisado"},
-                    {"Documento": "Conclusão (M4)", "Dado Extraído": status_conflito, "Status": "Veredito Final"}
-                ]
-                st.dataframe(dados_tabela, use_container_width=True, hide_index=True)
-                
-                # 3. JSON ORIGINAL (Escondido para devs no Streamlit)
-                with st.popover("Ver código-fonte (JSON)"):
-                    st.json({
-                        "M1.5_Filtro": {"corte": LIMITE_SEMANTICO, "A": sim_a, "B": sim_b},
-                        "M2_Extrator": {"A": resultado_A.valor_encontrado, "B": resultado_B.valor_encontrado},
-                        "M4_Juiz": {"status": status_conflito}
-                    })
+        with st.spinner("M5: Gerando Parecer Executivo..."):
+            parecer = gerar_parecer_executivo(
+                pergunta_auditoria, arquivo_a.name, extracao_a, arquivo_b.name, extracao_b, veredito, motivos
+            )
+
+        st.success("Auditoria Concluída!")
+
+        st.header("🤖 Diagnóstico Forense M4")
+        
+        if veredito == "CONSENSO TOTAL":
+            st.success(f"✅ **CONSENSO TOTAL**: {motivos}")
+        elif veredito == "LACUNA DE EVIDÊNCIA":
+            st.warning("⚠️ **LACUNA DE EVIDÊNCIA**: Não foi possível localizar a informação nos dois documentos.")
+        else:
+            st.error(f"⚔️ **DIVERGÊNCIA CRÍTICA DETECTADA**: {motivos}")
+
+        col_res1, col_res2 = st.columns(2)
+        with col_res1:
+            st.markdown(f"**📄 {arquivo_a.name}**")
+            st.write(f"- Valor formatado: `{extracao_a.valor_formatado}`")
+            st.write(f"- Valor numérico: `{extracao_a.valor_numerico}`")
+            st.write(f"- Moeda/Unidade: `{extracao_a.unidade_ou_moeda}`")
+            st.write(f"- Condição/Prazo: `{extracao_a.condicao_ou_prazo}`")
+            st.caption(f"Contexto Base: *\"{extracao_a.contexto_da_clausula}\"*")
+            
+        with col_res2:
+            st.markdown(f"**📄 {arquivo_b.name}**")
+            st.write(f"- Valor formatado: `{extracao_b.valor_formatado}`")
+            st.write(f"- Valor numérico: `{extracao_b.valor_numerico}`")
+            st.write(f"- Moeda/Unidade: `{extracao_b.unidade_ou_moeda}`")
+            st.write(f"- Condição/Prazo: `{extracao_b.condicao_ou_prazo}`")
+            st.caption(f"Contexto Base: *\"{extracao_b.contexto_da_clausula}\"*")
+
+        st.divider()
+        st.subheader("📝 Parecer Executivo (M5 Sintetizador)")
+        st.info(parecer)
+
+        with st.expander("🕵️‍♂️ Trilha de Auditoria Forense (Caixa de Vidro)"):
+            st.markdown("### 1. Filtro Vetorial Adaptativo (M1.5)")
+            ledger_m1_5 = st.session_state.get('m1_5_ledger', {})
+            
+            for doc_name, dados_filtro in ledger_m1_5.items():
+                st.write(f"**{doc_name}** | Limite Dinâmico Calculado: `{dados_filtro['limite_corte_calculado']}` | Maior Score: `{dados_filtro['maior_score_encontrado']}` | Status: {dados_filtro['status']}")
+
+            st.markdown("### 2. JSON de Proveniência (Raw Data)")
+            json_prov = {
+                "M1.5_Filtro_Adaptativo": ledger_m1_5,
+                "M2_Extrator_Multivariavel": {
+                    "doc_A": extracao_a.model_dump(),
+                    "doc_B": extracao_b.model_dump()
+                },
+                "M4_Juiz": {
+                    "diagnostico": veredito,
+                    "motivos": motivos
+                }
+            }
+            st.json(json_prov)
     else:
-        st.warning("⚠️ Preencha a pergunta e carregue os dois PDFs para iniciar.")
+        st.warning("Por favor, faça o upload dos dois contratos e insira uma pergunta.")
