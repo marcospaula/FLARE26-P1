@@ -1,6 +1,7 @@
 import streamlit as st
 import tempfile
 import os
+from openai import OpenAI
 import requests
 import json
 import statistics
@@ -11,6 +12,9 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+# Inicia a API da OpenAI lendo do secrets.toml
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 # ==========================================
 # CONFIGURAÇÕES GERAIS E MODELOS
@@ -139,16 +143,15 @@ def extrair_dado_com_ia(texto, pergunta):
 
     prompt = f"""
 Sua tarefa é extrair dados em formato JSON estrito.
-NÃO ESCREVA NENHUM TEXTO ANTES OU DEPOIS DO JSON.
-
 PERGUNTA: {pergunta}
 
-Crie um JSON exatamente com as chaves abaixo. Se não achar algo, responda "NÃO LOCALIZADO".
+Crie um JSON EXATAMENTE com as chaves abaixo. Se a informação não existir no texto, preencha o valor com "NÃO LOCALIZADO".
+NUNCA invente informações.
 {{
   "valor_formatado": "",
   "valor_numerico": "",
   "unidade_ou_moeda": "",
-  "condicao_ou_prazo": "", // OBRIGATÓRIO: Extraia regras como "por evento", "por cada mês de atraso", "por dia", etc. Se não houver, escreva "NÃO LOCALIZADO".
+  "condicao_ou_prazo": "",
   "contexto_da_clausula": "",
   "confiabilidade": 0.0
 }}
@@ -156,65 +159,39 @@ Crie um JSON exatamente com as chaves abaixo. Se não achar algo, responda "NÃO
 TEXTO:
 {texto[:3000]}
 """
-    
-    url = f"{OLLAMA_URL}/api/generate"
-    payload = {
-        "model": MODEL_GERACAO,
-        "prompt": prompt,
-        "stream": False,
-        "options": {
-            "temperature": 0.0,
-            "num_ctx": 4096,
-            "top_k": 10,
-            "top_p": 0.5
-        }
-    }
 
     try:
-        response = requests.post(url, json=payload, timeout=300)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini", # O modelo mais rápido e barato que dá conta com folga da extração JSON
+            response_format={"type": "json_object"},
+            messages=[
+                {"role": "system", "content": "Você é um auditor forense de contratos super restrito. Retorne APENAS um JSON válido."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.0
+        )
         
-        if response.status_code == 200:
-            raw_response = response.json().get("response", "")
-            
-            print("====================================")
-            print("RESPOSTA CRUA DO QWEN 1.5B (M2):")
-            print(raw_response)
-            print("====================================")
-            
-            clean_text = raw_response.strip()
-            if clean_text.startswith("```json"): clean_text = clean_text[7:]
-            elif clean_text.startswith("```"): clean_text = clean_text[3:]
-            if clean_text.endswith("```"): clean_text = clean_text[:-3]
-            clean_text = clean_text.strip()
-            
-            match = re.search(r'\{.*\}', clean_text, re.DOTALL)
-            if match:
-                try:
-                    data = json.loads(match.group(0))
-                    
-                    dados_finais = {
-                        "valor_formatado": str(data.get("valor_formatado", "NÃO LOCALIZADO")),
-                        "valor_numerico": str(data.get("valor_numerico", "NÃO LOCALIZADO")),
-                        "unidade_ou_moeda": str(data.get("unidade_ou_moeda", "NÃO LOCALIZADO")),
-                        "condicao_ou_prazo": str(data.get("condicao_ou_prazo", "NÃO LOCALIZADO")),
-                        "contexto_da_clausula": str(data.get("contexto_da_clausula", "LACUNA DE EVIDÊNCIA")),
-                        "confiabilidade": float(data.get("confiabilidade", 0.0))
-                    }
-                    return ExtracaoMultivariavel(**dados_finais)
-                except json.JSONDecodeError as je:
-                    print(f"Erro de Parse do JSON: {je}")
-            
-            print("M2 Falhou: Não encontrou bloco JSON válido na resposta.")
-            return resultado_vazio()
-            
-        else:
-            # BLINDAGEM: Se a API deu erro HTTP, retorna vazio em vez de None
-            print(f"Erro da API do Ollama: HTTP {response.status_code} - {response.text}")
-            return resultado_vazio()
-            
+        raw_response = response.choices[0].message.content
+        
+        print("====================================")
+        print("RESPOSTA CRUA DO GPT (M2):")
+        print(raw_response)
+        print("====================================")
+        
+        data = json.loads(raw_response)
+        
+        dados_finais = {
+            "valor_formatado": str(data.get("valor_formatado", "NÃO LOCALIZADO")),
+            "valor_numerico": str(data.get("valor_numerico", "NÃO LOCALIZADO")),
+            "unidade_ou_moeda": str(data.get("unidade_ou_moeda", "NÃO LOCALIZADO")),
+            "condicao_ou_prazo": str(data.get("condicao_ou_prazo", "NÃO LOCALIZADO")),
+            "contexto_da_clausula": str(data.get("contexto_da_clausula", "LACUNA DE EVIDÊNCIA")),
+            "confiabilidade": float(data.get("confiabilidade", 0.0))
+        }
+        return ExtracaoMultivariavel(**dados_finais)
+        
     except Exception as e:
-        # BLINDAGEM: Se a requisição explodir, retorna vazio em vez de None
-        print(f"Erro Fatal M2: {e}")
+        print(f"Erro Fatal M2 (OpenAI): {e}")
         return resultado_vazio()
 
 # ==========================================
@@ -249,44 +226,49 @@ def comparar_documentos(dado_A: ExtracaoMultivariavel, dado_B: ExtracaoMultivari
 # ==========================================
 # SINTETIZADOR DE PARECER (M5)
 # ==========================================
-def gerar_parecer_executivo(pergunta, doc_a_nome, dado_a, doc_b_nome, dado_b, veredito, motivos):
-    if veredito == "LACUNA DE EVIDÊNCIA":
-        return "A auditoria identificou uma lacuna de evidência. A informação solicitada não foi localizada nos documentos avaliados, impossibilitando a análise de divergência ou consenso."
-        
-    prompt = f"""
-Você é um auditor sênior emitindo um parecer executivo sobre um contrato.
-Escreva um parágrafo curto (máximo 4 linhas), profissional e direto explicando o resultado da auditoria abaixo.
-Não use jargões de programação. Foque no impacto jurídico e na regra de negócio do contrato.
-NUNCA INVENTE NÚMEROS. Use APENAS os valores exatos que estão no JSON de entrada. Se você inventar um valor, a auditoria será invalidada.
+def gerar_parecer_executivo(pergunta, doc_A, extracao_A, doc_B, extracao_B, veredito, motivos):
+    # Prompt projetado para "prender" o LLM aos fatos
+    prompt_sintese = f"""
+Você é o M5 Sintetizador, um sistema auditor forense de contratos.
+Sua única função é escrever um "Parecer Executivo" imparcial (máximo de 4 frases) explicando as conclusões de uma auditoria documental.
 
-Pergunta da Auditoria: {pergunta}
-Veredito Final do Juiz M4: {veredito}
-Motivos Analisados: {', '.join(motivos)}
+Você está PROIBIDO de inventar qualquer dado, número ou cláusula. Use APENAS as informações abaixo.
+Se faltar informação, apenas diga que "há uma lacuna de evidência".
 
-Dados extraídos do {doc_a_nome}: 
-- Valor: {dado_a.valor_formatado}
-- Condição/Prazo: {dado_a.condicao_ou_prazo}
+--- INFORMAÇÕES DA AUDITORIA (RAW DATA) ---
+Pergunta Auditada: {pergunta}
+Veredito do Juiz (M4): {veredito}
+Motivos do Juiz: {', '.join(motivos)}
 
-Dados extraídos do {doc_b_nome}: 
-- Valor: {dado_b.valor_formatado}
-- Condição/Prazo: {dado_b.condicao_ou_prazo}
+Dados do Contrato X ({doc_A}):
+- Valor Formatado: {extracao_A.valor_formatado}
+- Moeda: {extracao_A.unidade_ou_moeda}
+- Condição/Prazo: {extracao_A.condicao_ou_prazo}
+
+Dados do Contrato Y ({doc_B}):
+- Valor Formatado: {extracao_B.valor_formatado}
+- Moeda: {extracao_B.unidade_ou_moeda}
+- Condição/Prazo: {extracao_B.condicao_ou_prazo}
+-------------------------------------------
+
+Escreva o Parecer Executivo de forma profissional e direta:
 """
-    url = f"{OLLAMA_URL}/api/generate"
-    payload = {
-        "model": MODEL_GERACAO,
-        "prompt": prompt,
-        "stream": False,
-        "keep_alive": "5m",
-        "options": {"temperature": 0.3}
-    }
 
     try:
-        response = requests.post(url, json=payload, timeout=120)
-        if response.status_code == 200:
-            return response.json().get("response", "Erro na geração do parecer.")
-        return "Parecer executivo não pôde ser gerado devido a erro de API."
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "Você é um auditor sênior redigindo pareceres jurídicos impecáveis e factuais."},
+                {"role": "user", "content": prompt_sintese}
+            ],
+            temperature=0.2
+        )
+        
+        return response.choices[0].message.content.strip()
+        
     except Exception as e:
-        return f"Falha ao contatar M5: {str(e)}"
+        print(f"Erro M5 (OpenAI): {e}")
+        return "O Sintetizador M5 falhou em gerar o parecer executivo devido a uma indisponibilidade de rede ou API."
 
 # ==========================================
 # INTERFACE DO USUÁRIO (STREAMLIT)
