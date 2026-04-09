@@ -2,3 +2,4 @@
 __pycache__/
 .env
 flare26_ledger.json
+.streamlit/secrets.toml
