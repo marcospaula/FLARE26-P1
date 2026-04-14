@@ -1,0 +1,670 @@
+[
+    {
+        "id_teste": "T_1",
+        "timestamp": "2026-04-13T21:29:58.047504",
+        "pergunta_auditada": "Qual o valor unitário das licenças e a condição de frete ou entrega?",
+        "documentos": {
+            "doc_A": "Orcamento_A_FOB.pdf",
+            "doc_B": "Orcamento_B_CIF.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Orcamento_A_FOB.pdf": {
+                    "limite_corte_calculado": 0.448,
+                    "maior_score_encontrado": 0.498,
+                    "status": "Aprovado"
+                },
+                "Orcamento_B_CIF.pdf": {
+                    "limite_corte_calculado": 0.504,
+                    "maior_score_encontrado": 0.554,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "R$ 50,00",
+                    "valor_numerico": "50.00",
+                    "unidade_ou_moeda": "BRL",
+                    "condicao_ou_prazo": "FOB (Free On Board)",
+                    "contexto_da_clausula": "O valor unitário das licenças de software e a condição de entrega estipulada para esta proposta.",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "R$ 45,00",
+                    "valor_numerico": "45.00",
+                    "unidade_ou_moeda": "BRL",
+                    "condicao_ou_prazo": "CIF (Cost, Insurance and Freight), com frete pago pelo fornecedor",
+                    "contexto_da_clausula": "TÓPICO 3 - PREÇOS E CONDIÇÕES",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 50.00 vs 45.00.",
+                    "Condição/prazo divergente: 'FOB (Free On Board)' vs 'CIF (Cost, Insurance and Freight), com frete pago pelo fornecedor'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_2",
+        "timestamp": "2026-04-13T21:34:23.369639",
+        "pergunta_auditada": "Qual o valor unitário das licenças e a condição de frete ou entrega?",
+        "documentos": {
+            "doc_A": "Orcamento_A_FOB.pdf",
+            "doc_B": "Orcamento_B_CIF.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Orcamento_A_FOB.pdf": {
+                    "limite_corte_calculado": 0.498,
+                    "maior_score_encontrado": 0.498,
+                    "status": "Aprovado"
+                },
+                "Orcamento_B_CIF.pdf": {
+                    "limite_corte_calculado": 0.554,
+                    "maior_score_encontrado": 0.554,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "R$ 50,00",
+                    "valor_numerico": "50.00",
+                    "unidade_ou_moeda": "BRL",
+                    "condicao_ou_prazo": "FOB (Free On Board)",
+                    "contexto_da_clausula": "TÓPICO 3 - PREÇOS E CONDIÇÕES",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "R$ 45,00",
+                    "valor_numerico": "45.00",
+                    "unidade_ou_moeda": "BRL",
+                    "condicao_ou_prazo": "CIF (Cost, Insurance and Freight), com frete pago pelo fornecedor",
+                    "contexto_da_clausula": "TÓPICO 3 - PREÇOS E CONDIÇÕES",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 50.00 vs 45.00.",
+                    "Condição/prazo divergente: 'FOB (Free On Board)' vs 'CIF (Cost, Insurance and Freight), com frete pago pelo fornecedor'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_3",
+        "timestamp": "2026-04-13T21:34:39.548998",
+        "pergunta_auditada": "Qual o valor unitário das licenças e a condição de frete ou entrega?",
+        "documentos": {
+            "doc_A": "Orcamento_A_FOB.pdf",
+            "doc_B": "Orcamento_B_CIF.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Orcamento_A_FOB.pdf": {
+                    "limite_corte_calculado": 0.498,
+                    "maior_score_encontrado": 0.498,
+                    "status": "Aprovado"
+                },
+                "Orcamento_B_CIF.pdf": {
+                    "limite_corte_calculado": 0.554,
+                    "maior_score_encontrado": 0.554,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "R$ 50,00",
+                    "valor_numerico": "50.00",
+                    "unidade_ou_moeda": "BRL",
+                    "condicao_ou_prazo": "FOB (Free On Board)",
+                    "contexto_da_clausula": "Proposta comercial para fornecimento de licenças e equipamentos, tópico 3 - preços e condições.",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "R$ 45,00",
+                    "valor_numerico": "45.00",
+                    "unidade_ou_moeda": "BRL",
+                    "condicao_ou_prazo": "CIF (Cost, Insurance and Freight), com frete pago pelo fornecedor",
+                    "contexto_da_clausula": "TÓPICO 3 - PREÇOS E CONDIÇÕES",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 50.00 vs 45.00.",
+                    "Condição/prazo divergente: 'FOB (Free On Board)' vs 'CIF (Cost, Insurance and Freight), com frete pago pelo fornecedor'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_4",
+        "timestamp": "2026-04-13T21:42:06.732050",
+        "pergunta_auditada": "Qual é o percentual da Margem Bruta e do EBITDA reportado no período?",
+        "documentos": {
+            "doc_A": "Financeiro_A_Draft.pdf",
+            "doc_B": "Financeiro_B_Final.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Financeiro_A_Draft.pdf": {
+                    "limite_corte_calculado": 0.569,
+                    "maior_score_encontrado": 0.592,
+                    "status": "Aprovado"
+                },
+                "Financeiro_B_Final.pdf": {
+                    "limite_corte_calculado": 0.564,
+                    "maior_score_encontrado": 0.583,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "45%",
+                    "valor_numerico": "45",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "3T2026",
+                    "contexto_da_clausula": "Margem Bruta reportada no período",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "42%",
+                    "valor_numerico": "42",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "3T2026",
+                    "contexto_da_clausula": "Margem Bruta reportada no período",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 45 vs 42."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_5",
+        "timestamp": "2026-04-13T21:44:34.699279",
+        "pergunta_auditada": "Qual é o prazo de execução da obra e o percentual do seguro garantia exigido?",
+        "documentos": {
+            "doc_A": "Edital_A_Minuta.pdf",
+            "doc_B": "Edital_B_Publicado.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Edital_A_Minuta.pdf": {
+                    "limite_corte_calculado": 0.559,
+                    "maior_score_encontrado": 0.609,
+                    "status": "Aprovado"
+                },
+                "Edital_B_Publicado.pdf": {
+                    "limite_corte_calculado": 0.624,
+                    "maior_score_encontrado": 0.666,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "5%",
+                    "valor_numerico": "5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "90 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "10%",
+                    "valor_numerico": "10",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "120 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 5 vs 10.",
+                    "Condição/prazo divergente: '90 dias corridos' vs '120 dias corridos'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_6",
+        "timestamp": "2026-04-13T21:47:04.921418",
+        "pergunta_auditada": "Qual é o prazo de execução da obra e o percentual do seguro garantia exigido?",
+        "documentos": {
+            "doc_A": "Edital_A_Minuta.pdf",
+            "doc_B": "Edital_B_Publicado.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Edital_A_Minuta.pdf": {
+                    "limite_corte_calculado": 0.609,
+                    "maior_score_encontrado": 0.609,
+                    "status": "Aprovado"
+                },
+                "Edital_B_Publicado.pdf": {
+                    "limite_corte_calculado": 0.605,
+                    "maior_score_encontrado": 0.666,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "5%",
+                    "valor_numerico": "5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "90 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "10%",
+                    "valor_numerico": "10",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "120 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 5 vs 10.",
+                    "Condição/prazo divergente: '90 dias corridos' vs '120 dias corridos'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_7",
+        "timestamp": "2026-04-13T21:47:20.282118",
+        "pergunta_auditada": "Qual é o prazo de execução da obra e o percentual do seguro garantia exigido?",
+        "documentos": {
+            "doc_A": "Edital_A_Minuta.pdf",
+            "doc_B": "Edital_B_Publicado.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Edital_A_Minuta.pdf": {
+                    "limite_corte_calculado": 0.609,
+                    "maior_score_encontrado": 0.609,
+                    "status": "Aprovado"
+                },
+                "Edital_B_Publicado.pdf": {
+                    "limite_corte_calculado": 0.629,
+                    "maior_score_encontrado": 0.666,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "5%",
+                    "valor_numerico": "5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "90 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "10%",
+                    "valor_numerico": "10",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "120 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 5 vs 10.",
+                    "Condição/prazo divergente: '90 dias corridos' vs '120 dias corridos'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_8",
+        "timestamp": "2026-04-13T21:48:06.464559",
+        "pergunta_auditada": "Qual é o prazo de execução da obra e o percentual do seguro garantia exigido?",
+        "documentos": {
+            "doc_A": "Edital_A_Minuta.pdf",
+            "doc_B": "Edital_B_Publicado.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Edital_A_Minuta.pdf": {
+                    "limite_corte_calculado": 0.609,
+                    "maior_score_encontrado": 0.609,
+                    "status": "Aprovado"
+                },
+                "Edital_B_Publicado.pdf": {
+                    "limite_corte_calculado": 0.673,
+                    "maior_score_encontrado": 0.0,
+                    "status": "Reprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "5%",
+                    "valor_numerico": "5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "90 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_9",
+        "timestamp": "2026-04-13T21:48:21.850042",
+        "pergunta_auditada": "Qual é o prazo de execução da obra e o percentual do seguro garantia exigido?",
+        "documentos": {
+            "doc_A": "Edital_A_Minuta.pdf",
+            "doc_B": "Edital_B_Publicado.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Edital_A_Minuta.pdf": {
+                    "limite_corte_calculado": 0.609,
+                    "maior_score_encontrado": 0.609,
+                    "status": "Aprovado"
+                },
+                "Edital_B_Publicado.pdf": {
+                    "limite_corte_calculado": 0.666,
+                    "maior_score_encontrado": 0.666,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "5%",
+                    "valor_numerico": "5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "90 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "10%",
+                    "valor_numerico": "10",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "120 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 5 vs 10.",
+                    "Condição/prazo divergente: '90 dias corridos' vs '120 dias corridos'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_10",
+        "timestamp": "2026-04-13T21:48:33.090313",
+        "pergunta_auditada": "Qual é o prazo de execução da obra e o percentual do seguro garantia exigido?",
+        "documentos": {
+            "doc_A": "Edital_A_Minuta.pdf",
+            "doc_B": "Edital_B_Publicado.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Edital_A_Minuta.pdf": {
+                    "limite_corte_calculado": 0.609,
+                    "maior_score_encontrado": 0.609,
+                    "status": "Aprovado"
+                },
+                "Edital_B_Publicado.pdf": {
+                    "limite_corte_calculado": 0.666,
+                    "maior_score_encontrado": 0.666,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "5%",
+                    "valor_numerico": "5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "90 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "10%",
+                    "valor_numerico": "10",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "120 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 5 vs 10.",
+                    "Condição/prazo divergente: '90 dias corridos' vs '120 dias corridos'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_11",
+        "timestamp": "2026-04-13T21:48:45.785179",
+        "pergunta_auditada": "Qual é o prazo de execução da obra e o percentual do seguro garantia exigido?",
+        "documentos": {
+            "doc_A": "Edital_A_Minuta.pdf",
+            "doc_B": "Edital_B_Publicado.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Edital_A_Minuta.pdf": {
+                    "limite_corte_calculado": 0.609,
+                    "maior_score_encontrado": 0.609,
+                    "status": "Aprovado"
+                },
+                "Edital_B_Publicado.pdf": {
+                    "limite_corte_calculado": 0.666,
+                    "maior_score_encontrado": 0.666,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "5%",
+                    "valor_numerico": "5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "90 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "10%",
+                    "valor_numerico": "10",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "120 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 5 vs 10.",
+                    "Condição/prazo divergente: '90 dias corridos' vs '120 dias corridos'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_12",
+        "timestamp": "2026-04-13T21:48:54.595026",
+        "pergunta_auditada": "Qual é o prazo de execução da obra e o percentual do seguro garantia exigido?",
+        "documentos": {
+            "doc_A": "Edital_A_Minuta.pdf",
+            "doc_B": "Edital_B_Publicado.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Edital_A_Minuta.pdf": {
+                    "limite_corte_calculado": 0.609,
+                    "maior_score_encontrado": 0.609,
+                    "status": "Aprovado"
+                },
+                "Edital_B_Publicado.pdf": {
+                    "limite_corte_calculado": 0.666,
+                    "maior_score_encontrado": 0.666,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "5%",
+                    "valor_numerico": "5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "90 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "10%",
+                    "valor_numerico": "10",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "120 dias corridos",
+                    "contexto_da_clausula": "Prazo de execução da obra e percentual do seguro garantia exigido",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 5 vs 10.",
+                    "Condição/prazo divergente: '90 dias corridos' vs '120 dias corridos'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_13",
+        "timestamp": "2026-04-13T22:01:09.117574",
+        "pergunta_auditada": "Qual é o prazo de validade da proposta e a sanção/multa por atraso injustificado?",
+        "documentos": {
+            "doc_A": "edital-04-2025-e-seus-anexos.pdf",
+            "doc_B": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.695,
+                    "maior_score_encontrado": 0.71,
+                    "status": "Aprovado"
+                },
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.697,
+                    "maior_score_encontrado": 0.716,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "60 dias",
+                    "valor_numerico": "60",
+                    "unidade_ou_moeda": "dias",
+                    "condicao_ou_prazo": "não inferior a 60 dias a contar da data de sua apresentação",
+                    "contexto_da_clausula": "prazo de validade da proposta",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_14",
+        "timestamp": "2026-04-13T22:02:40.027658",
+        "pergunta_auditada": "Qual é o prazo de validade da proposta e a sanção/multa por atraso injustificado?",
+        "documentos": {
+            "doc_A": "edital-04-2025-e-seus-anexos.pdf",
+            "doc_B": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.702,
+                    "maior_score_encontrado": 0.71,
+                    "status": "Aprovado"
+                },
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.708,
+                    "maior_score_encontrado": 0.716,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "60 dias",
+                    "valor_numerico": "60",
+                    "unidade_ou_moeda": "dias",
+                    "condicao_ou_prazo": "não será inferior a 60 dias a contar da data de sua apresentação",
+                    "contexto_da_clausula": "prazo de validade da proposta",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    }
+]
