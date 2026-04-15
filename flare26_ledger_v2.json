@@ -666,5 +666,334 @@
                 ]
             }
         }
+    },
+    {
+        "id_teste": "T_15",
+        "timestamp": "2026-04-14T21:07:09.711967",
+        "pergunta_auditada": "Qual é o prazo de validade da proposta exigido pela administração?",
+        "documentos": {
+            "doc_A": "edital-04-2025-e-seus-anexos.pdf",
+            "doc_B": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.722,
+                    "maior_score_encontrado": 0.743,
+                    "status": "Aprovado"
+                },
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.723,
+                    "maior_score_encontrado": 0.736,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "15 dias úteis",
+                    "contexto_da_clausula": "Antes da aplicação da multa será facultada a defesa do interessado no prazo de 15 (quinze) dias úteis, contado da data de sua intimação.",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "5",
+                    "unidade_ou_moeda": "dias",
+                    "condicao_ou_prazo": "prazo máximo de 05 dias",
+                    "contexto_da_clausula": "Caso a Contratante determine, a multa deverá ser recolhida no prazo máximo de 05 dias, a contar da data do recebimento da comunicação enviada pela autoridade competente.",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento B contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_16",
+        "timestamp": "2026-04-14T21:08:40.029227",
+        "pergunta_auditada": "Qual é o percentual ou valor exigido para a garantia de execução do contrato?",
+        "documentos": {
+            "doc_A": "edital-04-2025-e-seus-anexos.pdf",
+            "doc_B": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.698,
+                    "maior_score_encontrado": 0.71,
+                    "status": "Aprovado"
+                },
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.678,
+                    "maior_score_encontrado": 0.682,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "Não haverá exigência de garantia contratual da execução",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum dos documentos contém a informação solicitada."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_17",
+        "timestamp": "2026-04-14T21:11:47.368608",
+        "pergunta_auditada": "Qual é o valor da multa moratória ou sanção por atraso injustificado na entrega?",
+        "documentos": {
+            "doc_A": "edital-04-2025-e-seus-anexos.pdf",
+            "doc_B": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.68,
+                    "maior_score_encontrado": 0.683,
+                    "status": "Aprovado"
+                },
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.625,
+                    "maior_score_encontrado": 0.628,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum dos documentos contém a informação solicitada."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_18",
+        "timestamp": "2026-04-14T21:14:09.962524",
+        "pergunta_auditada": "Qual é o prazo em dias para o órgão público realizar o pagamento após a emissão da nota fiscal?",
+        "documentos": {
+            "doc_A": "edital-04-2025-e-seus-anexos.pdf",
+            "doc_B": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.705,
+                    "maior_score_encontrado": 0.0,
+                    "status": "Reprovado"
+                },
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.71,
+                    "maior_score_encontrado": 0.0,
+                    "status": "Reprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum dos documentos contém a informação solicitada."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_19",
+        "timestamp": "2026-04-14T21:23:10.428051",
+        "pergunta_auditada": "Qual é o prazo de validade da proposta exigido pela administração?",
+        "documentos": {
+            "doc_A": "edital-04-2025-e-seus-anexos.pdf",
+            "doc_B": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.743,
+                    "maior_score_encontrado": 0.743,
+                    "status": "Aprovado"
+                },
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.736,
+                    "maior_score_encontrado": 0.736,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "valor_formatado": "05 (cinco) dias",
+                    "valor_numerico": "5",
+                    "unidade_ou_moeda": "dias",
+                    "condicao_ou_prazo": "a contar da data do recebimento da comunicação enviada pela autoridade competente",
+                    "contexto_da_clausula": "Caso a Contratante determine, a multa deverá ser recolhida no prazo máximo de 05 (cinco) dias, a contar da data do recebimento da comunicação enviada pela autoridade competente.",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento B contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_20",
+        "timestamp": "2026-04-14T21:39:21.500378",
+        "pergunta_auditada": "Qual é o valor da multa moratória ou sanção por atraso injustificado na entrega?",
+        "documentos": {
+            "doc_A": "edital-04-2025-e-seus-anexos.pdf",
+            "doc_B": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.683,
+                    "maior_score_encontrado": 0.683,
+                    "status": "Aprovado"
+                },
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.628,
+                    "maior_score_encontrado": 0.628,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum dos documentos contém a informação solicitada."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_21",
+        "timestamp": "2026-04-14T21:41:35.751628",
+        "pergunta_auditada": "Qual é o prazo exigido para o recolhimento ou defesa prévia da multa pela contratada?",
+        "documentos": {
+            "doc_A": "edital-04-2025-e-seus-anexos.pdf",
+            "doc_B": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.657,
+                    "maior_score_encontrado": 0.657,
+                    "status": "Aprovado"
+                },
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.73,
+                    "maior_score_encontrado": 0.73,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "5 dias úteis",
+                    "valor_numerico": "5",
+                    "unidade_ou_moeda": "dias úteis",
+                    "condicao_ou_prazo": "para que, no prazo de 5 (cinco) dias úteis, regularize sua situação ou, no mesmo prazo, apresente sua defesa",
+                    "contexto_da_clausula": "Constatando-se, junto ao SICAF, a situação de irregularidade do Contratado, será providenciada sua notificação, por escrito, para que, no prazo de 5 (cinco) dias úteis, regularize sua situação ou, no mesmo prazo, apresente sua defesa. O prazo poderá ser prorrogado uma vez, por igual período, a critério do Contratante.",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
     }
 ]

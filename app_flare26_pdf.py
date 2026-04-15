@@ -9,21 +9,19 @@ import math
 import re
 from datetime import datetime
 from pydantic import BaseModel, Field
+
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-
 # Inicia a API da OpenAI lendo do secrets.toml
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-
 
 # ==========================================
 # CONFIGURAÇÕES GERAIS E MODELOS
 # ==========================================
 st.set_page_config(page_title="FLARE26: Caixa de Vidro", layout="wide")
-
 
 OLLAMA_URL = "http://localhost:11434"
 MODEL_GERACAO = "qwen2.5:1.5b"  # M2 e M5
@@ -43,7 +41,6 @@ class ExtracaoMultivariavel(BaseModel):
     contexto_da_clausula: str = Field(description="Cópia literal do trecho que baseou a resposta")
     confiabilidade: float = Field(description="Nota de 0.0 a 1.0 sobre a certeza da extração")
 
-
 def resultado_vazio():
     return ExtracaoMultivariavel(
         valor_formatado="NÃO LOCALIZADO",
@@ -53,7 +50,6 @@ def resultado_vazio():
         contexto_da_clausula="LACUNA DE EVIDÊNCIA",
         confiabilidade=0.0
     )
-
 
 # ==========================================
 # SALVAMENTO DO LEDGER LOCAL (FIX)
@@ -88,72 +84,90 @@ def salvar_no_ledger_local(pergunta, doc_a_name, doc_b_name, json_data):
     with open(LEDGER_FILE, 'w', encoding='utf-8') as f:
         json.dump(ledger_history, f, indent=4, ensure_ascii=False)
 
-
 # ==========================================
-# MOTOR VETORIAL E RAG (M1 E M1.5)
+# MOTOR VETORIAL E RAG PAI/FILHO (M1 E M1.5)
+# ==========================================
+# ==========================================
+# MOTOR VETORIAL E RAG PAI/FILHO NATIVO (M1 E M1.5)
 # ==========================================
 @st.cache_resource
 def iniciar_banco_vetorial():
-    # Normalizamos na raiz para garantir que L2 vire Cosine real de 0 a 1
     embeddings = HuggingFaceEmbeddings(
         model_name=MODEL_EMBEDDING,
         encode_kwargs={'normalize_embeddings': True}
     )
+    
+    # Único banco vetorial, sem InMemoryStore
     vector_store = Chroma(
+        collection_name="flare26_docs",
         embedding_function=embeddings,
         collection_metadata={"hnsw:space": "cosine"}
     )
+    
     return vector_store, embeddings
-
 
 vector_store, _ = iniciar_banco_vetorial()
 
+# Dicionário global (em memória) para guardar os blocos Pais.
+# Na Fase 2 isso irá para o SQLite, mas agora resolve o problema do Streamlit.
+if "docstore_pai" not in st.session_state:
+    st.session_state.docstore_pai = {}
 
 def processar_pdf(arquivo_pdf):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
         tmp_file.write(arquivo_pdf.getvalue())
         tmp_path = tmp_file.name
 
-
     loader = PyPDFLoader(tmp_path)
     documentos = loader.load()
     
-    for doc in documentos:
-        doc.metadata["source"] = arquivo_pdf.name
+    # 1. Cria os blocos grandes (Pais) de 2000 caracteres
+    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
+    docs_pai = parent_splitter.split_documents(documentos)
+    
+    # 2. Cria os blocos pequenos (Filhos) de 400 caracteres
+    child_splitter = RecursiveCharacterTextSplitter(chunk_size=400, chunk_overlap=50)
+    
+    docs_filho_para_chroma = []
+    
+    for i, doc_pai in enumerate(docs_pai):
+        # Cria um ID único para cada bloco pai
+        parent_id = f"{arquivo_pdf.name}_pai_{i}"
+        
+        # Salva o bloco pai no dicionário da sessão (nosso próprio InMemoryStore)
+        st.session_state.docstore_pai[parent_id] = doc_pai.page_content
+        
+        # Corta o pai em filhos
+        docs_filhos = child_splitter.split_documents([doc_pai])
+        
+        # Anota em cada filho de quem ele descende
+        for filho in docs_filhos:
+            filho.metadata["source"] = arquivo_pdf.name
+            filho.metadata["parent_id"] = parent_id
+            docs_filho_para_chroma.append(filho)
 
-
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-    chunks = text_splitter.split_documents(documentos)
-
-
-    vector_store.add_documents(chunks)
+    # 3. Indexa SÓ OS FILHOS no Chroma
+    if docs_filho_para_chroma:
+        vector_store.add_documents(docs_filho_para_chroma)
+        
     os.remove(tmp_path)
-
 
 def recuperar_contexto_filtrado(pergunta, nome_documento, top_k=5):
     """
-    Módulo M1.5: Filtro Vetorial Adaptativo (Threshold Dinâmico Estatístico)
-    Calcula matematicamente o limite dinâmico Z-Score.
+    Módulo M1.5: Filtro Vetorial Adaptativo (Engenharia Nativa)
     """
-    if not vector_store:
-        return ""
-
-
+    # Busca os "Filhos" no Chroma
     resultados_brutos = vector_store.similarity_search_with_score(
         pergunta, k=top_k, filter={"source": nome_documento}
     )
 
-
     if not resultados_brutos:
         return ""
 
-
     resultados = []
     for doc, distancia in resultados_brutos:
-        # Reversão matemática da distância para escore de similaridade (0 a 1)
         similaridade = max(0.0, 1.0 - distancia)
         resultados.append((doc, similaridade))
-
 
     scores = [score for _, score in resultados]
     
@@ -164,22 +178,25 @@ def recuperar_contexto_filtrado(pergunta, nome_documento, top_k=5):
         desvio_padrao = statistics.stdev(scores)
         limite_corte = media_scores + (desvio_padrao * 0.5)
 
-
-    limite_corte = max(0.35, limite_corte) # Piso mínimo
-
+    limite_corte = max(0.35, limite_corte) 
 
     contextos_validos = []
     maior_score = 0.0
-
+    parent_ids_vistos = set()
 
     for doc, score in resultados:
         if score >= limite_corte:
-            contextos_validos.append(doc.page_content)
             if score > maior_score:
                 maior_score = score
+                
+            # A MÁGICA NATIVA: Lê o ID do pai e busca no nosso dicionário
+            parent_id = doc.metadata.get("parent_id")
+            if parent_id and parent_id not in parent_ids_vistos:
+                conteudo_pai = st.session_state.docstore_pai.get(parent_id)
+                if conteudo_pai:
+                    contextos_validos.append(conteudo_pai)
+                    parent_ids_vistos.add(parent_id)
 
-
-    # Registro de Auditoria M1.5
     if 'm1_5_ledger' not in st.session_state:
         st.session_state['m1_5_ledger'] = {}
     
@@ -189,55 +206,55 @@ def recuperar_contexto_filtrado(pergunta, nome_documento, top_k=5):
         "status": "Aprovado" if contextos_validos else "Reprovado"
     }
 
-
-    return "\n\n".join(contextos_validos)
-
+    return "\n\n--- [NOVO BLOCO DE CONTEXTO - PAI] ---\n\n".join(contextos_validos)
 
 # ==========================================
 # EXTRATOR NEURAL (M2) - HÍBRIDO E BLINDADO
+# ==========================================
+# ==========================================
+# EXTRATOR NEURAL (M2) - HÍBRIDO E BLINDADO (COM SEED)
 # ==========================================
 def extrair_dado_com_ia(texto, pergunta):
     if not texto.strip():
         return resultado_vazio()
 
-
     prompt = f"""
-Sua tarefa é extrair dados em formato JSON estrito.
-PERGUNTA: {pergunta}
+Sua tarefa é atuar como um Extrator Forense de Dados Universal.
+Você deve analisar o TEXTO abaixo e extrair os dados solicitados na PERGUNTA, retornando APENAS um JSON válido.
 
+PERGUNTA DA AUDITORIA: {pergunta}
 
-Crie um JSON EXATAMENTE com as chaves abaixo. Se a informação não existir no texto, preencha o valor com "NÃO LOCALIZADO".
-NUNCA invente informações.
-{{
-  "valor_formatado": "",
-  "valor_numerico": "",
-  "unidade_ou_moeda": "",
-  "condicao_ou_prazo": "",
-  "contexto_da_clausula": "",
-  "confiabilidade": 0.0
-}}
+REGRAS ESTRITAS DE PREENCHIMENTO DO JSON:
+1. "valor_formatado": O valor exato, número e unidade juntos, exatamente como escrito no texto (Exemplos: "15 dias", "R$ 5.000,00", "45 kg/m³", "12,5%").
+2. "valor_numerico": OBRIGATÓRIO isolar APENAS os algarismos (Exemplos: "15", "5000.00", "45", "12.5"). Se não houver número explícito, retorne "NÃO LOCALIZADO".
+3. "unidade_ou_moeda": Apenas a métrica, moeda ou grandeza (Exemplos: "dias", "kg/m³", "USD", "%", "toneladas").
+4. "condicao_ou_prazo": O evento gatilho, restrição de engenharia, escopo financeiro ou contexto temporal (Exemplos: "após aprovação", "em temperatura ambiente", "margem líquida anual", "em caso de quebra contratual").
+5. "contexto_da_clausula": A cópia LITERAL e EXATA do parágrafo, linha de tabela ou frase do texto que prova a sua extração.
+6. Se a informação não existir no texto, preencha todos os campos textuais com "NÃO LOCALIZADO" e a confiabilidade com 0.0.
+7. "confiabilidade": Se a informação foi encontrada e extraída, DEVE ser um valor numérico entre 0.8 e 1.0 (sendo 1.0 a certeza absoluta baseada no texto). NUNCA retorne 0.0 se você extraiu a informação.
 
+NUNCA invente informações. NUNCA misture números com palavras no campo "valor_numerico". O sistema é agnóstico: os dados podem ser jurídicos, financeiros, médicos ou de engenharia.
 
-TEXTO:
+TEXTO PARA AUDITORIA:
 {texto[:3000]}
 """
 
-
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini", # O modelo mais rápido e barato que dá conta com folga da extração JSON
+            model="gpt-4o-mini",
             response_format={"type": "json_object"},
             messages=[
-                {"role": "system", "content": "Você é um auditor forense super restrito. Retorne APENAS um JSON válido."},
+                {"role": "system", "content": "Você é um extrator de dados determinístico. Retorne apenas o JSON estruturado."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.0
+            temperature=0.0,
+            seed=4242  # A mágica do determinismo: força a mesma amostragem randômica na GPU da OpenAI
         )
         
         raw_response = response.choices[0].message.content
         
         print("====================================")
-        print("RESPOSTA CRUA DO GPT (M2):")
+        print("RESPOSTA CRUA DO GPT (M2) COM SEED:")
         print(raw_response)
         print("====================================")
         
@@ -257,16 +274,13 @@ TEXTO:
         print(f"Erro Fatal M2 (OpenAI): {e}")
         return resultado_vazio()
 
-
 # ==========================================
 # JUIZ DETERMINÍSTICO (M4)
 # ==========================================
 def comparar_documentos(dado_A: ExtracaoMultivariavel, dado_B: ExtracaoMultivariavel):
-    # Se os dois não localizaram
     if dado_A.valor_numerico == "NÃO LOCALIZADO" and dado_B.valor_numerico == "NÃO LOCALIZADO":
         return "LACUNA DE EVIDÊNCIA", ["Nenhum dos documentos contém a informação solicitada."]
     
-    # Se apenas UM não localizou
     if dado_A.valor_numerico == "NÃO LOCALIZADO":
         return "DIVERGÊNCIA CRÍTICA", ["Apenas Documento B contém a informação."]
     if dado_B.valor_numerico == "NÃO LOCALIZADO":
@@ -287,7 +301,6 @@ def comparar_documentos(dado_A: ExtracaoMultivariavel, dado_B: ExtracaoMultivari
         return "DIVERGÊNCIA CRÍTICA", motivos_divergencia
     
     return "CONSENSO TOTAL", ["Os documentos são equivalentes em todas as dimensões analisadas."]
-
 
 # ==========================================
 # SINTETIZADOR DE PARECER (M5)
@@ -333,13 +346,11 @@ Escreva o Parecer Executivo de forma profissional e direta:
         print(f"Erro M5 (OpenAI): {e}")
         return "O Sintetizador M5 falhou em gerar o parecer executivo devido a uma indisponibilidade de rede ou API."
 
-
 # ==========================================
 # INTERFACE DO USUÁRIO (STREAMLIT)
 # ==========================================
 st.title("FLARE26: RAG Auditor (Caixa de Vidro Corporativa)")
 st.markdown("Auditoria Neuro-Simbólica com Filtro Vetorial Inteligente e Extração Multivariável.")
-
 
 col1, col2 = st.columns(2)
 
@@ -411,11 +422,11 @@ if st.button("Executar Auditoria Forense", type="primary"):
         st.info(parecer)
 
         with st.expander("🕵️‍♂️ Trilha de Auditoria Forense (Caixa de Vidro)", expanded=True):
-            st.markdown("### 1. Filtro Vetorial Adaptativo (M1.5)")
+            st.markdown("### 1. Filtro Vetorial Adaptativo Híbrido (M1.5)")
             ledger_m1_5 = st.session_state.get('m1_5_ledger', {})
             
             for doc_name, dados_filtro in ledger_m1_5.items():
-                st.write(f"**{doc_name}** | Limite Dinâmico Calculado: `{dados_filtro['limite_corte_calculado']}` | Maior Score: `{dados_filtro['maior_score_encontrado']}` | Status: {dados_filtro['status']}")
+                st.write(f"**{doc_name}** | Limite Dinâmico Calculado: `{dados_filtro['limite_corte_calculado']}` | Maior Score (Filho): `{dados_filtro['maior_score_encontrado']}` | Status: {dados_filtro['status']}")
 
             st.markdown("### 2. JSON de Proveniência (Raw Data)")
             json_prov = {
