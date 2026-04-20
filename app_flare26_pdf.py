@@ -9,7 +9,7 @@ import re
 from datetime import datetime
 from pydantic import BaseModel, Field
 
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -118,7 +118,7 @@ def processar_pdf(arquivo_pdf):
         tmp_path = tmp_file.name
 
     try:
-        loader = PyPDFLoader(tmp_path)
+        loader = PyMuPDFLoader(tmp_path)
         pages_all = loader.load()
         if len(pages_all) > MAX_PAGES: raise ValueError(f"Limite de {MAX_PAGES} páginas excedido.")
         

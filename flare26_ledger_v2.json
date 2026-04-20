@@ -2977,5 +2977,315 @@
                 ]
             }
         }
+    },
+    {
+        "id": "T_63",
+        "data": "2026-04-19T22:09:59.209163",
+        "pergunta": "Qual o prazo de execução da obra em dias?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Edital_A_Minuta.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 490
+                },
+                "Edital_B_Publicado.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 512
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "90",
+                    "tipo_dado": "Dias",
+                    "condicionantes": "Prazo de execução da obra",
+                    "trecho_literal": "O prazo de execução da obra será de 90 (noventa) dias corridos, contados a partir da emissão da ordem de serviço.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "120",
+                    "tipo_dado": "Dias",
+                    "condicionantes": "Prazo de execução da obra a partir da emissão da ordem de serviço.",
+                    "trecho_literal": "7.1 O prazo de execução da obra será estendido para 120 (cento e vinte) dias corridos, contados a partir da emissão da ordem de serviço.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Os prazos de execução da obra são diferentes: 90 dias na Resposta A e 120 dias na Resposta B, além de a Resposta B especificar que o prazo começa a contar a partir da emissão da ordem de serviço."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_64",
+        "data": "2026-04-19T22:11:10.153755",
+        "pergunta": "Qual o percentual do seguro garantia exigido para a empresa vencedora?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Edital_A_Minuta.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 490
+                },
+                "Edital_B_Publicado.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 512
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "5%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Para a empresa vencedora apresentar o seguro garantia.",
+                    "trecho_literal": "7.2 A empresa vencedora deverá apresentar, em até 10 dias após a assinatura, um seguro garantia equivalente a 5% (cinco por cento) do valor total arrematado.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "10%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Para desclassificação",
+                    "trecho_literal": "7.2 A empresa vencedora deverá apresentar, sob pena de desclassificação, um seguro garantia equivalente a 10% (dez por cento) do valor global do contrato.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Os percentuais do seguro garantia exigido são diferentes: 5% na Resposta A e 10% na Resposta B."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_65",
+        "data": "2026-04-19T22:13:16.214047",
+        "pergunta": "Qual o valor da multa mensal por inexecução parcial do contrato?\"",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Edital_A_Minuta.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 490
+                },
+                "Edital_B_Publicado.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 512
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "N/A",
+                    "condicionantes": "N/A",
+                    "trecho_literal": "EDITAL DE CONCORRÊNCIA PÚBLICA Nº 045/2026 - MINUTA PRELIMINAR Objeto: Construção do novo anexo hospitalar. SEÇÃO VII - DOS PRAZOS E GARANTIAS 7.1 O prazo de execução da obra será de 90 (noventa) dias corridos, contados a partir da emissão da ordem de serviço. 7.2 A empresa vencedora deverá apresentar, em até 10 dias após a assinatura, um seguro garantia equivalente a 5% (cinco por cento) do valor total arrematado. 7.3 Multa diária de R$ 1.000,00 em caso de descumprimento dos marcos.",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "N/A",
+                    "condicionantes": "N/A",
+                    "trecho_literal": "EDITAL DE CONCORRÊNCIA PÚBLICA Nº 045/2026 - VERSÃO PUBLICADA NO DOU Objeto: Construção do novo anexo hospitalar. SEÇÃO VII - DOS PRAZOS E GARANTIAS 7.1 O prazo de execução da obra será estendido para 120 (cento e vinte) dias corridos, contados a partir da emissão da ordem de serviço. 7.2 A empresa vencedora deverá apresentar, sob pena de desclassificação, um seguro garantia equivalente a 10% (dez por cento) do valor global do contrato. 7.3 Multa diária de R$ 1.500,00 em caso de descumprimento dos marcos.",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum documento possui a resposta para a pergunta."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_66",
+        "data": "2026-04-19T22:16:48.390731",
+        "pergunta": "Qual foi a margem bruta reportada no trimestre e o que motivou esse resultado?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Financeiro_A_Draft.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 505
+                },
+                "Financeiro_B_Final.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 567
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "45%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Refletindo ganhos de eficiência na cadeia de suprimentos.",
+                    "trecho_literal": "4.1 A Margem Bruta reportada no período alcançou 45% (quarenta e cinco por cento), refletindo ganhos de eficiência na cadeia de suprimentos.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "42%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Após reavaliação de custos de frete",
+                    "trecho_literal": "A Margem Bruta reportada no período foi revisada para 42% (quarenta e dois por cento) após reavaliação de custos de frete.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "As margens brutas reportadas são diferentes (45% vs 42%) e os motivos que as justificam também são distintos."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_67",
+        "data": "2026-04-19T22:18:11.644847",
+        "pergunta": "Qual foi o valor do lucro líquido da operação?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Financeiro_A_Draft.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 505
+                },
+                "Financeiro_B_Final.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 567
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "R$ 2.4 milhões",
+                    "tipo_dado": "Monetário",
+                    "condicionantes": "N/A",
+                    "trecho_literal": "4.3 O lucro líquido da operação ficou em R$ 2.4 milhões.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "R$ 2.1 milhões",
+                    "tipo_dado": "Monetário",
+                    "condicionantes": "N/A",
+                    "trecho_literal": "4.3 O lucro líquido da operação ficou em R$ 2.1 milhões.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Os valores do lucro líquido são diferentes: R$ 2.4 milhões vs R$ 2.1 milhões."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_68",
+        "data": "2026-04-19T22:35:09.140610",
+        "pergunta": "Qual é o requisito de escolaridade e registro profissional exigido para o cargo de Médico?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "EDITAL Nº 1_2025 - DGP-PF.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 10
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "N/A",
+                    "condicionantes": "N/A",
+                    "trecho_literal": "REQUISITO: diploma, devidamente registrado, de conclusão de curso de graduação de nível superior em Medicina, fornecido por instituição de ensino superior reconhecida pelo MEC.",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "N/A",
+                    "condicionantes": "N/A",
+                    "trecho_literal": "REQUISITO: diploma, devidamente registrado, de conclusão de curso de graduação de nível superior em Medicina, fornecido por instituição de ensino superior reconhecida pelo MEC.",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum documento possui a resposta para a pergunta."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_69",
+        "data": "2026-04-19T22:41:02.373702",
+        "pergunta": "Quais são os requisitos mínimos para solicitar isenção da taxa de inscrição?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "EDITAL Nº 1_2025 - DGP-PF.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 11
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "N/A",
+                    "condicionantes": "N/A",
+                    "trecho_literal": "6.4.8.8 Não será concedida isenção de pagamento de taxa de inscrição ao candidato que: a) omitir informações e(ou) torná-las inverídicas; b) fraudar e(ou) falsiﬁcar documentação; c) não observar a forma, o prazo e os horários estabelecidos no subitem 6.4.8.2 deste edital.",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "N/A",
+                    "condicionantes": "N/A",
+                    "trecho_literal": "6.4.8.8 Não será concedida isenção de pagamento de taxa de inscrição ao candidato que: a) omitir informações e(ou) torná-las inverídicas; b) fraudar e(ou) falsiﬁcar documentação; c) não observar a forma, o prazo e os horários estabelecidos no subitem 6.4.8.2 deste edital.",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum documento possui a resposta para a pergunta."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_70",
+        "data": "2026-04-19T22:57:32.545862",
+        "pergunta": "Quais são os requisitos mínimos para solicitar isenção da taxa de inscrição?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "EDITAL Nº 1_2025 - DGP-PF.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 12
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "N/A",
+                    "condicionantes": "N/A",
+                    "trecho_literal": "6.4.1 Antes de solicitar inscrição, o candidato deverá conhecer o edital e certificar-se de que preenche todos os requisitos exigidos para o(s) cargo(s) ao(s) qual(is) deseja concorrer. No sistema de inscrição, o candidato deverá optar pelo cargo/área e pela localidade de realização das provas. O candidato deverá, ainda, preencher formulário socioeconômico.",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "N/A",
+                    "condicionantes": "N/A",
+                    "trecho_literal": "6.4.1 Antes de solicitar inscrição, o candidato deverá conhecer o edital e certificar-se de que preenche todos os requisitos exigidos para o(s) cargo(s) ao(s) qual(is) deseja concorrer. No sistema de inscrição, o candidato deverá optar pelo cargo/área e pela localidade de realização das provas. O candidato deverá, ainda, preencher formulário socioeconômico.",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum documento possui a resposta para a pergunta."
+                ]
+            }
+        }
     }
 ]
