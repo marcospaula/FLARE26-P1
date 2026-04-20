@@ -995,5 +995,1987 @@
                 ]
             }
         }
+    },
+    {
+        "id_teste": "T_22",
+        "timestamp": "2026-04-18T16:52:30.761692",
+        "pergunta_auditada": "Qual é o percentual da multa compensatória em caso de inexecução total do contrato?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.708,
+                    "maior_score_encontrado": 0.775,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.682,
+                    "maior_score_encontrado": 0.693,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_23",
+        "timestamp": "2026-04-18T17:34:51.608787",
+        "pergunta_auditada": "Qual é o índice oficial utilizado para o reajuste dos preços do contrato?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.672,
+                    "maior_score_encontrado": 0.68,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.669,
+                    "maior_score_encontrado": 0.673,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "IPCA/IBGE",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "após a ocorrência da anualidade",
+                    "contexto_da_clausula": "aplicando-se o índice  IPCA/IBGE exclusivamente  para  as  obrigações  iniciadas  e  concluídas  após  a ocorrência da anualidade.",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum dos documentos contém a informação solicitada."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_24",
+        "timestamp": "2026-04-19T14:17:52.505687",
+        "pergunta_auditada": "Qual o percentual da multa compensatória em caso de inexecução total?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.777,
+                    "maior_score_encontrado": 0.0,
+                    "status": "Reprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.631,
+                    "maior_score_encontrado": 0.0,
+                    "status": "Reprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "tipo_variavel": "OMISSAO",
+                    "valor_minimo": null,
+                    "valor_maximo": null,
+                    "valor_textual": null,
+                    "unidade_ou_moeda": "N/A",
+                    "condicao_ou_prazo": "N/A",
+                    "contexto_da_clausula": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "tipo_variavel": "OMISSAO",
+                    "valor_minimo": null,
+                    "valor_maximo": null,
+                    "valor_textual": null,
+                    "unidade_ou_moeda": "N/A",
+                    "condicao_ou_prazo": "N/A",
+                    "contexto_da_clausula": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum dos documentos contém a informação solicitada."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_25",
+        "timestamp": "2026-04-19T14:23:25.527594",
+        "pergunta_auditada": "Qual o percentual da multa compensatória em caso de inexecução total?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.774,
+                    "maior_score_encontrado": 0.774,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.631,
+                    "maior_score_encontrado": 0.631,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "tipo_variavel": "OMISSAO",
+                    "valor_minimo": null,
+                    "valor_maximo": null,
+                    "valor_textual": null,
+                    "unidade_ou_moeda": "N/A",
+                    "condicao_ou_prazo": "N/A",
+                    "contexto_da_clausula": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "tipo_variavel": "OMISSAO",
+                    "valor_minimo": null,
+                    "valor_maximo": null,
+                    "valor_textual": null,
+                    "unidade_ou_moeda": "N/A",
+                    "condicao_ou_prazo": "N/A",
+                    "contexto_da_clausula": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum dos documentos contém a informação solicitada."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_26",
+        "timestamp": "2026-04-19T14:32:24.983325",
+        "pergunta_auditada": "Qual o percentual da multa compensatória em caso de inexecução total?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.761,
+                    "maior_score_encontrado": 0.774,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.631,
+                    "maior_score_encontrado": 0.631,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "tipo_variavel": "OMISSAO",
+                    "valor_minimo": null,
+                    "valor_maximo": null,
+                    "valor_textual": null,
+                    "unidade_ou_moeda": "N/A",
+                    "condicao_ou_prazo": "N/A",
+                    "contexto_da_clausula": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "tipo_variavel": "OMISSAO",
+                    "valor_minimo": null,
+                    "valor_maximo": null,
+                    "valor_textual": null,
+                    "unidade_ou_moeda": "N/A",
+                    "condicao_ou_prazo": "N/A",
+                    "contexto_da_clausula": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum dos documentos contém a informação solicitada."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_27",
+        "timestamp": "2026-04-19T14:41:47.981031",
+        "pergunta_auditada": "Qual o percentual da multa compensatória em caso de inexecução total?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.63,
+                    "maior_score_encontrado": 0.774,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.618,
+                    "maior_score_encontrado": 0.631,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "tipo_variavel": "OMISSAO",
+                    "valor_minimo": null,
+                    "valor_maximo": null,
+                    "valor_textual": null,
+                    "unidade_ou_moeda": "N/A",
+                    "condicao_ou_prazo": "N/A",
+                    "contexto_da_clausula": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "tipo_variavel": "OMISSAO",
+                    "valor_minimo": null,
+                    "valor_maximo": null,
+                    "valor_textual": null,
+                    "unidade_ou_moeda": "N/A",
+                    "condicao_ou_prazo": "N/A",
+                    "contexto_da_clausula": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum dos documentos contém a informação solicitada."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_28",
+        "timestamp": "2026-04-19T15:15:03.338618",
+        "pergunta_auditada": "Qual o valor da multa",
+        "documentos": {
+            "doc_A": "Contrato_SRRF01_02_2020.pdf",
+            "doc_B": "Edital_PGFN_04_2025.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Contrato_SRRF01_02_2020.pdf": {
+                    "limite_corte_calculado": 0.398,
+                    "maior_score_encontrado": 0.409,
+                    "status": "Aprovado"
+                },
+                "Edital_PGFN_04_2025.pdf": {
+                    "limite_corte_calculado": 0.449,
+                    "maior_score_encontrado": 0.454,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "15%",
+                    "valor_numerico": "15",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "aplicada exclusivamente sobre a parcela inadimplida da fatura mensal",
+                    "contexto_da_clausula": "Atrasos injustificados na entrega dos relatórios mensais ensejarão a aplicação de multa moratória no patamar de 15% (quinze por cento) aplicada exclusivamente sobre a parcela inadimplida da fatura mensal.",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "12,5%",
+                    "valor_numerico": "12.5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "Em caso de inadimplemento parcial ou total da obrigação assumida",
+                    "contexto_da_clausula": "Em caso de inadimplemento parcial ou total da obrigação assumida, a contratada estará sujeita à aplicação de multa compensatória de 12,5% (doze vírgula cinco por cento) sobre o valor total atualizado do contrato.",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 15 vs 12.5.",
+                    "Condição/prazo divergente: 'aplicada exclusivamente sobre a parcela inadimplida da fatura mensal' vs 'Em caso de inadimplemento parcial ou total da obrigação assumida'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_29",
+        "timestamp": "2026-04-19T15:17:07.446081",
+        "pergunta_auditada": "Qual o valor da multa",
+        "documentos": {
+            "doc_A": "Contrato_SRRF01_02_2020.pdf",
+            "doc_B": "Edital_PGFN_04_2025.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Contrato_SRRF01_02_2020.pdf": {
+                    "limite_corte_calculado": 0.393,
+                    "maior_score_encontrado": 0.409,
+                    "status": "Aprovado"
+                },
+                "Edital_PGFN_04_2025.pdf": {
+                    "limite_corte_calculado": 0.447,
+                    "maior_score_encontrado": 0.454,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "15%",
+                    "valor_numerico": "15",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "aplicada exclusivamente sobre a parcela inadimplida da fatura mensal",
+                    "contexto_da_clausula": "Cláusula Décima Primeira - Penalidades: Atrasos injustificados na entrega dos relatórios mensais ensejarão a aplicação de multa moratória no patamar de 15% (quinze por cento) aplicada exclusivamente sobre a parcela inadimplida da fatura mensal.",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "12,5%",
+                    "valor_numerico": "12.5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "Em caso de inadimplemento parcial ou total da obrigação assumida",
+                    "contexto_da_clausula": "Em caso de inadimplemento parcial ou total da obrigação assumida, a contratada estará sujeita à aplicação de multa compensatória de 12,5% (doze vírgula cinco por cento) sobre o valor total atualizado do contrato.",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 15 vs 12.5.",
+                    "Condição/prazo divergente: 'aplicada exclusivamente sobre a parcela inadimplida da fatura mensal' vs 'Em caso de inadimplemento parcial ou total da obrigação assumida'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_30",
+        "timestamp": "2026-04-19T15:17:34.179000",
+        "pergunta_auditada": "Qual o valor da multa",
+        "documentos": {
+            "doc_A": "Contrato_SRRF01_02_2020.pdf",
+            "doc_B": "Edital_PGFN_04_2025.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Contrato_SRRF01_02_2020.pdf": {
+                    "limite_corte_calculado": 0.399,
+                    "maior_score_encontrado": 0.409,
+                    "status": "Aprovado"
+                },
+                "Edital_PGFN_04_2025.pdf": {
+                    "limite_corte_calculado": 0.45,
+                    "maior_score_encontrado": 0.454,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "15%",
+                    "valor_numerico": "15",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "aplicada exclusivamente sobre a parcela inadimplida da fatura mensal",
+                    "contexto_da_clausula": "Atrasos injustificados na entrega dos relatórios mensais ensejarão a aplicação de multa moratória no patamar de 15% (quinze por cento) aplicada exclusivamente sobre a parcela inadimplida da fatura mensal.",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "12,5%",
+                    "valor_numerico": "12.5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "em caso de inadimplemento parcial ou total da obrigação assumida",
+                    "contexto_da_clausula": "Em caso de inadimplemento parcial ou total da obrigação assumida, a contratada estará sujeita à aplicação de multa compensatória de 12,5% (doze vírgula cinco por cento) sobre o valor total atualizado do contrato.",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 15 vs 12.5.",
+                    "Condição/prazo divergente: 'aplicada exclusivamente sobre a parcela inadimplida da fatura mensal' vs 'em caso de inadimplemento parcial ou total da obrigação assumida'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_31",
+        "timestamp": "2026-04-19T15:17:41.853429",
+        "pergunta_auditada": "Qual o valor da multa",
+        "documentos": {
+            "doc_A": "Contrato_SRRF01_02_2020.pdf",
+            "doc_B": "Edital_PGFN_04_2025.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Contrato_SRRF01_02_2020.pdf": {
+                    "limite_corte_calculado": 0.41,
+                    "maior_score_encontrado": 0.0,
+                    "status": "Reprovado"
+                },
+                "Edital_PGFN_04_2025.pdf": {
+                    "limite_corte_calculado": 0.454,
+                    "maior_score_encontrado": 0.0,
+                    "status": "Reprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum dos documentos contém a informação solicitada."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_32",
+        "timestamp": "2026-04-19T15:17:58.700076",
+        "pergunta_auditada": "Qual o valor da multa?",
+        "documentos": {
+            "doc_A": "Contrato_SRRF01_02_2020.pdf",
+            "doc_B": "Edital_PGFN_04_2025.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Contrato_SRRF01_02_2020.pdf": {
+                    "limite_corte_calculado": 0.418,
+                    "maior_score_encontrado": 0.418,
+                    "status": "Aprovado"
+                },
+                "Edital_PGFN_04_2025.pdf": {
+                    "limite_corte_calculado": 0.458,
+                    "maior_score_encontrado": 0.458,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "15%",
+                    "valor_numerico": "15",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "aplicada exclusivamente sobre a parcela inadimplida da fatura mensal",
+                    "contexto_da_clausula": "Atrasos injustificados na entrega dos relatórios mensais ensejarão a aplicação de multa moratória no patamar de 15% (quinze por cento) aplicada exclusivamente sobre a parcela inadimplida da fatura mensal.",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "12,5%",
+                    "valor_numerico": "12.5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "Em caso de inadimplemento parcial ou total da obrigação assumida",
+                    "contexto_da_clausula": "Em caso de inadimplemento parcial ou total da obrigação assumida, a contratada estará sujeita à aplicação de multa compensatória de 12,5% (doze vírgula cinco por cento) sobre o valor total atualizado do contrato.",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 15 vs 12.5.",
+                    "Condição/prazo divergente: 'aplicada exclusivamente sobre a parcela inadimplida da fatura mensal' vs 'Em caso de inadimplemento parcial ou total da obrigação assumida'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_33",
+        "timestamp": "2026-04-19T15:20:22.568000",
+        "pergunta_auditada": "Qual o valor da multa?",
+        "documentos": {
+            "doc_A": "Contrato_SRRF01_02_2020.pdf",
+            "doc_B": "Edital_PGFN_04_2025.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Contrato_SRRF01_02_2020.pdf": {
+                    "limite_corte_calculado": 0.418,
+                    "maior_score_encontrado": 0.418,
+                    "status": "Aprovado"
+                },
+                "Edital_PGFN_04_2025.pdf": {
+                    "limite_corte_calculado": 0.458,
+                    "maior_score_encontrado": 0.458,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "15%",
+                    "valor_numerico": "15",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "aplicada exclusivamente sobre a parcela inadimplida da fatura mensal",
+                    "contexto_da_clausula": "Atrasos injustificados na entrega dos relatórios mensais ensejarão a aplicação de multa moratória no patamar de 15% (quinze por cento) aplicada exclusivamente sobre a parcela inadimplida da fatura mensal.",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "12,5%",
+                    "valor_numerico": "12.5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "Em caso de inadimplemento parcial ou total da obrigação assumida",
+                    "contexto_da_clausula": "Em caso de inadimplemento parcial ou total da obrigação assumida, a contratada estará sujeita à aplicação de multa compensatória de 12,5% (doze vírgula cinco por cento) sobre o valor total atualizado do contrato.",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 15 vs 12.5.",
+                    "Condição/prazo divergente: 'aplicada exclusivamente sobre a parcela inadimplida da fatura mensal' vs 'Em caso de inadimplemento parcial ou total da obrigação assumida'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_34",
+        "timestamp": "2026-04-19T15:25:42.110147",
+        "pergunta_auditada": "Qual o valor da multa?",
+        "documentos": {
+            "doc_A": "Contrato_SRRF01_02_2020.pdf",
+            "doc_B": "Edital_PGFN_04_2025.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Contrato_SRRF01_02_2020.pdf": {
+                    "limite_corte_calculado": 0.418,
+                    "maior_score_encontrado": 0.418,
+                    "status": "Aprovado"
+                },
+                "Edital_PGFN_04_2025.pdf": {
+                    "limite_corte_calculado": 0.458,
+                    "maior_score_encontrado": 0.458,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "15%",
+                    "valor_numerico": "15",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "aplicada exclusivamente sobre a parcela inadimplida da fatura mensal",
+                    "contexto_da_clausula": "Atrasos injustificados na entrega dos relatórios mensais ensejarão a aplicação de multa moratória no patamar de 15% (quinze por cento) aplicada exclusivamente sobre a parcela inadimplida da fatura mensal.",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "12,5%",
+                    "valor_numerico": "12.5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "Em caso de inadimplemento parcial ou total da obrigação assumida",
+                    "contexto_da_clausula": "Em caso de inadimplemento parcial ou total da obrigação assumida, a contratada estará sujeita à aplicação de multa compensatória de 12,5% (doze vírgula cinco por cento) sobre o valor total atualizado do contrato.",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 15 vs 12.5.",
+                    "Condição/prazo divergente: 'aplicada exclusivamente sobre a parcela inadimplida da fatura mensal' vs 'Em caso de inadimplemento parcial ou total da obrigação assumida'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_35",
+        "timestamp": "2026-04-19T15:27:19.266717",
+        "pergunta_auditada": "Qual o valor da multa?",
+        "documentos": {
+            "doc_A": "Contrato_SRRF01_02_2020.pdf",
+            "doc_B": "Edital_PGFN_04_2025.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "Contrato_SRRF01_02_2020.pdf": {
+                    "limite_corte_calculado": 0.418,
+                    "maior_score_encontrado": 0.418,
+                    "status": "Aprovado"
+                },
+                "Edital_PGFN_04_2025.pdf": {
+                    "limite_corte_calculado": 0.458,
+                    "maior_score_encontrado": 0.458,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "15%",
+                    "valor_numerico": "15",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "aplicada exclusivamente sobre a parcela inadimplida da fatura mensal",
+                    "contexto_da_clausula": "Atrasos injustificados na entrega dos relatórios mensais ensejarão a aplicação de multa moratória no patamar de 15% (quinze por cento) aplicada exclusivamente sobre a parcela inadimplida da fatura mensal.",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "12,5%",
+                    "valor_numerico": "12.5",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "Em caso de inadimplemento parcial ou total da obrigação assumida",
+                    "contexto_da_clausula": "Em caso de inadimplemento parcial ou total da obrigação assumida, a contratada estará sujeita à aplicação de multa compensatória de 12,5% (doze vírgula cinco por cento) sobre o valor total atualizado do contrato.",
+                    "confiabilidade": 1.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Valor numérico divergente: 15 vs 12.5.",
+                    "Condição/prazo divergente: 'aplicada exclusivamente sobre a parcela inadimplida da fatura mensal' vs 'Em caso de inadimplemento parcial ou total da obrigação assumida'."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_36",
+        "timestamp": "2026-04-19T15:35:00.324403",
+        "pergunta_auditada": "Qual o valor da multa?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.54,
+                    "maior_score_encontrado": 0.567,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.579,
+                    "maior_score_encontrado": 0.623,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_37",
+        "timestamp": "2026-04-19T15:42:00.219005",
+        "pergunta_auditada": "Qual o valor da multa?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.539,
+                    "maior_score_encontrado": 0.567,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.579,
+                    "maior_score_encontrado": 0.623,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_38",
+        "timestamp": "2026-04-19T15:51:14.441921",
+        "pergunta_auditada": "Qual é o valor da multa?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.554,
+                    "maior_score_encontrado": 0.568,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.6,
+                    "maior_score_encontrado": 0.641,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum dos documentos contém a informação solicitada."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_39",
+        "timestamp": "2026-04-19T16:44:26.103402",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.464,
+                    "maior_score_encontrado": 0.663,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.479,
+                    "maior_score_encontrado": 0.684,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_40",
+        "timestamp": "2026-04-19T16:57:07.679536",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.464,
+                    "maior_score_encontrado": 0.663,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.479,
+                    "maior_score_encontrado": 0.684,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_41",
+        "timestamp": "2026-04-19T17:01:47.822025",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.464,
+                    "maior_score_encontrado": 0.663,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.479,
+                    "maior_score_encontrado": 0.684,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_42",
+        "timestamp": "2026-04-19T17:13:13.635037",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.464,
+                    "maior_score_encontrado": 0.663,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.479,
+                    "maior_score_encontrado": 0.684,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_43",
+        "timestamp": "2026-04-19T17:20:16.493238",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.464,
+                    "maior_score_encontrado": 0.663,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.479,
+                    "maior_score_encontrado": 0.684,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_44",
+        "timestamp": "2026-04-19T17:27:34.491272",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.475,
+                    "maior_score_encontrado": 0.679,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.508,
+                    "maior_score_encontrado": 0.725,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_45",
+        "timestamp": "2026-04-19T17:35:37.917553",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.475,
+                    "maior_score_encontrado": 0.679,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.508,
+                    "maior_score_encontrado": 0.725,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_46",
+        "timestamp": "2026-04-19T17:52:45.044369",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.464,
+                    "maior_score_encontrado": 0.663,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.479,
+                    "maior_score_encontrado": 0.684,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_47",
+        "timestamp": "2026-04-19T18:12:23.142974",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.507,
+                    "maior_score_encontrado": 0.724,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.479,
+                    "maior_score_encontrado": 0.684,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_48",
+        "timestamp": "2026-04-19T18:19:16.070952",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.464,
+                    "maior_score_encontrado": 0.663,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.479,
+                    "maior_score_encontrado": 0.684,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_49",
+        "timestamp": "2026-04-19T18:25:07.495815",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.464,
+                    "maior_score_encontrado": 0.663,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.479,
+                    "maior_score_encontrado": 0.684,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator_Multivariavel": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_50",
+        "timestamp": "2026-04-19T19:16:37.549944",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.464,
+                    "maior_score_encontrado": 0.663,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.479,
+                    "maior_score_encontrado": 0.684,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "valor_formatado": "R$ 20,00",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_51",
+        "timestamp": "2026-04-19T19:24:16.932295",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.464,
+                    "maior_score_encontrado": 0.663,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.479,
+                    "maior_score_encontrado": 0.684,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "valor_formatado": "R$ 20,00",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_52",
+        "timestamp": "2026-04-19T19:35:58.256945",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.464,
+                    "maior_score_encontrado": 0.663,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.479,
+                    "maior_score_encontrado": 0.684,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "valor_formatado": "R$ 20,00",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 1.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_53",
+        "timestamp": "2026-04-19T19:44:30.955175",
+        "pergunta_auditada": "Qual o valor da multa por inexecução total do objeto?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.46,
+                    "maior_score_encontrado": 0.657,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.469,
+                    "maior_score_encontrado": 0.671,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "valor_formatado": "20% (vinte por cento)",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id_teste": "T_54",
+        "timestamp": "2026-04-19T19:58:24.100967",
+        "pergunta_auditada": "Qual o percentual de multa por inexecução total ou parcial do contrato?",
+        "documentos": {
+            "doc_A": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "doc_B": "edital-04-2025-e-seus-anexos.pdf"
+        },
+        "caixa_de_vidro": {
+            "M1.5_Filtro_Adaptativo": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "limite_corte_calculado": 0.516,
+                    "maior_score_encontrado": 0.737,
+                    "status": "Aprovado"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "limite_corte_calculado": 0.475,
+                    "maior_score_encontrado": 0.678,
+                    "status": "Aprovado"
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "valor_formatado": "20%",
+                    "valor_numerico": "20",
+                    "unidade_ou_moeda": "%",
+                    "condicao_ou_prazo": "no caso de inexecução total do objeto",
+                    "contexto_da_clausula": "13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "valor_formatado": "NÃO LOCALIZADO",
+                    "valor_numerico": "NÃO LOCALIZADO",
+                    "unidade_ou_moeda": "NÃO LOCALIZADO",
+                    "condicao_ou_prazo": "NÃO LOCALIZADO",
+                    "contexto_da_clausula": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz": {
+                "diagnostico": "DIVERGÊNCIA DE COBERTURA",
+                "motivos": [
+                    "Documento B não localizou a informação, mas Documento A encontrou: 20%"
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_55",
+        "data": "2026-04-19T20:08:58.876709",
+        "pergunta": "Qual o percentual de multa por inexecução total ou parcial do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "termos_pesquisados": [
+                        "percentual",
+                        "multa",
+                        "inexecução",
+                        "total",
+                        "parcial",
+                        "contrato"
+                    ],
+                    "status": "Aprovado (Vetor Nativo)"
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "termos_pesquisados": [
+                        "percentual",
+                        "multa",
+                        "inexecução",
+                        "total",
+                        "parcial",
+                        "contrato"
+                    ],
+                    "status": "Aprovado (Vetor Nativo)"
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "20",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Aplicável no caso de inexecução total do objeto. Em caso de inexecução parcial, a multa será proporcional à obrigação inadimplida.",
+                    "trecho_literal": "13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 0.9
+                },
+                "doc_B": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "NÃO LOCALIZADO",
+                    "trecho_literal": "NÃO LOCALIZADO",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_56",
+        "data": "2026-04-19T20:18:03.654402",
+        "pergunta": "Qual o percentual de multa por inexecução total ou parcial do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "RAG Híbrido (Ensemble)",
+                    "termos_chave": [
+                        "percentual",
+                        "multa",
+                        "inexecução",
+                        "total",
+                        "parcial",
+                        "contrato"
+                    ],
+                    "ancoras_principais": [
+                        "percentual",
+                        "inexecução"
+                    ],
+                    "total_chunks_enviados_M2": 11
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "RAG Híbrido (Ensemble)",
+                    "termos_chave": [
+                        "percentual",
+                        "multa",
+                        "inexecução",
+                        "total",
+                        "parcial",
+                        "contrato"
+                    ],
+                    "ancoras_principais": [
+                        "percentual",
+                        "inexecução"
+                    ],
+                    "total_chunks_enviados_M2": 9
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "20%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "No caso de inexecução total do objeto; em caso de inexecução parcial, a multa será aplicada de forma proporcional à obrigação inadimplida.",
+                    "trecho_literal": "13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto; 13.2.4. em caso de inexecução parcial, a multa compensatória, no mesmo percentual do subitem acima, será aplicada de forma proporcional à obrigação inadimplida;",
+                    "confiabilidade": 0.9
+                },
+                "doc_B": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "N/A",
+                    "condicionantes": "N/A",
+                    "trecho_literal": "N/A",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_57",
+        "data": "2026-04-19T20:28:53.125942",
+        "pergunta": "Qual o percentual de multa por inexecução total ou parcial do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "RAG Híbrido V2 (Tolerância NLP)",
+                    "termos_chave": [
+                        "%",
+                        "multa",
+                        "inexecução",
+                        "total",
+                        "parcial",
+                        "contrato"
+                    ],
+                    "ancora_principal": "inexecução",
+                    "total_chunks_enviados_M2": 12
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "RAG Híbrido V2 (Tolerância NLP)",
+                    "termos_chave": [
+                        "%",
+                        "multa",
+                        "inexecução",
+                        "total",
+                        "parcial",
+                        "contrato"
+                    ],
+                    "ancora_principal": "inexecução",
+                    "total_chunks_enviados_M2": 9
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "20%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "No caso de inexecução total do objeto; em caso de inexecução parcial, a multa será aplicada de forma proporcional à obrigação inadimplida.",
+                    "trecho_literal": "13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto; 13.2.4. em caso de inexecução parcial, a multa compensatória, no mesmo percentual do subitem acima, será aplicada de forma proporcional à obrigação inadimplida;",
+                    "confiabilidade": 0.9
+                },
+                "doc_B": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "N/A",
+                    "condicionantes": "N/A",
+                    "trecho_literal": "N/A",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_58",
+        "data": "2026-04-19T20:56:39.523906",
+        "pergunta": "Qual o percentual de multa por inexecução total ou parcial do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "RAG Híbrido V2 (Tolerância NLP)",
+                    "termos_chave": [
+                        "%",
+                        "multa",
+                        "inexecução",
+                        "total",
+                        "parcial",
+                        "contrato"
+                    ],
+                    "ancora_principal": "inexecução",
+                    "total_chunks_enviados_M2": 12
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "RAG Híbrido V2 (Tolerância NLP)",
+                    "termos_chave": [
+                        "%",
+                        "multa",
+                        "inexecução",
+                        "total",
+                        "parcial",
+                        "contrato"
+                    ],
+                    "ancora_principal": "inexecução",
+                    "total_chunks_enviados_M2": 9
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "20%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Para inexecução total do objeto e proporcionalmente para inexecução parcial",
+                    "trecho_literal": "13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto; 13.2.4. em caso de inexecução parcial, a multa compensatória, no mesmo percentual do subitem acima, será aplicada de forma proporcional à obrigação inadimplida;",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Não foi encontrado percentual de multa por inexecução total ou parcial do contrato.",
+                    "trecho_literal": "O contrato deverá ser executado fielmente pelas partes, de acordo com as cláusulas avençadas e as normas da Lei nº 14.133, de 2021, e cada parte responderá pelas consequências de sua inexecução total ou parcial.",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_59",
+        "data": "2026-04-19T21:02:27.982274",
+        "pergunta": "Qual o percentual de multa por inexecução total ou parcial do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "RAG Híbrido V3 (Parent-Child Expansion)",
+                    "termos_chave": [
+                        "%",
+                        "multa",
+                        "inexecução",
+                        "total",
+                        "parcial",
+                        "contrato"
+                    ],
+                    "ancora_principal": "inexecução",
+                    "total_chunks_enviados_M2": 12
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "RAG Híbrido V3 (Parent-Child Expansion)",
+                    "termos_chave": [
+                        "%",
+                        "multa",
+                        "inexecução",
+                        "total",
+                        "parcial",
+                        "contrato"
+                    ],
+                    "ancora_principal": "inexecução",
+                    "total_chunks_enviados_M2": 9
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "20%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "No caso de inexecução total do objeto e proporcionalmente em caso de inexecução parcial",
+                    "trecho_literal": "13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto; 13.2.4. em caso de inexecução parcial, a multa compensatória, no mesmo percentual do subitem acima, será aplicada de forma proporcional à obrigação inadimplida;",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Não foi encontrado percentual de multa por inexecução total ou parcial do contrato.",
+                    "trecho_literal": "O contrato deverá ser executado fielmente pelas partes, de acordo com as cláusulas avençadas e as normas da Lei nº 14.133, de 2021, e cada parte responderá pelas consequências de sua inexecução total ou parcial.",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_60",
+        "data": "2026-04-19T21:08:40.873449",
+        "pergunta": "Qual o percentual de multa por inexecução total ou parcial do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 14
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 11
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "20%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "No caso de inexecução total do objeto",
+                    "trecho_literal": "13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "0,5% a 30%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Para inexecução total ou parcial do contrato",
+                    "trecho_literal": "8.2.4.4. Compensatória, para a inexecução total do contrato prevista acima na alínea “ ”, de 0,5% (c cinco por cento) a % (  por cento) do valor da contratação.décimos 1 um",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Resposta A menciona um percentual fixo de 20% apenas para inexecução total, enquanto a Resposta B apresenta uma faixa de 0,5% a 30% que se aplica tanto para inexecução total quanto parcial."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_61",
+        "data": "2026-04-19T21:15:07.221252",
+        "pergunta": "Qual o percentual de multa por inexecução total ou parcial do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Contrato_SRRF01_02_2020.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 590
+                },
+                "Edital_PGFN_04_2025.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 694
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Para inexecução total ou parcial",
+                    "trecho_literal": "Cláusula Décima Primeira - Penalidades: Atrasos injustificados na entrega dos relatórios mensais ensejarão a aplicação de multa moratória no patamar de 15% (quinze por cento) aplicada exclusivamente sobre a parcela inadimplida da fatura mensal.",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "resposta_direta": "12,5%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Em caso de inadimplemento parcial ou total da obrigação assumida",
+                    "trecho_literal": "Em caso de inadimplemento parcial ou total da obrigação assumida, a contratada estará sujeita à aplicação de multa compensatória de 12,5% (doze vírgula cinco por cento) sobre o valor total atualizado do contrato.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento B contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_62",
+        "data": "2026-04-19T21:16:59.646257",
+        "pergunta": "Qual o percentual de multa por inexecução total ou parcial do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Edital_A_Minuta.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 490
+                },
+                "Edital_B_Publicado.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 512
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Para inexecução total ou parcial",
+                    "trecho_literal": "EDITAL DE CONCORRÊNCIA PÚBLICA Nº 045/2026 - MINUTA PRELIMINAR Objeto: Construção do novo anexo hospitalar. SEÇÃO VII - DOS PRAZOS E GARANTIAS 7.1 O prazo de execução da obra será de 90 (noventa) dias corridos, contados a partir da emissão da ordem de serviço. 7.2 A empresa vencedora deverá apresentar, em até 10 dias após a assinatura, um seguro garantia equivalente a 5% (cinco por cento) do valor total arrematado. 7.3 Multa diária de R$ 1.000,00 em caso de descumprimento dos marcos.",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Para inexecução total ou parcial",
+                    "trecho_literal": "EDITAL DE CONCORRÊNCIA PÚBLICA Nº 045/2026 - VERSÃO PUBLICADA NO DOU Objeto: Construção do novo anexo hospitalar. SEÇÃO VII - DOS PRAZOS E GARANTIAS 7.1 O prazo de execução da obra será estendido para 120 (cento e vinte) dias corridos, contados a partir da emissão da ordem de serviço. 7.2 A empresa vencedora deverá apresentar, sob pena de desclassificação, um seguro garantia equivalente a 10% (dez por cento) do valor global do contrato. 7.3 Multa diária de R$ 1.500,00 em caso de descumprimento dos marcos.",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum documento possui a resposta para a pergunta."
+                ]
+            }
+        }
     }
 ]
