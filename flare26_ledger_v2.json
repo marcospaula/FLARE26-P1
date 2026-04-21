@@ -3287,5 +3287,899 @@
                 ]
             }
         }
+    },
+    {
+        "id": "T_71",
+        "data": "2026-04-20T22:17:51.311154",
+        "pergunta": "Qual é o percentual de multa por atraso injustificado na entrega do objeto?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 16
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 18
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "1% a 20%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Por atraso injustificado na entrega do objeto e inexecução total ou parcial do contrato.",
+                    "trecho_literal": "13.2.2. multa moratória de 1 % (um por cento) por dia de atraso injustificado sobre o valor da parcela inadimplida, até o limite de 15 (quinze) dias; 13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "0,5% a 30%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Para inexecução total ou parcial",
+                    "trecho_literal": "14.4.1. Para as infrações previstas nos itens 14.1.1, 14.1.2 e 14.1.3, a multa será de 0,5% a 15% do valor do contrato licitado. 14.4.2. Para as infrações previstas nos itens 14.1.4, 14.1.5, 14.1.6, 14.1.7, 14.1.8 e 14.1.9, a multa será de a 30% do valor do contrato licitado.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Os percentuais de multa por atraso injustificado na entrega do objeto são diferentes: 1% a 20% na Resposta A e 0,5% a 30% na Resposta B."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_72",
+        "data": "2026-04-20T22:27:25.066520",
+        "pergunta": "Qual é o percentual de multa por atraso injustificado na entrega do objeto?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 16
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 18
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "1% a 20%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Por atraso injustificado na entrega do objeto e inexecução total ou parcial do contrato.",
+                    "trecho_literal": "13.2.2. multa moratória de 1 % (um por cento) por dia de atraso injustificado sobre o valor da parcela inadimplida, até o limite de 15 (quinze) dias; 13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "0,5% a 30%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Para inexecução total ou parcial",
+                    "trecho_literal": "14.4.1. Para as infrações previstas nos itens 14.1.1, 14.1.2 e 14.1.3, a multa será de 0,5% a 15% do valor do contrato licitado. 14.4.2. Para as infrações previstas nos itens 14.1.4, 14.1.5, 14.1.6, 14.1.7, 14.1.8 e 14.1.9, a multa será de a 30% do valor do contrato licitado.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Os percentuais de multa por atraso injustificado na entrega do objeto são diferentes: 1% a 20% na Resposta A e 0,5% a 30% na Resposta B."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_73",
+        "data": "2026-04-20T22:29:37.742686",
+        "pergunta": "Qual é o percentual de multa por atraso injustificado na entrega do objeto?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 13
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 13
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "1% a 20%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Por atraso injustificado na entrega do objeto e inexecução total ou parcial do contrato.",
+                    "trecho_literal": "13.2.2. multa moratória de 1 % (um por cento) por dia de atraso injustificado sobre o valor da parcela inadimplida, até o limite de 15 (quinze) dias; 13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "0,5% a 30%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Para inexecução total ou parcial",
+                    "trecho_literal": "14.4.1. Para as infrações previstas nos itens 14.1.1, 14.1.2 e 14.1.3, a multa será de 0,5% a 15% do valor do contrato licitado. 14.4.2. Para as infrações previstas nos itens 14.1.4, 14.1.5, 14.1.6, 14.1.7, 14.1.8 e 14.1.9, a multa será de a 30% do valor do contrato licitado.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Resposta A indica um percentual de multa de 1% a 20%, enquanto a Resposta B indica 0,5% a 30%. As faixas percentuais são diferentes, o que representa uma divergência significativa nas condições de penalização."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_74",
+        "data": "2026-04-20T22:33:08.523032",
+        "pergunta": "Qual é o percentual de multa por atraso injustificado na entrega do objeto?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 13
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 13
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "1% a 20%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Por atraso injustificado na entrega do objeto e inexecução total ou parcial do contrato.",
+                    "trecho_literal": "13.2.2. multa moratória de 1 % (um por cento) por dia de atraso injustificado sobre o valor da parcela inadimplida, até o limite de 15 (quinze) dias; 13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "0,5% a 30%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Para inexecução total ou parcial",
+                    "trecho_literal": "14.4.1. Para as infrações previstas nos itens 14.1.1, 14.1.2 e 14.1.3, a multa será de 0,5% a 15% do valor do contrato licitado. 14.4.2. Para as infrações previstas nos itens 14.1.4, 14.1.5, 14.1.6, 14.1.7, 14.1.8 e 14.1.9, a multa será de a 30% do valor do contrato licitado.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Resposta A indica um percentual de multa de 1% a 20%, enquanto a Resposta B indica de 0,5% a 30%. As faixas percentuais são diferentes, o que implica em condições distintas para a aplicação da multa."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_75",
+        "data": "2026-04-20T22:38:41.285234",
+        "pergunta": "Qual é o percentual de multa por atraso injustificado na entrega do objeto?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 16
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 18
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "1% a 20%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Por atraso injustificado na entrega do objeto e inexecução total ou parcial do contrato.",
+                    "trecho_literal": "13.2.2. multa moratória de 1 % (um por cento) por dia de atraso injustificado sobre o valor da parcela inadimplida, até o limite de 15 (quinze) dias; 13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto;",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "0,5% a 30%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Para inexecução total ou parcial",
+                    "trecho_literal": "14.4.1. Para as infrações previstas nos itens 14.1.1, 14.1.2 e 14.1.3, a multa será de 0,5% a 15% do valor do contrato licitado. 14.4.2. Para as infrações previstas nos itens 14.1.4, 14.1.5, 14.1.6, 14.1.7, 14.1.8 e 14.1.9, a multa será de a 30% do valor do contrato licitado.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Resposta A indica um percentual de multa de 1% a 20%, enquanto a Resposta B indica de 0,5% a 30%. As faixas de percentual são diferentes, o que pode impactar significativamente as penalidades aplicáveis."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_76",
+        "data": "2026-04-20T22:42:37.536688",
+        "pergunta": "Qual o prazo de validade do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 16
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 17
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "6 meses",
+                    "tipo_dado": "Prazo",
+                    "condicionantes": "A partir da data de assinatura da Ata de Registro de Preços/contrato",
+                    "trecho_literal": "a Ata de Registro de preço/contrato proveniente desta licitação terá vigência de 06 (seis) meses a partir da data de assinatura;",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "N/A",
+                    "condicionantes": "N/A",
+                    "trecho_literal": "O prazo de que trata o item anterior será reduzido à metade, mantendo-se a possibilidade de prorrogação, nos casos de contratações decorrentes de despesas cujos valores não ultrapassem o limite de que trata o inciso II do art. 75 da Lei nº 14.133, de 2021",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_77",
+        "data": "2026-04-20T22:53:05.581488",
+        "pergunta": "Qual o prazo de validade do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Edital_B_Publicado.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 512
+                },
+                "Edital_A_Minuta.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 490
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "1.500,00",
+                    "tipo_dado": "Monetário",
+                    "condicionantes": "Em caso de descumprimento dos marcos.",
+                    "trecho_literal": "7.3 Multa diária de R$ 1.500,00 em caso de descumprimento dos marcos.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "1.000,00",
+                    "tipo_dado": "Monetário",
+                    "condicionantes": "Em caso de descumprimento dos marcos.",
+                    "trecho_literal": "7.3 Multa diária de R$ 1.000,00 em caso de descumprimento dos marcos.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Os valores apresentados nas respostas A e B são diferentes (1.500,00 vs 1.000,00), o que indica uma divergência crítica em relação ao prazo de validade do contrato."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_78",
+        "data": "2026-04-20T22:53:57.502310",
+        "pergunta": "Qual o prazo de validade do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Edital_B_Publicado.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 512
+                },
+                "Edital_A_Minuta.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 490
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "10%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Seguro garantia equivalente ao valor global do contrato",
+                    "trecho_literal": "7.2 A empresa vencedora deverá apresentar, sob pena de desclassificação, um seguro garantia equivalente a 10% (dez por cento) do valor global do contrato.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "1.000,00",
+                    "tipo_dado": "Monetário",
+                    "condicionantes": "Em caso de descumprimento dos marcos.",
+                    "trecho_literal": "7.3 Multa diária de R$ 1.000,00 em caso de descumprimento dos marcos.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "As respostas A e B apresentam informações diferentes sobre o prazo de validade do contrato, com a Resposta A indicando um percentual e a Resposta B um valor monetário."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_79",
+        "data": "2026-04-20T22:54:25.764179",
+        "pergunta": "Qual o prazo de validade do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Edital_B_Publicado.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 512
+                },
+                "Edital_A_Minuta.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 490
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "resposta_direta": "10%",
+                    "tipo_dado": "Percentual",
+                    "condicionantes": "Seguro garantia equivalente ao valor global do contrato",
+                    "trecho_literal": "7.2 A empresa vencedora deverá apresentar, sob pena de desclassificação, um seguro garantia equivalente a 10% (dez por cento) do valor global do contrato.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "resposta_direta": "1.000,00",
+                    "tipo_dado": "Monetário",
+                    "condicionantes": "Em caso de descumprimento dos marcos.",
+                    "trecho_literal": "7.3 Multa diária de R$ 1.000,00 em caso de descumprimento dos marcos.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "As respostas A e B apresentam informações diferentes sobre o prazo de validade do contrato, sendo que A menciona um percentual (10%) e B um valor monetário (1.000,00), o que indica que se referem a condições distintas e não são comparáveis."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_80",
+        "data": "2026-04-20T23:03:49.990587",
+        "pergunta": "Qual o prazo de validade do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Edital_A_Minuta.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 490
+                },
+                "Edital_B_Publicado.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 512
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "natureza_da_pergunta": "Temporal",
+                    "natureza_do_texto_encontrado": "Temporal",
+                    "houve_compatibilidade_ontologica": true,
+                    "resposta_direta": "90 dias corridos",
+                    "tipo_dado": "Temporal",
+                    "condicionantes": "Contados a partir da emissão da ordem de serviço.",
+                    "trecho_literal": "O prazo de execução da obra será de 90 (noventa) dias corridos, contados a partir da emissão da ordem de serviço.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "natureza_da_pergunta": "Temporal",
+                    "natureza_do_texto_encontrado": "Temporal",
+                    "houve_compatibilidade_ontologica": true,
+                    "resposta_direta": "120 dias corridos",
+                    "tipo_dado": "Temporal",
+                    "condicionantes": "Contados a partir da emissão da ordem de serviço.",
+                    "trecho_literal": "O prazo de execução da obra será estendido para 120 (cento e vinte) dias corridos, contados a partir da emissão da ordem de serviço.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Os prazos de validade do contrato são diferentes: 90 dias corridos na Resposta A e 120 dias corridos na Resposta B."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_81",
+        "data": "2026-04-20T23:04:55.596129",
+        "pergunta": "Qual o prazo de validade do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Edital_A_Minuta.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 490
+                },
+                "Edital_B_Publicado.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 512
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "natureza_da_pergunta": "Temporal",
+                    "natureza_do_texto_encontrado": "Temporal",
+                    "houve_compatibilidade_ontologica": true,
+                    "resposta_direta": "90 (noventa) dias corridos",
+                    "tipo_dado": "Temporal",
+                    "condicionantes": "Contados a partir da emissão da ordem de serviço.",
+                    "trecho_literal": "O prazo de execução da obra será de 90 (noventa) dias corridos, contados a partir da emissão da ordem de serviço.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "natureza_da_pergunta": "Temporal",
+                    "natureza_do_texto_encontrado": "Temporal",
+                    "houve_compatibilidade_ontologica": true,
+                    "resposta_direta": "120 dias corridos",
+                    "tipo_dado": "Temporal",
+                    "condicionantes": "Contados a partir da emissão da ordem de serviço.",
+                    "trecho_literal": "O prazo de execução da obra será estendido para 120 (cento e vinte) dias corridos, contados a partir da emissão da ordem de serviço.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Os prazos de validade do contrato são diferentes: 90 dias corridos na Resposta A e 120 dias corridos na Resposta B."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_82",
+        "data": "2026-04-20T23:09:16.970334",
+        "pergunta": "Qual o prazo exato de vigência/validade do contrato, ignorando prazos de execução de obra?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Edital_A_Minuta.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 490
+                },
+                "Edital_B_Publicado.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 512
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "natureza_da_pergunta": "Temporal",
+                    "natureza_do_texto_encontrado": "Temporal",
+                    "houve_compatibilidade_ontologica": true,
+                    "resposta_direta": "90 dias corridos",
+                    "tipo_dado": "Temporal",
+                    "condicionantes": "N/A",
+                    "trecho_literal": "O prazo de execução da obra será de 90 (noventa) dias corridos, contados a partir da emissão da ordem de serviço.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "natureza_da_pergunta": "Temporal",
+                    "natureza_do_texto_encontrado": "Temporal",
+                    "houve_compatibilidade_ontologica": true,
+                    "resposta_direta": "120 dias corridos",
+                    "tipo_dado": "Temporal",
+                    "condicionantes": "Ignorando prazos de execução de obra.",
+                    "trecho_literal": "O prazo de execução da obra será estendido para 120 (cento e vinte) dias corridos, contados a partir da emissão da ordem de serviço.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Os prazos de vigência/validade do contrato são diferentes: 90 dias corridos na Resposta A e 120 dias corridos na Resposta B."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_83",
+        "data": "2026-04-20T23:16:07.995827",
+        "pergunta": "Qual o prazo exato de vigência/validade do contrato, ignorando prazos de execução de obra?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Edital_A_Minuta.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 490
+                },
+                "Edital_B_Publicado.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 512
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "natureza_da_pergunta": "N/A",
+                    "natureza_do_texto_encontrado": "N/A",
+                    "houve_compatibilidade_ontologica": false,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "NÃO LOCALIZADO",
+                    "condicionantes": "NÃO LOCALIZADO",
+                    "trecho_literal": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "natureza_da_pergunta": "N/A",
+                    "natureza_do_texto_encontrado": "N/A",
+                    "houve_compatibilidade_ontologica": false,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "NÃO LOCALIZADO",
+                    "condicionantes": "NÃO LOCALIZADO",
+                    "trecho_literal": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum documento possui a resposta para a pergunta."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_84",
+        "data": "2026-04-20T23:21:08.481041",
+        "pergunta": "Qual é o valor exato, em reais, da indenização exigida no caso de vazamento de dados que afete menos de mil registros, ignorando punições atreladas ao valor global do contrato?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Contrato_O_50kDanosMorais.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 306
+                },
+                "Contrato_P_100kDanosMorais.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 318
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "natureza_da_pergunta": "N/A",
+                    "natureza_do_texto_encontrado": "N/A",
+                    "houve_compatibilidade_ontologica": false,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "NÃO LOCALIZADO",
+                    "condicionantes": "NÃO LOCALIZADO",
+                    "trecho_literal": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                },
+                "doc_B": {
+                    "natureza_da_pergunta": "N/A",
+                    "natureza_do_texto_encontrado": "N/A",
+                    "houve_compatibilidade_ontologica": false,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "NÃO LOCALIZADO",
+                    "condicionantes": "NÃO LOCALIZADO",
+                    "trecho_literal": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "LACUNA DE EVIDÊNCIA",
+                "motivos": [
+                    "Nenhum documento possui a resposta para a pergunta."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_85",
+        "data": "2026-04-20T23:24:46.254246",
+        "pergunta": "Qual é o valor da indenização em reais caso o vazamento afete exatamente 1.000 registros?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Contrato_O_50kDanosMorais.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 306
+                },
+                "Contrato_P_100kDanosMorais.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 318
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "natureza_da_pergunta": "Monetário",
+                    "natureza_do_texto_encontrado": "Monetário",
+                    "houve_compatibilidade_ontologica": true,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "500% do valor do contrato",
+                    "tipo_dado": "Valor da indenização",
+                    "condicionantes": "Caso o vazamento afete exatamente 1.000 registros.",
+                    "trecho_literal": "12.2.2 Se ≥ 1.000 registros: 500% do valor do contrato.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "natureza_da_pergunta": "Monetário",
+                    "natureza_do_texto_encontrado": "Monetário",
+                    "houve_compatibilidade_ontologica": true,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "1.000% do valor do contrato",
+                    "tipo_dado": "Valor da indenização",
+                    "condicionantes": "Caso o vazamento afete exatamente 1.000 registros",
+                    "trecho_literal": "Se ≥ 1.000 registros: 1.000% do valor do contrato.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "As respostas A e B indicam percentuais diferentes de indenização: 500% na resposta A e 1.000% na resposta B."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_86",
+        "data": "2026-04-20T23:31:27.454938",
+        "pergunta": "Qual é o valor exato, em reais, da indenização exigida no caso de vazamento de dados que afete menos de mil registros?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Contrato_O_50kDanosMorais.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 306
+                },
+                "Contrato_P_100kDanosMorais.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 318
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "natureza_da_pergunta": "Monetário",
+                    "natureza_do_texto_encontrado": "Monetário",
+                    "houve_compatibilidade_ontologica": true,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "R$ 50.000,00",
+                    "tipo_dado": "Valor da indenização",
+                    "condicionantes": "Indenização por vazamento de dados afetando menos de mil registros.",
+                    "trecho_literal": "Se < 1.000 registros afetados: R$ 50.000,00.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "natureza_da_pergunta": "Monetário",
+                    "natureza_do_texto_encontrado": "Monetário",
+                    "houve_compatibilidade_ontologica": true,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "R$ 100.000,00",
+                    "tipo_dado": "Valor de indenização",
+                    "condicionantes": "Indenização por vazamento de dados afetando menos de mil registros.",
+                    "trecho_literal": "12.2.1 Se < 1.000 registros afetados: R$ 100.000,00.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Os valores da indenização exigida são diferentes: R$ 50.000,00 na Resposta A e R$ 100.000,00 na Resposta B."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_87",
+        "data": "2026-04-20T23:36:44.336121",
+        "pergunta": "Qual a multa moratória em caso de atrasos injustificados?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "Contrato_O_50kDanosMorais.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 306
+                },
+                "Contrato_P_100kDanosMorais.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 318
+                },
+                "Contrato_SRRF01_02_2020.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 590
+                },
+                "Edital_PGFN_04_2025.pdf": {
+                    "estrategia": "Leitura Total (Bypass de RAG)",
+                    "status": "Documento inteiro enviado para o M2",
+                    "caracteres_lidos": 694
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "natureza_da_pergunta": "Monetário",
+                    "natureza_do_texto_encontrado": "Monetário",
+                    "houve_compatibilidade_ontologica": true,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "15% (quinze por cento)",
+                    "tipo_dado": "Multa Moratória",
+                    "condicionantes": "A multa é aplicada sobre a parcela inadimplida da fatura mensal.",
+                    "trecho_literal": "Atrasos injustificados na entrega dos relatórios mensais ensejarão a aplicação de multa moratória no patamar de 15% (quinze por cento) aplicada exclusivamente sobre a parcela inadimplida da fatura mensal.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "natureza_da_pergunta": "Monetário",
+                    "natureza_do_texto_encontrado": "Monetário",
+                    "houve_compatibilidade_ontologica": true,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "12,5% (doze vírgula cinco por cento) sobre o valor total atualizado do contrato",
+                    "tipo_dado": "Multa Moratória",
+                    "condicionantes": "Em caso de inadimplemento parcial ou total da obrigação assumida",
+                    "trecho_literal": "a contratada estará sujeita à aplicação de multa compensatória de 12,5% (doze vírgula cinco por cento) sobre o valor total atualizado do contrato.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "A resposta A indica uma multa de 15% sobre a parcela inadimplida, enquanto a resposta B menciona uma multa de 12,5% sobre o valor total atualizado do contrato. As porcentagens e as bases de cálculo são diferentes."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_88",
+        "data": "2026-04-20T23:50:29.409059",
+        "pergunta": "Em caso de inexecução total ou parcial do contrato, qual é o prazo máximo de penalidade de impedimento de licitar e contratar com a União, e qual a condição para a reabilitação da empresa perante a Administração Pública?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 14
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 17
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "natureza_da_pergunta": "Temporal",
+                    "natureza_do_texto_encontrado": "Temporal",
+                    "houve_compatibilidade_ontologica": true,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "até dois anos; até cinco anos",
+                    "tipo_dado": "Prazo de penalidade",
+                    "condicionantes": "Em caso de inexecução total ou parcial do contrato",
+                    "trecho_literal": "suspensão de licitar e impedimento de contratar com o órgão, entidade ou unidade administrativa pela qual a Administração Pública opera e atua concretamente, pelo prazo de até dois anos; impedimento de licitar e contratar com órgãos e entidades da União com o consequente descredenciamento no SICAF pelo prazo de até cinco anos;",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "natureza_da_pergunta": "N/A",
+                    "natureza_do_texto_encontrado": "N/A",
+                    "houve_compatibilidade_ontologica": false,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "NÃO LOCALIZADO",
+                    "condicionantes": "NÃO LOCALIZADO",
+                    "trecho_literal": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_89",
+        "data": "2026-04-20T23:59:05.818974",
+        "pergunta": "Qual é o prazo exato estipulado para o pagamento da contratada após o ateste ou recebimento definitivo da nota fiscal?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 13
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 13
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "natureza_da_pergunta": "Temporal",
+                    "natureza_do_texto_encontrado": "Temporal",
+                    "houve_compatibilidade_ontologica": true,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "30 (trinta) dias",
+                    "tipo_dado": "Prazo",
+                    "condicionantes": "Prazo máximo para pagamento após recebimento da Nota Fiscal ou Fatura.",
+                    "trecho_literal": "O pagamento será realizado no prazo máximo de até 30 (trinta) dias, contados a partir do recebimento da Nota Fiscal ou Fatura.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "natureza_da_pergunta": "N/A",
+                    "natureza_do_texto_encontrado": "N/A",
+                    "houve_compatibilidade_ontologica": false,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "NÃO LOCALIZADO",
+                    "tipo_dado": "NÃO LOCALIZADO",
+                    "condicionantes": "NÃO LOCALIZADO",
+                    "trecho_literal": "LACUNA DE EVIDÊNCIA",
+                    "confiabilidade": 0.0
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Apenas Documento A contém a informação."
+                ]
+            }
+        }
+    },
+    {
+        "id": "T_90",
+        "data": "2026-04-21T00:05:28.920994",
+        "pergunta": "Qual é o prazo máximo de pagamento após a finalização da liquidação da despesa?",
+        "caixa_vidro": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 19
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 10
+                }
+            },
+            "M2_Extrator": {
+                "doc_A": {
+                    "natureza_da_pergunta": "Temporal",
+                    "natureza_do_texto_encontrado": "Temporal",
+                    "houve_compatibilidade_ontologica": true,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "30 (trinta) dias",
+                    "tipo_dado": "Prazo",
+                    "condicionantes": "Prazo máximo de pagamento após a finalização da liquidação da despesa.",
+                    "trecho_literal": "O pagamento será realizado no prazo máximo de até 30 (trinta) dias, contados a partir do recebimento da Nota Fiscal ou Fatura.",
+                    "confiabilidade": 0.95
+                },
+                "doc_B": {
+                    "natureza_da_pergunta": "Temporal",
+                    "natureza_do_texto_encontrado": "Temporal",
+                    "houve_compatibilidade_ontologica": true,
+                    "violou_restricao_do_usuario": false,
+                    "resposta_direta": "até dez dias úteis",
+                    "tipo_dado": "Prazo",
+                    "condicionantes": "Prazo máximo de pagamento após a finalização da liquidação da despesa.",
+                    "trecho_literal": "O pagamento será efetuado no prazo máximo de até dez dias úteis, contados da finalização da liquidação da despesa, conforme seção anterior, nos termos da Instrução Normativa SEGES/ME nº 77, de 2022.",
+                    "confiabilidade": 0.95
+                }
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA",
+                "motivos": [
+                    "Resposta A estabelece um prazo de 30 dias, enquanto a Resposta B menciona até 10 dias úteis, o que representa uma diferença significativa no prazo de pagamento."
+                ]
+            }
+        }
     }
 ]
