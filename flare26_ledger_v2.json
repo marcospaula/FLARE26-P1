@@ -4181,5 +4181,194 @@
                 ]
             }
         }
+    },
+    {
+        "timestamp": "2026-04-27T22:03:37.730854",
+        "pergunta_auditoria": "Qual é o percentual máximo aplicado para a multa compensatória em caso de inexecução total do contrato?",
+        "documentos_auditados": [
+            "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "edital-04-2025-e-seus-anexos.pdf"
+        ],
+        "telemetria": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 12
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 10
+                }
+            },
+            "M2_Extrator_Score": {
+                "doc_A": 0.95,
+                "doc_B": 0.95
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA"
+            }
+        }
+    },
+    {
+        "timestamp": "2026-04-27T22:06:14.397896",
+        "pergunta_auditoria": "Qual é o percentual máximo aplicado para a multa compensatória em caso de inexecução total do contrato?",
+        "documentos_auditados": [
+            "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "edital-04-2025-e-seus-anexos.pdf"
+        ],
+        "telemetria": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 12
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 10
+                }
+            },
+            "M2_Extrator_Score": {
+                "doc_A": 0.95,
+                "doc_B": 0.95
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA"
+            }
+        }
+    },
+    {
+        "timestamp": "2026-04-27T22:09:17.789200",
+        "pergunta_auditoria": "Qual é o prazo exato, em dias, estipulado para o pagamento da fatura após o ateste da nota fiscal?",
+        "documentos_auditados": [
+            "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "edital-04-2025-e-seus-anexos.pdf"
+        ],
+        "telemetria": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 11
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 13
+                }
+            },
+            "M2_Extrator_Score": {
+                "doc_A": 0.95,
+                "doc_B": 0.95
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA"
+            }
+        }
+    },
+    {
+        "timestamp": "2026-04-27T22:21:05.592585",
+        "pergunta_auditoria": "Qual é o percentual máximo aplicado para a multa compensatória em caso de inexecução total do contrato?",
+        "documentos_auditados": [
+            "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "edital-04-2025-e-seus-anexos.pdf"
+        ],
+        "telemetria": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 11
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 8
+                }
+            },
+            "M2_Extrator_Score": {
+                "doc_A": 0.95,
+                "doc_B": 0.95
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA"
+            }
+        }
+    },
+    {
+        "timestamp": "2026-04-27T22:22:33.444101",
+        "pergunta_auditoria": "Qual é o prazo de validade da proposta, ignorando qualquer menção sobre o prazo de vigência contratual?",
+        "documentos_auditados": [
+            "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "edital-04-2025-e-seus-anexos.pdf"
+        ],
+        "telemetria": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 10
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 10
+                }
+            },
+            "M2_Extrator_Score": {
+                "doc_A": 0.0,
+                "doc_B": 0.0
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "LACUNA DE EVIDÊNCIA"
+            }
+        }
+    },
+    {
+        "timestamp": "2026-04-27T22:26:28.158812",
+        "pergunta_auditoria": "Qual é o prazo de validade da proposta, ignorando qualquer menção sobre o prazo de vigência contratual?",
+        "documentos_auditados": [
+            "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "edital-04-2025-e-seus-anexos.pdf"
+        ],
+        "telemetria": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 10
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 10
+                }
+            },
+            "M2_Extrator_Score": {
+                "doc_A": 0.0,
+                "doc_B": 0.0
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "LACUNA DE EVIDÊNCIA"
+            }
+        }
+    },
+    {
+        "timestamp": "2026-04-27T22:27:27.755255",
+        "pergunta_auditoria": "Qual é o percentual máximo aplicado para a multa compensatória em caso de inexecução total do contrato?",
+        "documentos_auditados": [
+            "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf",
+            "edital-04-2025-e-seus-anexos.pdf"
+        ],
+        "telemetria": {
+            "M1.5_Gatekeeper": {
+                "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 11
+                },
+                "edital-04-2025-e-seus-anexos.pdf": {
+                    "estrategia": "Parent-Child RAG",
+                    "total_blocos": 8
+                }
+            },
+            "M2_Extrator_Score": {
+                "doc_A": 0.95,
+                "doc_B": 0.95
+            },
+            "M4_Juiz_Neural": {
+                "veredito": "DIVERGÊNCIA CRÍTICA"
+            }
+        }
     }
 ]
