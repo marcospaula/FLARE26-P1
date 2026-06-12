@@ -329,11 +329,47 @@ def extrair_dado_com_ia(texto, pergunta):
     except Exception: return resultado_vazio()
 
 def limpar_e_extrair_numeros(texto):
-    """Extrai apenas dígitos e vírgulas para comparação simbólica pura."""
-    if not isinstance(texto, str): return ""
-    # Encontra números decimais (ex: 0,5 ou 10.5) ou inteiros
-    numeros = re.findall(r'\d+(?:[.,]\d+)?', texto)
-    return sorted([float(n.replace(',', '.')) for n in numeros]) if numeros else []
+    """Normaliza e extrai valores numéricos do português BR para comparação simbólica.
+
+    Suporta formato BR (R$ 1.200.000,50 → 1200000.5), escalas (1,2 bilhões →
+    1200000000.0, 500 mil → 500000.0) e 'por cento' equivalente a '%'.
+    """
+    if not isinstance(texto, str):
+        return []
+
+    t = texto.lower().replace("por cento", "%").replace("r$", "").replace("reais", "")
+
+    ESCALAS = [
+        (r'bilh[õo]es?|bilh[aã]o|\bbil\b|\bbi\b', 1_000_000_000),
+        (r'milh[õo]es?|milh[aã]o|\bmi\b',         1_000_000),
+        (r'\bmil\b',                                1_000),
+    ]
+
+    def parse_br(s):
+        s = s.strip()
+        if re.match(r'^\d{1,3}(\.\d{3})+(,\d+)?$', s):
+            return float(s.replace('.', '').replace(',', '.'))
+        return float(s.replace(',', '.'))
+
+    NUM_PAT = r'\d{1,3}(?:\.\d{3})*(?:,\d+)?|\d+(?:,\d+)?'
+    resultados = set()
+
+    for m in re.finditer(rf'({NUM_PAT})', t):
+        try:
+            val = parse_br(m.group(1))
+        except ValueError:
+            continue
+
+        multiplicador = 1
+        trecho_depois = t[m.end():m.end() + 20]
+        for pattern, mult in ESCALAS:
+            if re.match(rf'\s*(?:{pattern})', trecho_depois):
+                multiplicador = mult
+                break
+
+        resultados.add(round(val * multiplicador, 2))
+
+    return sorted(resultados)
 
 def comparar_documentos(dado_A: ExtracaoUniversal, dado_B: ExtracaoUniversal, pergunta: str):
     """
