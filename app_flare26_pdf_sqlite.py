@@ -161,10 +161,10 @@ vector_store, _ = iniciar_banco_vetorial()
 
 def limpar_banco_vetorial():
     """Limpa ChromaDB + SQLite + força garbage collection"""
+    global vector_store
     try:
         vector_store.delete_collection()
         # Recria o banco vetorial
-        global vector_store
         embeddings = HuggingFaceEmbeddings(
             model_name=MODEL_EMBEDDING,
             encode_kwargs={'normalize_embeddings': True}
@@ -431,7 +431,12 @@ REGRAS ESTRITAS DE PREENCHIMENTO DO JSON:
 4. "unidade_ou_moeda": Apenas a métrica (Ex: "%", "R$").
 5. "condicao_ou_prazo": A condição exata, como "no caso de inexecução total".
 6. "contexto_da_clausula": A cópia LITERAL do parágrafo que prova a sua extração.
-7. Se a informação não existir, preencha tudo com "NÃO LOCALIZADO" e confiabilidade 0.0.
+7. "confiabilidade": Obrigatório SEMPRE. Nota de 0.0 a 1.0 sobre sua certeza na extração:
+   - 0.9 a 1.0: cláusula clara, valor e condição explícitos no texto.
+   - 0.6 a 0.8: valor encontrado mas condição com alguma ambiguidade.
+   - 0.3 a 0.5: informação inferida ou incompleta.
+   - 0.0: informação não localizada.
+8. Se a informação não existir, preencha tudo com "NÃO LOCALIZADO" e confiabilidade 0.0.
 
 TEXTO PARA AUDITORIA:
 {texto[:8000]}
