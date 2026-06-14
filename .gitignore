@@ -1,5 +1,20 @@
+# --- Ambiente Python ---
 .venv/
+venv/
 __pycache__/
+*.pyc
+
+# --- Segredos (NUNCA versionar) ---
 .env
-flare26_ledger.json
 .streamlit/secrets.toml
+
+# --- Artefatos de runtime (regeneráveis) ---
+chroma_db/
+*.db
+flare26_cache_docs.db
+
+# --- Ledgers gerados em execução ---
+# O ledger é mutável a cada auditoria; o dataset curado de testes
+# vive em tests/fixtures, não na raiz.
+flare26_ledger.json
+flare26_ledger_v2.json
