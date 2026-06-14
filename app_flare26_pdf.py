@@ -1,94 +1,55 @@
 import streamlit as st
-import tempfile
 import os
+import gc
 import time
-import sqlite3     
-import gc          
 import json
-import re
-import hashlib
-from datetime import datetime
-from pydantic import BaseModel, Field
-import fitz 
-from openai import OpenAI
-from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_core.documents import Document
 import threading
+from datetime import datetime
 from streamlit.runtime.scriptrunner import add_script_run_ctx
 
-import flare26_core as core  # Núcleo determinístico testado (sanitização, números BR, juiz simbólico)
+import flare26_core as core          # Núcleo determinístico testado (números BR, juízes)
+import flare26_pipeline as pipeline  # RAG headless (M1, M1.5, M2) — sem Streamlit
 
 # ==========================================
 # CONFIGURAÇÕES E INICIALIZAÇÃO
 # ==========================================
 st.set_page_config(
-    page_title="FLARE26: Auditor Universal", 
-    page_icon="⚖️", 
+    page_title="FLARE26: Auditor Universal",
+    page_icon="⚖️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+client = pipeline.criar_client_openai(st.secrets["OPENAI_API_KEY"])
 
-MODEL_EMBEDDING = "all-MiniLM-L6-v2"
+# Constantes e schema: fonte única de verdade no pipeline.
+MODEL_EMBEDDING = pipeline.MODEL_EMBEDDING
+MAX_FILE_SIZE_MB = pipeline.MAX_FILE_SIZE_MB
+ExtracaoUniversal = pipeline.ExtracaoUniversal
+resultado_vazio = pipeline.resultado_vazio
+
 LEDGER_FILE = "flare26_ledger_v2.json"
 DB_PATH = "flare26_cache_docs.db"
-
-MAX_FILE_SIZE_MB = 10  
-MAX_PAGES = 500        
-CHUNK_SIZE_PAI = 3500  
-CHUNK_OVERLAP_PAI = 200
-CHUNK_SIZE_FILHO = 400
-CHUNK_OVERLAP_FILHO = 50
-TOP_K_RETRIEVAL = 20   
 
 # ==========================================
 # GESTÃO DE ESTADO (ISOLAMENTO DO FRONT-END)
 # ==========================================
 if 'pdfs_processados' not in st.session_state:
     st.session_state['pdfs_processados'] = set()
-if 'm1_5_ledger' not in st.session_state: 
+if 'm1_5_ledger' not in st.session_state:
     st.session_state['m1_5_ledger'] = {}
 
 def gerar_hash_arquivo(arquivo_pdf):
     """Gera um MD5 rápido para identificar univocamente o PDF."""
     arquivo_pdf.seek(0)
-    file_hash = hashlib.md5(arquivo_pdf.read()).hexdigest()
+    file_hash = pipeline.gerar_hash_bytes(arquivo_pdf.read())
     arquivo_pdf.seek(0)
     return file_hash
 
 # ==========================================
-# MOTOR SQLITE E SANITIZADOR DE OCR
+# MOTOR SQLITE (delega ao pipeline headless)
 # ==========================================
-COLUNAS_DOCSTORE = {"parent_id", "nome_doc", "file_hash", "conteudo"}
-
 def iniciar_banco_sqlite():
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS docstore_pai (
-            parent_id TEXT PRIMARY KEY,
-            nome_doc TEXT,
-            file_hash TEXT,
-            conteudo TEXT
-        )
-    ''')
-    # Guard de migração: caches antigos (versão _sqlite) não têm 'file_hash'.
-    # Como o docstore é regenerável, recriamos a tabela se o schema divergir.
-    colunas = {row[1] for row in cursor.execute("PRAGMA table_info(docstore_pai)")}
-    if colunas != COLUNAS_DOCSTORE:
-        cursor.execute("DROP TABLE IF EXISTS docstore_pai")
-        cursor.execute('''
-            CREATE TABLE docstore_pai (
-                parent_id TEXT PRIMARY KEY,
-                nome_doc TEXT,
-                file_hash TEXT,
-                conteudo TEXT
-            )
-        ''')
-    conn.commit()
-    conn.close()
+    pipeline.iniciar_banco_sqlite(DB_PATH)
 
 def limpar_banco_sqlite():
     if os.path.exists(DB_PATH):
@@ -98,41 +59,12 @@ def limpar_banco_sqlite():
 
 iniciar_banco_sqlite()
 
-# Delegado ao núcleo testado (flare26_core). Mantido como alias por compatibilidade.
-sanitizar_texto_pdf = core.sanitizar_texto_pdf
-
-# ==========================================
-# SCHEMA AGNÓSTICO (PYDANTIC)
-# ==========================================
-class ExtracaoUniversal(BaseModel):
-    natureza_da_pergunta: str = Field(description="O domínio de dados exigido (ex: Temporal, Monetário).")
-    natureza_do_texto_encontrado: str = Field(description="O domínio de dados encontrado.")
-    houve_compatibilidade_ontologica: bool = Field(description="True se a natureza encontrada corresponde à exigida.")
-    violou_restricao_do_usuario: bool = Field(
-        description="CRÍTICO: Retorne True SE a pergunta exigir explicitamente que um tipo de dado seja ignorado E o texto encontrado tratar desse assunto proibido."
-    )
-    resposta_direta: str = Field(description="A resposta exata. Retorne 'NÃO LOCALIZADO' se houve_compatibilidade_ontologica for False OU se violou_restricao_do_usuario for True.")
-    tipo_dado: str = Field(description="Categoria do dado. Se incompatível/violado, retorne 'NÃO LOCALIZADO'.")
-    condicionantes: str = Field(description="Regras da resposta. Se incompatível/violado, retorne 'NÃO LOCALIZADO'.")
-    trecho_literal: str = Field(description="Cópia literal do texto. Se incompatível/violado, retorne 'LACUNA DE EVIDÊNCIA'.")
-    confiabilidade: float = Field(description="Score de 0.0 a 1.0. Se incompatível/violado, OBRIGATORIAMENTE 0.0.")
-
-def resultado_vazio():
-    return ExtracaoUniversal(
-        natureza_da_pergunta="N/A", natureza_do_texto_encontrado="N/A",
-        houve_compatibilidade_ontologica=False, violou_restricao_do_usuario=False,
-        resposta_direta="NÃO LOCALIZADO", tipo_dado="NÃO LOCALIZADO",
-        condicionantes="NÃO LOCALIZADO", trecho_literal="LACUNA DE EVIDÊNCIA", confiabilidade=0.0
-    )
-
 # ==========================================
 # MOTOR VETORIAL (M1) CACHEADO
 # ==========================================
 @st.cache_resource
 def iniciar_banco_vetorial():
-    embeddings = HuggingFaceEmbeddings(model_name=MODEL_EMBEDDING, encode_kwargs={'normalize_embeddings': True})
-    vector_store = Chroma(collection_name="flare26_docs", embedding_function=embeddings, collection_metadata={"hnsw:space": "cosine"}, persist_directory="./chroma_db")
-    return vector_store, embeddings
+    return pipeline.criar_vector_store(persist_directory="./chroma_db", model_embedding=MODEL_EMBEDDING)
 
 vector_store, _ = iniciar_banco_vetorial()
 
@@ -152,193 +84,63 @@ def resetar_ambiente_total():
 def validar_tamanho_pdf(arquivo_pdf):
     return (arquivo_pdf.size / (1024 * 1024)) <= MAX_FILE_SIZE_MB
 
-def extrair_texto_fitz_rapido(tmp_path):
-    doc = fitz.open(tmp_path)
-    if doc.page_count > MAX_PAGES: 
-        doc.close()
-        raise ValueError(f"Limite de {MAX_PAGES} páginas excedido.")
-    textos_paginas = [sanitizar_texto_pdf(page.get_text()) for page in doc]
-    doc.close()
-    return textos_paginas
-
-def _worker_processamento_pdf(tmp_path, arquivo_name, file_hash, session_state_ref):
-    """Worker de background isolado para não travar a UI (Thread 2)."""
+def _worker_processamento_pdf(pdf_bytes, arquivo_name, file_hash, session_state_ref):
+    """Worker de background (Thread 2): delega o trabalho pesado ao pipeline."""
     try:
-        textos_paginas = extrair_texto_fitz_rapido(tmp_path)
-        pages = [Document(page_content=txt, metadata={"source": arquivo_name, "file_hash": file_hash}) for txt in textos_paginas]
-        
-        conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-        cursor = conn.cursor()
-        
-        parent_splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE_PAI, chunk_overlap=CHUNK_OVERLAP_PAI)
-        docs_pai = parent_splitter.split_documents(pages)
-        
-        child_splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE_FILHO, chunk_overlap=CHUNK_OVERLAP_FILHO)
-        docs_filho_para_chroma = []
-        
-        for i, doc_pai in enumerate(docs_pai):
-            parent_id = f"{file_hash}_pai_{i}"
-            cursor.execute("INSERT OR REPLACE INTO docstore_pai (parent_id, nome_doc, file_hash, conteudo) VALUES (?, ?, ?, ?)",
-                           (parent_id, arquivo_name, file_hash, doc_pai.page_content))
-            for filho in child_splitter.split_documents([doc_pai]):
-                filho.metadata.update({"source": arquivo_name, "file_hash": file_hash, "parent_id": parent_id})
-                docs_filho_para_chroma.append(filho)
-
-        conn.commit()
-        conn.close()
-
-        if docs_filho_para_chroma:
-            # Batching agressivo de inserção vetorial para salvar RAM
-            batch_size = 200 
-            for i in range(0, len(docs_filho_para_chroma), batch_size):
-                vector_store.add_documents(docs_filho_para_chroma[i:i + batch_size])
-        
+        pipeline.processar_pdf_bytes(pdf_bytes, arquivo_name, db_path=DB_PATH, vector_store=vector_store)
         session_state_ref.add(file_hash)
-        
-        # Otimização extrema de lixo de memória
-        del docs_pai, docs_filho_para_chroma, pages, textos_paginas
-        gc.collect()
-        
     except Exception as e:
         print(f"Erro fatal na thread do PDF {arquivo_name}: {e}")
-    finally:
-        if os.path.exists(tmp_path): os.remove(tmp_path)
 
 def processar_pdf_idempotente(arquivo_pdf):
     """Gerencia a thread de processamento e mantém a UI viva."""
     if not validar_tamanho_pdf(arquivo_pdf): raise ValueError(f"PDF {arquivo_pdf.name} muito grande.")
-    
+
     file_hash = gerar_hash_arquivo(arquivo_pdf)
-    
-    if file_hash in st.session_state['pdfs_processados']: 
+    if file_hash in st.session_state['pdfs_processados']:
         return {"sucesso": True, "status": "cache"}
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
-        tmp_file.write(arquivo_pdf.getvalue())
-        tmp_path = tmp_file.name
+    pdf_bytes = arquivo_pdf.getvalue()
 
-    # Delega a injeção pesada para a Thread
+    # Delega a injeção pesada para a Thread (mantém a UI desenhando frames)
     thread = threading.Thread(
-        target=_worker_processamento_pdf, 
-        args=(tmp_path, arquivo_pdf.name, file_hash, st.session_state['pdfs_processados'])
+        target=_worker_processamento_pdf,
+        args=(pdf_bytes, arquivo_pdf.name, file_hash, st.session_state['pdfs_processados'])
     )
     add_script_run_ctx(thread)
     thread.start()
-    
-    # UI Loader: Mantém o Streamlit desenhando frames enquanto a thread trabalha
+
     barra_progresso = st.progress(0, text=f"Indexando {arquivo_pdf.name} em Background...")
-    
     while thread.is_alive():
         for i in range(100):
             if not thread.is_alive(): break
             time.sleep(0.05)
             barra_progresso.progress((i + 1) % 100, text=f"Indexando vetores de {arquivo_pdf.name}...")
-            
     barra_progresso.empty()
-    
-    # Verifica se a thread falhou silenciosamente
+
     if file_hash not in st.session_state['pdfs_processados']:
         raise RuntimeError(f"Falha ao processar {arquivo_pdf.name}. Verifique os logs de Thread.")
-        
     return {"sucesso": True, "status": "indexado"}
 
 # ==========================================
-# MÓDULO M1.5: RAG HÍBRIDO OTIMIZADO
+# MÓDULO M1.5: RAG HÍBRIDO (delega ao pipeline; grava telemetria no session_state)
 # ==========================================
 def recuperar_contexto_filtrado(pergunta, arquivo_pdf):
     file_hash = gerar_hash_arquivo(arquivo_pdf)
-    
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    cursor = conn.cursor()
-    cursor.execute("SELECT conteudo FROM docstore_pai WHERE file_hash = ?", (file_hash,))
-    rows = cursor.fetchall()
-    conn.close()
-    
-    texto_completo = "\n".join([row[0] for row in rows])
+    contexto, chunks, telemetria = pipeline.recuperar_contexto(
+        pergunta, file_hash, db_path=DB_PATH, vector_store=vector_store
+    )
+    st.session_state['m1_5_ledger'][arquivo_pdf.name] = telemetria
+    return contexto, chunks
     if len(texto_completo) < 80000: 
         st.session_state['m1_5_ledger'][arquivo_pdf.name] = {"estrategia": "Leitura Total (Bypass)", "caracteres": len(texto_completo)}
         return texto_completo, [{"texto": "Full Context Bypass.", "score": 1.0}]
 
-    stopwords = {"qual", "quais", "como", "quem", "onde", "para", "pelo", "pela", "sobre", "entre", "seja", "esse", "este", "dos", "das", "nas", "nos", "que", "com", "por", "um", "uma"}
-    pergunta_norm = pergunta.lower().replace("percentual", "%").replace("porcentagem", "%")
-    palavras_limpas = [re.sub(r'[^a-záéíóúçãõâê%]', '', p) for p in pergunta_norm.split()]
-    termos_dinamicos = [p for p in palavras_limpas if (len(p) >= 4 or p == "%") and p not in stopwords]
-    ancora_principal = sorted([t for t in termos_dinamicos if t != "%"], key=len, reverse=True)[0] if [t for t in termos_dinamicos if t != "%"] else ""
-
-    contextos_finais = set()
-    chunks_exibicao = []
-
-    res_vetor = vector_store.similarity_search_with_score(pergunta, k=TOP_K_RETRIEVAL, filter={"file_hash": file_hash})
-    if res_vetor:
-        limite_corte = max(0.25, max([1.0 - dist for _, dist in res_vetor]) * 0.70)
-        conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-        cursor = conn.cursor()
-        for doc, dist in res_vetor:
-            if 1.0 - dist >= limite_corte:
-                cursor.execute("SELECT conteudo FROM docstore_pai WHERE parent_id = ?", (doc.metadata.get("parent_id"),))
-                row = cursor.fetchone()
-                if row and row[0] not in contextos_finais:
-                    contextos_finais.add(row[0])
-                    chunks_exibicao.append({"texto": row[0][:200] + "... [VETOR]", "score": 1.0 - dist})
-        conn.close()
-
-    contextos_lexicos = []
-    for row in rows: 
-        score_lex = sum((10 if t == "%" else len(t)) for t in termos_dinamicos if t in row[0].lower())
-        if ancora_principal and ancora_principal in row[0].lower(): score_lex += 15 
-        if score_lex >= 15: contextos_lexicos.append((score_lex, row[0]))
-    
-    contextos_lexicos.sort(key=lambda x: x[0], reverse=True)
-    for score, conteudo in contextos_lexicos[:6]:
-        if conteudo not in contextos_finais:
-            contextos_finais.add(conteudo)
-            chunks_exibicao.append({"texto": conteudo[:200] + "... [LÉXICO]", "score": min(0.99, score/100.0)})
-
-    st.session_state['m1_5_ledger'][arquivo_pdf.name] = {"estrategia": "Parent-Child RAG", "total_blocos": len(contextos_finais)}
-    return "\n\n--- [BLOCO PAI] ---\n\n".join(list(contextos_finais)[:8]), chunks_exibicao
-
 # ==========================================
-# EXTRADADOS M2 E M4
+# EXTRAÇÃO M2 (delega ao pipeline headless)
 # ==========================================
 def extrair_dado_com_ia(texto, pergunta):
-    if not texto.strip(): return resultado_vazio()
-    prompt = (
-        "Você é um Extrator Forense Especialista em Editais Governamentais.\n"
-        f"PERGUNTA DA AUDITORIA: {pergunta}\n\n"
-        "REGRAS:\n"
-        "1. Se a pergunta exigir ignorar algo e o texto tratar disso, 'violou_restricao_do_usuario' = True.\n"
-        "2. Se incompatível ou violado, 'resposta_direta' = 'NÃO LOCALIZADO'.\n"
-        f"TEXTO:\n{texto[:90000]}" 
-    )
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "Você é um auditor forense focado em validação de domínio e restrições negativas."},
-                {"role": "user", "content": prompt}
-            ],
-            tools=[{"type": "function", "function": {"name": "retornar_extracao", "parameters": ExtracaoUniversal.model_json_schema()}}],
-            tool_choice={"type": "function", "function": {"name": "retornar_extracao"}},
-            temperature=0.0 
-        )
-        dados = json.loads(response.choices[0].message.tool_calls[0].function.arguments)
-        
-        incompativel = not dados.get("houve_compatibilidade_ontologica", False)
-        violou_restricao = dados.get("violou_restricao_do_usuario", False)
-        
-        if incompativel or violou_restricao: return resultado_vazio()
-
-        resp = str(dados.get("resposta_direta", "NÃO LOCALIZADO")).strip()
-        return ExtracaoUniversal(
-            natureza_da_pergunta=str(dados.get("natureza_da_pergunta", "N/A")),
-            natureza_do_texto_encontrado=str(dados.get("natureza_do_texto_encontrado", "N/A")),
-            houve_compatibilidade_ontologica=True, violou_restricao_do_usuario=False,
-            resposta_direta=resp, tipo_dado=str(dados.get("tipo_dado", "NÃO LOCALIZADO")),
-            condicionantes=str(dados.get("condicionantes", "NÃO LOCALIZADO")),
-            trecho_literal=str(dados.get("trecho_literal", "LACUNA DE EVIDÊNCIA")),
-            confiabilidade=0.95 if resp != "NÃO LOCALIZADO" else 0.0
-        )
-    except Exception: return resultado_vazio()
+    return pipeline.extrair_dado(client, texto, pergunta)
 
 # Delegado ao núcleo testado (flare26_core). Mantido como alias por compatibilidade.
 limpar_e_extrair_numeros = core.extrair_numeros_br
