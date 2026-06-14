@@ -18,6 +18,8 @@ from langchain_core.documents import Document
 import threading
 from streamlit.runtime.scriptrunner import add_script_run_ctx
 
+import flare26_core as core  # Núcleo determinístico testado (sanitização, números BR, juiz simbólico)
+
 # ==========================================
 # CONFIGURAÇÕES E INICIALIZAÇÃO
 # ==========================================
@@ -81,13 +83,8 @@ def limpar_banco_sqlite():
 
 iniciar_banco_sqlite()
 
-def sanitizar_texto_pdf(texto_bruto):
-    if not texto_bruto: return ""
-    texto = texto_bruto.replace('\x00', '')
-    texto = re.sub(r'\n{3,}', '\n\n', texto)
-    texto = re.sub(r'-\n+', '', texto)
-    texto = re.sub(r'[ \t]+', ' ', texto)
-    return texto.strip()
+# Delegado ao núcleo testado (flare26_core). Mantido como alias por compatibilidade.
+sanitizar_texto_pdf = core.sanitizar_texto_pdf
 
 # ==========================================
 # SCHEMA AGNÓSTICO (PYDANTIC)
@@ -328,75 +325,22 @@ def extrair_dado_com_ia(texto, pergunta):
         )
     except Exception: return resultado_vazio()
 
-def limpar_e_extrair_numeros(texto):
-    """Normaliza e extrai valores numéricos do português BR para comparação simbólica.
-
-    Suporta formato BR (R$ 1.200.000,50 → 1200000.5), escalas (1,2 bilhões →
-    1200000000.0, 500 mil → 500000.0) e 'por cento' equivalente a '%'.
-    """
-    if not isinstance(texto, str):
-        return []
-
-    t = texto.lower().replace("por cento", "%").replace("r$", "").replace("reais", "")
-
-    ESCALAS = [
-        (r'bilh[õo]es?|bilh[aã]o|\bbil\b|\bbi\b', 1_000_000_000),
-        (r'milh[õo]es?|milh[aã]o|\bmi\b',         1_000_000),
-        (r'\bmil\b',                                1_000),
-    ]
-
-    def parse_br(s):
-        s = s.strip()
-        if re.match(r'^\d{1,3}(\.\d{3})+(,\d+)?$', s):
-            return float(s.replace('.', '').replace(',', '.'))
-        return float(s.replace(',', '.'))
-
-    NUM_PAT = r'\d{1,3}(?:\.\d{3})*(?:,\d+)?|\d+(?:,\d+)?'
-    resultados = set()
-
-    for m in re.finditer(rf'({NUM_PAT})', t):
-        try:
-            val = parse_br(m.group(1))
-        except ValueError:
-            continue
-
-        multiplicador = 1
-        trecho_depois = t[m.end():m.end() + 20]
-        for pattern, mult in ESCALAS:
-            if re.match(rf'\s*(?:{pattern})', trecho_depois):
-                multiplicador = mult
-                break
-
-        resultados.add(round(val * multiplicador, 2))
-
-    return sorted(resultados)
+# Delegado ao núcleo testado (flare26_core). Mantido como alias por compatibilidade.
+limpar_e_extrair_numeros = core.extrair_numeros_br
 
 def comparar_documentos(dado_A: ExtracaoUniversal, dado_B: ExtracaoUniversal, pergunta: str):
     """
-    Juiz Híbrido (Cost Killer). 
-    Tenta resolver por lógica matemática primeiro. Se falhar, apela para o GPT-4.
+    Juiz Híbrido (Cost Killer).
+    Tenta resolver pelo juiz simbólico determinístico (flare26_core). Só apela
+    para o GPT-4 quando o simbólico devolve INDETERMINADO.
     """
-    # 1. Filtro Simbólico de Existência
-    if dado_A.resposta_direta == "NÃO LOCALIZADO" and dado_B.resposta_direta == "NÃO LOCALIZADO":
-        return "LACUNA DE EVIDÊNCIA", ["Python (Simbólico): Nenhum documento possui a resposta para a pergunta."]
-    if dado_A.resposta_direta == "NÃO LOCALIZADO": 
-        return "DIVERGÊNCIA CRÍTICA", ["Python (Simbólico): Apenas Documento B contém a informação."]
-    if dado_B.resposta_direta == "NÃO LOCALIZADO": 
-        return "DIVERGÊNCIA CRÍTICA", ["Python (Simbólico): Apenas Documento A contém a informação."]
-
-    # 2. Filtro Simbólico de Igualdade Exata
-    if dado_A.resposta_direta.strip().lower() == dado_B.resposta_direta.strip().lower():
-        if dado_A.condicionantes.strip().lower() == dado_B.condicionantes.strip().lower():
-             return "CONSENSO TOTAL", ["Python (Simbólico): Os dados e condicionantes extraídos são strings idênticas."]
-
-    # 3. Filtro Simbólico Numérico (A Matemática não Mente)
-    nums_a = limpar_e_extrair_numeros(dado_A.resposta_direta)
-    nums_b = limpar_e_extrair_numeros(dado_B.resposta_direta)
-    
-    if nums_a and nums_b:
-        # Se o extrator achou números em ambos, mas os números não têm nenhuma intersecção
-        if not set(nums_a).intersection(set(nums_b)):
-            return "DIVERGÊNCIA CRÍTICA", [f"Python (Simbólico): Divergência matemática flagrante detectada ({nums_a} vs {nums_b}). Economizamos 1 chamada de API."]
+    # 1-3. Juiz simbólico determinístico (existência, igualdade, divergência numérica)
+    veredito, motivos = core.comparar_simbolico(
+        dado_A.resposta_direta, dado_A.condicionantes,
+        dado_B.resposta_direta, dado_B.condicionantes,
+    )
+    if veredito != core.INDETERMINADO:
+        return veredito, motivos
 
     # 4. Fallback Neural (Quando a Lógica Simbólica não é suficiente)
     prompt_juiz = (
