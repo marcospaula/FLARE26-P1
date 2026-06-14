@@ -1,0 +1,77 @@
+{
+  "_schema": {
+    "descricao": "Benchmark de abstenção ontológica FLARE26. Ver eval/README.md.",
+    "campos": ["id", "pergunta", "documento", "gold", "evidencia", "verificado"],
+    "nota": "gold='ABSTAIN' quando o documento NÃO contém o dado pedido."
+  },
+  "itens": [
+    {
+      "id": "atraso-A",
+      "pergunta": "Qual a multa por atraso no pagamento?",
+      "documento": "Contrato_A_Multa_Fixa.pdf",
+      "gold": "R$ 5.000,00",
+      "evidencia": "multa fixa de R$ 5.000,00 por evento de atraso",
+      "verificado": true
+    },
+    {
+      "id": "atraso-B",
+      "pergunta": "Qual a multa por atraso no pagamento?",
+      "documento": "Contrato_B_Multa_Diaria.pdf",
+      "gold": "0,5% por dia de atraso, limitada a 10%",
+      "evidencia": "multa de 0,5% (meio por cento) por dia de atraso, limitada a 10% do valor devido",
+      "verificado": true
+    },
+    {
+      "id": "atraso-K",
+      "pergunta": "Qual a multa por atraso no pagamento?",
+      "documento": "Contrato_K_MultaSuspensão.pdf",
+      "gold": "0,5% ao dia até 10 dias; 1% ao dia acima de 10 dias + suspensão",
+      "evidencia": "Para atraso <= 10 dias: multa de 0,5% ao dia. Para atraso > 10 dias: multa de 1% ao dia + suspensão do contrato até regularização.",
+      "verificado": true
+    },
+    {
+      "id": "atraso-L",
+      "pergunta": "Qual a multa por atraso no pagamento?",
+      "documento": "Contrato_L_ApenasMulta.pdf",
+      "gold": "2% ao dia, limitada a 20% do valor do contrato",
+      "evidencia": "multa de 2% ao dia, limitada a 20% do valor do contrato",
+      "verificado": true
+    },
+    {
+      "id": "inexec-A",
+      "pergunta": "Qual o valor da multa por inexecução total do objeto?",
+      "documento": "Contrato_A_Multa_Fixa.pdf",
+      "gold": "ABSTAIN",
+      "evidencia": "",
+      "verificado": true
+    },
+    {
+      "id": "inexec-B",
+      "pergunta": "Qual o valor da multa por inexecução total do objeto?",
+      "documento": "Contrato_B_Multa_Diaria.pdf",
+      "gold": "ABSTAIN",
+      "evidencia": "",
+      "verificado": true
+    },
+    {
+      "id": "multa-C",
+      "pergunta": "Qual a multa por atraso no pagamento?",
+      "documento": "Contrato_C_30Dias.pdf",
+      "gold": "ABSTAIN",
+      "evidencia": "",
+      "verificado": true
+    },
+    {
+      "id": "multa-D",
+      "pergunta": "Qual a multa por atraso no pagamento?",
+      "documento": "Contrato_D_15Dias.pdf",
+      "gold": "ABSTAIN",
+      "evidencia": "",
+      "verificado": true
+    }
+  ],
+  "_todo": [
+    "Verificar e rotular prazo de pagamento (C/D/I/J), danos morais (O/P), e os editais governamentais com cláusula de inexecução (gold != ABSTAIN).",
+    "Adicionar pares de CONSENSO (mesmo valor em 2+ docs) para medir falso-positivo de divergência."
+  ]
+}
