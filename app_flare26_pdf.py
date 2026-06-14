@@ -61,6 +61,8 @@ def gerar_hash_arquivo(arquivo_pdf):
 # ==========================================
 # MOTOR SQLITE E SANITIZADOR DE OCR
 # ==========================================
+COLUNAS_DOCSTORE = {"parent_id", "nome_doc", "file_hash", "conteudo"}
+
 def iniciar_banco_sqlite():
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     cursor = conn.cursor()
@@ -72,6 +74,19 @@ def iniciar_banco_sqlite():
             conteudo TEXT
         )
     ''')
+    # Guard de migração: caches antigos (versão _sqlite) não têm 'file_hash'.
+    # Como o docstore é regenerável, recriamos a tabela se o schema divergir.
+    colunas = {row[1] for row in cursor.execute("PRAGMA table_info(docstore_pai)")}
+    if colunas != COLUNAS_DOCSTORE:
+        cursor.execute("DROP TABLE IF EXISTS docstore_pai")
+        cursor.execute('''
+            CREATE TABLE docstore_pai (
+                parent_id TEXT PRIMARY KEY,
+                nome_doc TEXT,
+                file_hash TEXT,
+                conteudo TEXT
+            )
+        ''')
     conn.commit()
     conn.close()
 
@@ -328,92 +343,89 @@ def extrair_dado_com_ia(texto, pergunta):
 # Delegado ao núcleo testado (flare26_core). Mantido como alias por compatibilidade.
 limpar_e_extrair_numeros = core.extrair_numeros_br
 
-def comparar_documentos(dado_A: ExtracaoUniversal, dado_B: ExtracaoUniversal, pergunta: str):
-    """
-    Juiz Híbrido (Cost Killer).
-    Tenta resolver pelo juiz simbólico determinístico (flare26_core). Só apela
-    para o GPT-4 quando o simbólico devolve INDETERMINADO.
-    """
-    # 1-3. Juiz simbólico determinístico (existência, igualdade, divergência numérica)
-    veredito, motivos = core.comparar_simbolico(
-        dado_A.resposta_direta, dado_A.condicionantes,
-        dado_B.resposta_direta, dado_B.condicionantes,
-    )
-    if veredito != core.INDETERMINADO:
-        return veredito, motivos
+# NOTA: o juiz par-a-par com fallback neural foi sucedido pelo juiz N-way
+# (core.comparar_n_documentos). Próximo passo: fundir grupos textuais
+# semanticamente equivalentes via um passe neural opcional (recuperável no git).
 
-    # 4. Fallback Neural (Quando a Lógica Simbólica não é suficiente)
-    prompt_juiz = (
-        "Como as respostas são complexas e semanticamente ambíguas, julgue a equivalência.\n"
-        f"Pergunta: {pergunta}\n"
-        f"Resp A: {dado_A.resposta_direta} (Condições: {dado_A.condicionantes})\n"
-        f"Resp B: {dado_B.resposta_direta} (Condições: {dado_B.condicionantes})\n\n"
-        "Retorne um JSON exato: {'veredito': 'CONSENSO TOTAL' ou 'DIVERGÊNCIA CRÍTICA', 'motivos': ['Motivo detalhado']}"
-    )
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini", response_format={"type": "json_object"},
-            messages=[{"role": "user", "content": prompt_juiz}], temperature=0.0
-        )
-        res = json.loads(response.choices[0].message.content)
-        motivo = res.get("motivos", ["Erro."])
-        if isinstance(motivo, list): motivo = motivo[0]
-        return res.get("veredito", "DIVERGÊNCIA CRÍTICA"), [f"LLM M4 (Neural): {motivo}"]
-    except Exception: 
-        return "DIVERGÊNCIA CRÍTICA", ["Falha na comparação neural."]
+def gerar_parecer_n(pergunta, resultado: core.ResultadoConsenso, extracoes: dict):
+    """Parecer executivo (M5) sobre a auditoria de N documentos.
 
-def gerar_parecer(extracao_a, extracao_b, veredito, pergunta):
+    Ancorado APENAS no resultado simbólico do M4 (enclausuramento neural):
+    o LLM redige a narrativa, mas os fatos vêm da matriz determinística.
+    """
+    linhas_grupos = []
+    for g in resultado.grupos:
+        linhas_grupos.append(f"- Valor '{g.valor}': {', '.join(g.documentos)}")
+    if resultado.lacunas:
+        linhas_grupos.append(f"- Sem o dado: {', '.join(resultado.lacunas)}")
+    contexto = "\n".join(linhas_grupos)
     try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[{"role": "user", "content": f"Gere um parecer executivo formal (3 frases) para laudo pericial.\nPergunta: {pergunta}\nVeredito: {veredito}\nDoc A: {extracao_a.resposta_direta}\nDoc B: {extracao_b.resposta_direta}"}],
+            messages=[{"role": "user", "content": (
+                "Gere um parecer executivo formal (máx. 4 frases) para laudo pericial "
+                "sobre a comparação de múltiplos documentos. NÃO invente números; use "
+                "apenas os fatos abaixo.\n"
+                f"Pergunta: {pergunta}\n"
+                f"Veredito: {resultado.veredito}\n"
+                f"Agrupamento:\n{contexto}"
+            )}],
             temperature=0.2
         )
         return response.choices[0].message.content
-    except Exception: return "Falha ao gerar parecer."
+    except Exception:
+        return resultado.resumo
 
-def gerar_relatorio_markdown(pergunta, arquivo_a, arquivo_b, extracao_a, extracao_b, veredito, motivos, parecer):
-    """Gera o laudo forense estruturado para download."""
+def gerar_relatorio_markdown_n(pergunta, resultado: core.ResultadoConsenso,
+                               extracoes: dict, parecer: str) -> str:
+    """Laudo forense estruturado para auditoria de N documentos."""
     data_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    md = f"""# 🏛️ LAUDO DE AUDITORIA FORENSE AUTOMATIZADA
-**Projeto:** FLARE26-P1 (Motor Neuro-Simbólico)
-**Data da Emissão:** {data_hora}
+    linhas = [
+        "# 🏛️ LAUDO DE AUDITORIA FORENSE AUTOMATIZADA",
+        "**Projeto:** FLARE26-P1 (Motor Neuro-Simbólico)",
+        f"**Data da Emissão:** {data_hora}",
+        "",
+        "## 1. ESCOPO DA AUDITORIA",
+        f"* **Pergunta Alvo:** {pergunta}",
+        f"* **Documentos Auditados:** {len(extracoes)}",
+        "",
+        "## 2. VEREDICTO DO JUIZ M4 (N-WAY)",
+        f"**Status:** {resultado.veredito}",
+        f"**Síntese:** {resultado.resumo}",
+        "",
+        "### Agrupamento de Consenso",
+    ]
+    for i, g in enumerate(resultado.grupos, 1):
+        linhas.append(f"* **Grupo {i} — {g.valor}** ({len(g.documentos)} doc): {', '.join(g.documentos)}")
+    if resultado.lacunas:
+        linhas.append(f"* **Lacuna de Evidência** ({len(resultado.lacunas)} doc): {', '.join(resultado.lacunas)}")
 
-## 1. ESCOPO DA AUDITORIA
-* **Pergunta Alvo:** {pergunta}
-* **Documento A (Referência):** {arquivo_a.name}
-* **Documento B (Comparativo):** {arquivo_b.name}
+    linhas += ["", "---", "## 3. EXTRAÇÃO DOCUMENTAL (M2)", ""]
+    for nome, ext in extracoes.items():
+        linhas += [
+            f"### 📄 {nome}",
+            f"* **Resposta Extraída:** {ext.resposta_direta}",
+            f"* **Condicionante:** {ext.condicionantes}",
+            f"* **Tipo de Dado:** {ext.tipo_dado}",
+            f"> \"{ext.trecho_literal}\"",
+            "",
+        ]
 
-## 2. VEREDICTO DO JUIZ NEURAL (M4)
-**Status:** {veredito}
-**Justificativa:** {motivos[0]}
+    linhas += [
+        "---",
+        "## 4. PARECER EXECUTIVO (M5)",
+        parecer,
+        "",
+        "---",
+        "*Laudo gerado por IA Determinística. Verifique as hashes dos arquivos fonte.*",
+    ]
+    return "\n".join(linhas)
 
----
-## 3. EXTRAÇÃO DOCUMENTAL (M2)
+def salvar_no_ledger_local(pergunta, documentos, ledger_json):
+    """Salva a auditoria atual no ledger JSON de longo prazo.
 
-### 📄 DOCUMENTO A
-* **Resposta Extraída:** {extracao_a.resposta_direta}
-* **Condicionante:** {extracao_a.condicionantes}
-* **Tipo de Dado (Ontologia):** {extracao_a.tipo_dado}
-> **Trecho Literal:** "{extracao_a.trecho_literal}"
-
-### 📄 DOCUMENTO B
-* **Resposta Extraída:** {extracao_b.resposta_direta}
-* **Condicionante:** {extracao_b.condicionantes}
-* **Tipo de Dado (Ontologia):** {extracao_b.tipo_dado}
-> **Trecho Literal:** "{extracao_b.trecho_literal}"
-
----
-## 4. PARECER EXECUTIVO (M5)
-{parecer}
-
----
-*Laudo gerado criptograficamente por IA Determinística. Verifique as hashes dos arquivos fonte para garantia de inalterabilidade.*
-"""
-    return md
-
-def salvar_no_ledger_local(pergunta, arquivo_a, arquivo_b, ledger_json):
-    """Salva a auditoria atual no ledger JSON de longo prazo."""
+    `documentos` é a lista de nomes auditados (N-way).
+    """
     if os.path.exists(LEDGER_FILE):
         try:
             with open(LEDGER_FILE, 'r', encoding='utf-8') as f:
@@ -422,11 +434,11 @@ def salvar_no_ledger_local(pergunta, arquivo_a, arquivo_b, ledger_json):
             historico = []
     else:
         historico = []
-    
+
     registro = {
         "timestamp": datetime.now().isoformat(),
         "pergunta_auditoria": pergunta,
-        "documentos_auditados": [arquivo_a, arquivo_b],
+        "documentos_auditados": list(documentos),
         "telemetria": ledger_json
     }
     historico.append(registro)
@@ -469,112 +481,127 @@ with st.sidebar:
 
 # --- MAIN WORKSPACE ---
 st.title("🔍 FLARE26: Dashboard Forense")
-st.markdown("###### *Ensemble Retrieval (Vetor + Léxico) e Validação Ontológica*")
+st.markdown("###### *Auditoria N-way: Ensemble Retrieval (Vetor + Léxico) e Validação Ontológica*")
 
-col_upload1, col_upload2 = st.columns(2)
-with col_upload1: arquivo_a = st.file_uploader("📄 Documento A (Referência)", type="pdf", key="file_a")
-with col_upload2: arquivo_b = st.file_uploader("📄 Documento B (Comparativo)", type="pdf", key="file_b")
+arquivos = st.file_uploader(
+    "📄 Documentos para auditoria (selecione 2 ou mais PDFs)",
+    type="pdf", accept_multiple_files=True, key="files_n"
+)
 
-pergunta_auditoria = st.text_input("❓ Objeto de Auditoria (Pergunta Forense)", placeholder="Ex: Qual o prazo estipulado para pagamento da fatura?")
+pergunta_auditoria = st.text_input(
+    "❓ Objeto de Auditoria (Pergunta Forense)",
+    placeholder="Ex: Qual o prazo estipulado para pagamento da fatura?"
+)
 
 if st.button("🚀 Iniciar Motor Neuro-Simbólico", type="primary", use_container_width=True):
-    if arquivo_a and arquivo_b and pergunta_auditoria:
+    if arquivos and len(arquivos) >= 2 and pergunta_auditoria:
         start_time = time.time()
-        
-        # --- TERMINAL DE STATUS (Módulo M1.5 a M4) ---
-        with st.status("⚙️ Executando Pipeline de Auditoria...", expanded=True) as status:
-            st.write("⏳ Verificando integridade e hashing (Idempotência)...")
-            status_a = processar_pdf_idempotente(arquivo_a)
-            status_b = processar_pdf_idempotente(arquivo_b)
-            if status_a["status"] == "cache" and status_b["status"] == "cache":
-                st.write("⚡ Bypass ativado: Documentos lidos diretamente do cache local.")
-            
-            st.write("🔍 [M1.5] Cruzando matrizes vetoriais com léxico dinâmico...")
-            contexto_a, filhos_a = recuperar_contexto_filtrado(pergunta_auditoria, arquivo_a)
-            contexto_b, filhos_b = recuperar_contexto_filtrado(pergunta_auditoria, arquivo_b)
-            
-            st.write("🤖 [M2] Aplicando Validação Ontológica e extraindo evidências...")
-            extracao_a = extrair_dado_com_ia(contexto_a, pergunta_auditoria)
-            extracao_b = extrair_dado_com_ia(contexto_b, pergunta_auditoria)
-            
-            st.write("⚖️ [M4] Submetendo ao Juiz Neural para Análise de Divergência...")
-            veredito, motivos = comparar_documentos(extracao_a, extracao_b, pergunta_auditoria)
-            
-            st.write("📝 [M5] Sintetizando o Parecer Executivo...")
-            parecer = gerar_parecer(extracao_a, extracao_b, veredito, pergunta_auditoria)
-            
-            tempo_total = time.time() - start_time
-            status.update(label=f"✅ Auditoria Concluída com Sucesso ({tempo_total:.2f}s)", state="complete", expanded=False)
+        extracoes = {}          # nome_doc -> ExtracaoUniversal
+        chunks_por_doc = {}     # nome_doc -> filhos (telemetria)
 
-        # --- NAVEGAÇÃO POR ABAS (Apresentação Limpa) ---
-        tab_laudo, tab_dados, tab_telemetria = st.tabs(["⚖️ Veredicto Final", "📊 Base de Evidências", "🕵️‍♂️ Caixa de Vidro (Logs)"])
+        # --- TERMINAL DE STATUS (Pipeline M1.5 a M5) ---
+        with st.status("⚙️ Executando Pipeline de Auditoria N-way...", expanded=True) as status:
+            for i, arq in enumerate(arquivos, 1):
+                st.write(f"⏳ [{i}/{len(arquivos)}] Indexando e extraindo de **{arq.name}**...")
+                processar_pdf_idempotente(arq)
+                contexto, filhos = recuperar_contexto_filtrado(pergunta_auditoria, arq)
+                extracoes[arq.name] = extrair_dado_com_ia(contexto, pergunta_auditoria)
+                chunks_por_doc[arq.name] = filhos
+
+            st.write("⚖️ [M4] Juiz N-way: agrupando respostas por consenso determinístico...")
+            resultado = core.comparar_n_documentos(
+                {nome: ext.resposta_direta for nome, ext in extracoes.items()}
+            )
+
+            st.write("📝 [M5] Sintetizando o Parecer Executivo...")
+            parecer = gerar_parecer_n(pergunta_auditoria, resultado, extracoes)
+
+            tempo_total = time.time() - start_time
+            status.update(label=f"✅ Auditoria de {len(arquivos)} documentos concluída ({tempo_total:.2f}s)",
+                          state="complete", expanded=False)
+
+        # Mapa doc -> rótulo do grupo (para a tabela)
+        grupo_de = {}
+        for idx, g in enumerate(resultado.grupos, 1):
+            for d in g.documentos:
+                grupo_de[d] = f"Grupo {idx} ({g.valor})"
+        for d in resultado.lacunas:
+            grupo_de[d] = "Lacuna"
+
+        # --- NAVEGAÇÃO POR ABAS ---
+        tab_laudo, tab_dados, tab_telemetria = st.tabs(
+            ["⚖️ Veredicto Final", "📊 Base de Evidências", "🕵️‍♂️ Caixa de Vidro (Logs)"]
+        )
 
         with tab_laudo:
-            # Renderização de Veredicto
-            if veredito == "CONSENSO TOTAL":
-                st.markdown(f'<div class="card-resultado card-sucesso"><h2>✅ {veredito}</h2><h4>{motivos[0]}</h4></div>', unsafe_allow_html=True)
-            elif veredito == "LACUNA DE EVIDÊNCIA":
-                st.markdown(f'<div class="card-resultado card-aviso"><h2>⚠️ {veredito}</h2><h4>{motivos[0]}</h4></div>', unsafe_allow_html=True)
+            veredito = resultado.veredito
+            if veredito == core.CONSENSO:
+                st.markdown(f'<div class="card-resultado card-sucesso"><h2>✅ {veredito}</h2><h4>{resultado.resumo}</h4></div>', unsafe_allow_html=True)
+            elif veredito == core.LACUNA_EVIDENCIA:
+                st.markdown(f'<div class="card-resultado card-aviso"><h2>⚠️ {veredito}</h2><h4>{resultado.resumo}</h4></div>', unsafe_allow_html=True)
             else:
-                st.markdown(f'<div class="card-resultado card-erro"><h2>⚔️ {veredito}</h2><h4>{motivos[0]}</h4></div>', unsafe_allow_html=True)
-            
+                st.markdown(f'<div class="card-resultado card-erro"><h2>⚔️ {veredito}</h2><h4>{resultado.resumo}</h4></div>', unsafe_allow_html=True)
+
+            # Métricas de topo
+            m1, m2, m3, m4 = st.columns(4)
+            m1.metric("📄 Documentos", len(extracoes))
+            m2.metric("🧩 Grupos de valor", len(resultado.grupos))
+            m3.metric("⚠️ Lacunas", len(resultado.lacunas))
+            conf_media = (sum(e.confiabilidade for e in extracoes.values()) / len(extracoes)) if extracoes else 0.0
+            m4.metric("🎯 Confiança média", f"{conf_media:.0%}")
+
+            st.markdown("### 🧩 Agrupamento de Consenso")
+            for idx, g in enumerate(resultado.grupos, 1):
+                st.markdown(f"**Grupo {idx} — `{g.valor}`** ({len(g.documentos)} doc): {', '.join(g.documentos)}")
+            if resultado.lacunas:
+                st.markdown(f"**⚠️ Sem o dado** ({len(resultado.lacunas)} doc): {', '.join(resultado.lacunas)}")
+
             st.markdown("### 📝 Parecer do Auditor Chefe")
             st.info(parecer)
-            
-            # Gerador de Arquivo Exportável
-            relatorio_md = gerar_relatorio_markdown(pergunta_auditoria, arquivo_a, arquivo_b, extracao_a, extracao_b, veredito, motivos, parecer)
+
+            relatorio_md = gerar_relatorio_markdown_n(pergunta_auditoria, resultado, extracoes, parecer)
             st.download_button(
                 label="📥 Baixar Laudo Forense Oficial (.md)",
-                data=relatorio_md,
+                # BOM UTF-8 ("﻿") força editores que defaultam p/ Latin-1/cp1252
+                # a detectar UTF-8 e evita mojibake (ó->Ã³, 🏛️->ðï¸).
+                data=("﻿" + relatorio_md).encode("utf-8"),
                 file_name=f"laudo_flare26_{int(time.time())}.md",
-                mime="text/markdown",
-                type="primary",
-                use_container_width=True
+                mime="text/markdown; charset=utf-8", type="primary", use_container_width=True
             )
 
         with tab_dados:
-            col_res1, col_res2 = st.columns(2)
-            with col_res1:
-                st.markdown(f"""
-                <div class="card-resultado">
-                    <h5 style="color: #4CAF50;">📄 {arquivo_a.name}</h5>
-                    <p><strong>Resposta Bruta:</strong> {extracao_a.resposta_direta}</p>
-                    <p><strong>Condição Legal:</strong> {extracao_a.condicionantes}</p>
-                    <p><strong>Domínio/Ontologia:</strong> {extracao_a.tipo_dado}</p>
-                    <hr>
-                    <p style="font-size: 0.85em; color: #aaa;"><i>"{extracao_a.trecho_literal}"</i></p>
-                </div>
-                """, unsafe_allow_html=True)
-            with col_res2:
-                st.markdown(f"""
-                <div class="card-resultado">
-                    <h5 style="color: #4CAF50;">📄 {arquivo_b.name}</h5>
-                    <p><strong>Resposta Bruta:</strong> {extracao_b.resposta_direta}</p>
-                    <p><strong>Condição Legal:</strong> {extracao_b.condicionantes}</p>
-                    <p><strong>Domínio/Ontologia:</strong> {extracao_b.tipo_dado}</p>
-                    <hr>
-                    <p style="font-size: 0.85em; color: #aaa;"><i>"{extracao_b.trecho_literal}"</i></p>
-                </div>
-                """, unsafe_allow_html=True)
+            tabela = [{
+                "Documento": nome,
+                "Resposta": ext.resposta_direta,
+                "Condicionante": ext.condicionantes,
+                "Tipo": ext.tipo_dado,
+                "Confiança": f"{ext.confiabilidade:.0%}",
+                "Grupo": grupo_de.get(nome, "—"),
+            } for nome, ext in extracoes.items()]
+            st.dataframe(tabela, use_container_width=True, hide_index=True)
+
+            for nome, ext in extracoes.items():
+                with st.expander(f"📄 Trecho literal — {nome}"):
+                    st.caption(ext.trecho_literal)
 
         with tab_telemetria:
             st.markdown("### JSON Provenience Ledger")
             json_prov = {
                 "M1.5_Gatekeeper": st.session_state.get('m1_5_ledger', {}),
-                "M2_Extrator_Score": {"doc_A": extracao_a.confiabilidade, "doc_B": extracao_b.confiabilidade},
-                "M4_Juiz_Neural": {"veredito": veredito}
+                "M2_Extrator_Score": {nome: ext.confiabilidade for nome, ext in extracoes.items()},
+                "M4_Juiz_NWay": {
+                    "veredito": resultado.veredito,
+                    "grupos": [{"valor": g.valor, "documentos": list(g.documentos)} for g in resultado.grupos],
+                    "lacunas": list(resultado.lacunas),
+                },
             }
             st.json(json_prov)
-            salvar_no_ledger_local(pergunta_auditoria, arquivo_a.name, arquivo_b.name, json_prov)
-            
-            st.markdown("### Roteamento Vetorial (Top Chunks)")
-            col_v1, col_v2 = st.columns(2)
-            with col_v1:
-                st.caption(f"Chunks injetados via {arquivo_a.name}")
-                st.write(filhos_a)
-            with col_v2:
-                st.caption(f"Chunks injetados via {arquivo_b.name}")
-                st.write(filhos_b)
+            salvar_no_ledger_local(pergunta_auditoria, list(extracoes.keys()), json_prov)
+
+            st.markdown("### Roteamento Vetorial (Top Chunks por documento)")
+            for nome, filhos in chunks_por_doc.items():
+                with st.expander(f"Chunks injetados via {nome}"):
+                    st.write(filhos)
 
     else:
-        st.warning("⚠️ Forneça os dois documentos base e o objeto da auditoria para iniciar a máquina.")
+        st.warning("⚠️ Forneça **ao menos 2 documentos** e o objeto da auditoria para iniciar a máquina.")
