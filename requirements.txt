@@ -10,3 +10,6 @@ pymupdf>=1.24.0
 python-dotenv>=1.0.0
 wikipedia>=1.4.0
 ollama>=0.2.0
+
+# --- Dev / testes ---
+pytest>=8.0.0
