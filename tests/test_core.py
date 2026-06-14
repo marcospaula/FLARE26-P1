@@ -119,6 +119,56 @@ class TestPontuacaoLexica:
 
 
 # --------------------------------------------------------------------------
+# Juiz N-way (consenso por agrupamento)
+# --------------------------------------------------------------------------
+class TestComparaNDocumentos:
+    def test_consenso_total(self):
+        r = core.comparar_n_documentos({"A": "10%", "B": "10%", "C": "10%"})
+        assert r.veredito == core.CONSENSO
+        assert len(r.grupos) == 1
+        assert set(r.grupos[0].documentos) == {"A", "B", "C"}
+        assert r.lacunas == ()
+
+    def test_equivalencia_numerica_agrupa(self):
+        # "12,5%" e "12.5 por cento" devem cair no mesmo grupo.
+        r = core.comparar_n_documentos({"A": "12,5%", "B": "12.5 por cento"})
+        assert r.veredito == core.CONSENSO
+        assert len(r.grupos) == 1
+
+    def test_divergencia_em_grupos(self):
+        r = core.comparar_n_documentos({"A": "10%", "B": "20%", "C": "10%"})
+        assert r.veredito == core.DIVERGENCIA
+        assert len(r.grupos) == 2
+        # Grupo mais populoso primeiro
+        assert set(r.grupos[0].documentos) == {"A", "C"}
+
+    def test_lacuna_parcial(self):
+        r = core.comparar_n_documentos({"A": "10%", "B": core.NAO_LOCALIZADO})
+        assert r.veredito == core.DIVERGENCIA
+        assert r.lacunas == ("B",)
+        assert len(r.grupos) == 1
+
+    def test_todos_lacuna(self):
+        r = core.comparar_n_documentos({"A": core.NAO_LOCALIZADO, "B": core.NAO_LOCALIZADO})
+        assert r.veredito == core.LACUNA_EVIDENCIA
+        assert r.grupos == ()
+        assert set(r.lacunas) == {"A", "B"}
+
+    def test_um_documento_consenso_trivial(self):
+        r = core.comparar_n_documentos({"A": "R$ 5.000,00"})
+        assert r.veredito == core.CONSENSO
+
+    def test_resumo_legivel(self):
+        r = core.comparar_n_documentos({"A": "10%", "B": "10%"})
+        assert "concordam" in r.resumo.lower()
+
+    def test_compativel_com_par_simbolico(self):
+        # N-way com 2 docs divergentes numericamente == juiz par.
+        r = core.comparar_n_documentos({"A": "12,5%", "B": "20%"})
+        assert r.veredito == core.DIVERGENCIA
+
+
+# --------------------------------------------------------------------------
 # REGRESSÃO: re-julga as 98 extrações reais do ledger histórico
 # --------------------------------------------------------------------------
 FIXTURE = Path(__file__).parent / "fixtures" / "ledger_snapshot.json"

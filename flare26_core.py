@@ -199,3 +199,90 @@ def comparar_simbolico(resp_a: str, cond_a: str,
 
     # 4. Inconclusivo → caller deve acionar o juiz neural
     return INDETERMINADO, ["Simbólico inconclusivo: requer julgamento neural (M4 LLM)."]
+
+
+# ==========================================================================
+# JUIZ N-WAY (consenso por agrupamento) — escala A-vs-B para N documentos
+# ==========================================================================
+@dataclass(frozen=True)
+class GrupoConsenso:
+    """Um agrupamento de documentos que extraíram a mesma resposta."""
+    valor: str                 # rótulo legível do valor representativo do grupo
+    documentos: tuple[str, ...]
+    numeros: tuple[float, ...]  # números normalizados (vazio se resposta textual)
+
+
+@dataclass(frozen=True)
+class ResultadoConsenso:
+    """Veredito agregado do M4 sobre N documentos."""
+    veredito: str
+    grupos: tuple[GrupoConsenso, ...]   # grupos com dado, do maior para o menor
+    lacunas: tuple[str, ...]            # documentos sem a informação
+    resumo: str
+
+
+def _chave_canonica(resposta: str) -> tuple:
+    """Chave determinística de equivalência de uma resposta.
+
+    - "NÃO LOCALIZADO" → sentinela de lacuna
+    - resposta com números → equivalência pelo CONJUNTO de números (12,5% ≡ 12.5)
+    - resposta textual → string normalizada (minúscula, espaços colapsados)
+    """
+    r = (resposta or "").strip()
+    if not r or r.upper() == NAO_LOCALIZADO:
+        return ("__LACUNA__",)
+    nums = extrair_numeros_br(r)
+    if nums:
+        return ("num", frozenset(nums))
+    return ("txt", re.sub(r"\s+", " ", r.lower()))
+
+
+def comparar_n_documentos(extracoes: dict[str, str]) -> ResultadoConsenso:
+    """Juiz N-way determinístico: agrupa documentos por resposta equivalente.
+
+    `extracoes` mapeia nome_do_documento → resposta_direta extraída (M2).
+    Retorna grupos de consenso, lacunas e um veredito agregado. Tudo O(N),
+    sem nenhuma chamada de IA (cost-killer também na escala).
+    """
+    grupos_map: dict[tuple, list[str]] = {}
+    lacunas: list[str] = []
+
+    for nome, resposta in extracoes.items():
+        chave = _chave_canonica(resposta)
+        if chave == ("__LACUNA__",):
+            lacunas.append(nome)
+        else:
+            grupos_map.setdefault(chave, []).append((nome, resposta))
+
+    grupos: list[GrupoConsenso] = []
+    for chave, itens in grupos_map.items():
+        docs = tuple(nome for nome, _ in itens)
+        valor_label = itens[0][1].strip()  # primeira resposta como rótulo
+        numeros = tuple(chave[1]) if chave[0] == "num" else ()
+        grupos.append(GrupoConsenso(valor=valor_label, documentos=docs, numeros=numeros))
+
+    # Ordena do grupo mais populoso para o menor (estável por valor)
+    grupos.sort(key=lambda g: (-len(g.documentos), g.valor))
+    grupos_t = tuple(grupos)
+    lacunas_t = tuple(lacunas)
+
+    # Veredito agregado
+    n_grupos = len(grupos_t)
+    if n_grupos == 0:
+        veredito = LACUNA_EVIDENCIA
+        resumo = "Nenhum documento contém a informação auditada."
+    elif n_grupos == 1 and not lacunas_t:
+        veredito = CONSENSO
+        resumo = f"Todos os {len(grupos_t[0].documentos)} documentos concordam: {grupos_t[0].valor}."
+    elif n_grupos == 1 and lacunas_t:
+        veredito = DIVERGENCIA
+        resumo = (f"{len(grupos_t[0].documentos)} documento(s) concordam em "
+                  f"'{grupos_t[0].valor}', mas {len(lacunas_t)} não contêm o dado.")
+    else:
+        veredito = DIVERGENCIA
+        resumo = f"Divergência: {n_grupos} valores distintos entre os documentos."
+        if lacunas_t:
+            resumo += f" Além de {len(lacunas_t)} sem o dado."
+
+    return ResultadoConsenso(veredito=veredito, grupos=grupos_t,
+                             lacunas=lacunas_t, resumo=resumo)
