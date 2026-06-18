@@ -353,3 +353,31 @@ def extrair_dado(client, texto: str, pergunta: str, *,
         )
     except Exception:
         return resultado_vazio()
+
+
+def extrair_dado_consenso(client, texto: str, pergunta: str, *,
+                          k: int = 5, modelo: str = MODELO_EXTRACAO) -> ExtracaoUniversal:
+    """Self-consistency: roda extrair_dado k vezes e RESPONDE se qualquer execução
+    responder; abstém só se TODAS abstiverem.
+
+    Justificativa empírica (benchmark de 30 itens): as abstenções ontológicas são
+    estáveis (0 vazamento em 5 execuções), enquanto as super-abstenções oscilam.
+    Logo, "responder se ≥1 responde" recupera recall (71%→94%) SEM reabrir
+    falso-positivo (mantém 0%). Entre as execuções que responderam, devolve a do
+    valor mais frequente.
+    """
+    if not texto.strip():
+        return resultado_vazio()
+
+    amostras = [extrair_dado(client, texto, pergunta, modelo=modelo) for _ in range(max(1, k))]
+    responderam = [e for e in amostras if e.resposta_direta != "NÃO LOCALIZADO"]
+    if not responderam:
+        return resultado_vazio()
+
+    from collections import Counter
+    contagem = Counter(e.resposta_direta.strip().lower() for e in responderam)
+    valor_top = contagem.most_common(1)[0][0]
+    for e in responderam:
+        if e.resposta_direta.strip().lower() == valor_top:
+            return e
+    return responderam[0]

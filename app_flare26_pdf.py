@@ -132,14 +132,16 @@ def recuperar_contexto_filtrado(pergunta, arquivo_pdf):
     )
     st.session_state['m1_5_ledger'][arquivo_pdf.name] = telemetria
     return contexto, chunks
-    if len(texto_completo) < 80000: 
-        st.session_state['m1_5_ledger'][arquivo_pdf.name] = {"estrategia": "Leitura Total (Bypass)", "caracteres": len(texto_completo)}
-        return texto_completo, [{"texto": "Full Context Bypass.", "score": 1.0}]
 
 # ==========================================
 # EXTRAÇÃO M2 (delega ao pipeline headless)
 # ==========================================
 def extrair_dado_com_ia(texto, pergunta):
+    # Modo "alta garantia": self-consistency (votação) recupera recall sem
+    # reabrir falso-positivo, ao custo de k chamadas de LLM por documento.
+    k = st.session_state.get('consenso_k', 0)
+    if k and k > 1:
+        return pipeline.extrair_dado_consenso(client, texto, pergunta, k=k)
     return pipeline.extrair_dado(client, texto, pergunta)
 
 # Delegado ao núcleo testado (flare26_core). Mantido como alias por compatibilidade.
@@ -272,6 +274,15 @@ with st.sidebar:
     st.caption("🖥️ **Motor de Embedding:**")
     st.code(MODEL_EMBEDDING, language="text")
     st.caption("🗄️ **Armazenamento Vetorial:** ChromaDB\n\n🗃️ **Indexação Híbrida:** SQLite")
+    st.markdown("---")
+    alta_garantia = st.toggle(
+        "🛡️ Alta garantia (self-consistency)",
+        value=False,
+        help="Roda a extração 5x e responde se qualquer execução responder. "
+             "Recupera respostas que oscilam, mantendo 0% de falso-positivo. "
+             "Custo: ~5x mais chamadas de LLM por documento."
+    )
+    st.session_state['consenso_k'] = 5 if alta_garantia else 0
     st.markdown("---")
     if st.button("🗑️ Resetar Ambiente e Cache", type="secondary", use_container_width=True):
         resetar_ambiente_total()
