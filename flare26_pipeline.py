@@ -51,9 +51,14 @@ COLUNAS_DOCSTORE = {"parent_id", "nome_doc", "file_hash", "conteudo"}
 # SCHEMA DE EXTRAÇÃO (M2) — ontologicamente restrito
 # ==========================================================================
 class ExtracaoUniversal(BaseModel):
-    natureza_da_pergunta: str = Field(description="O domínio de dados exigido (ex: Temporal, Monetário).")
-    natureza_do_texto_encontrado: str = Field(description="O domínio de dados encontrado.")
-    houve_compatibilidade_ontologica: bool = Field(description="True se a natureza encontrada corresponde à exigida.")
+    # --- Compatibilidade em DUAS dimensões (genérica, agnóstica de domínio) ---
+    natureza_da_pergunta: str = Field(description="TIPO de dado exigido pela pergunta (ex: Temporal, Monetário, Percentual).")
+    escopo_da_pergunta: str = Field(description="ESCOPO específico que a pergunta pede: a condição, evento, sujeito ou recorte exato sob o qual o dado é solicitado (ex: 'quando ocorre a condição X').")
+    natureza_do_texto_encontrado: str = Field(description="TIPO de dado encontrado no texto candidato.")
+    escopo_do_texto_encontrado: str = Field(description="ESCOPO a que a evidência candidata se aplica: a condição/evento/recorte que ela realmente cobre.")
+    houve_compatibilidade_ontologica: bool = Field(
+        description="True SOMENTE se TIPO e ESCOPO baterem: a evidência precisa ser do mesmo tipo E valer para a MESMA condição/evento/recorte da pergunta. Dois valores do mesmo tipo sob condições diferentes NÃO são compatíveis."
+    )
     violou_restricao_do_usuario: bool = Field(
         description="CRÍTICO: Retorne True SE a pergunta exigir explicitamente que um tipo de dado seja ignorado E o texto encontrado tratar desse assunto proibido."
     )
@@ -66,7 +71,8 @@ class ExtracaoUniversal(BaseModel):
 
 def resultado_vazio() -> ExtracaoUniversal:
     return ExtracaoUniversal(
-        natureza_da_pergunta="N/A", natureza_do_texto_encontrado="N/A",
+        natureza_da_pergunta="N/A", escopo_da_pergunta="N/A",
+        natureza_do_texto_encontrado="N/A", escopo_do_texto_encontrado="N/A",
         houve_compatibilidade_ontologica=False, violou_restricao_do_usuario=False,
         resposta_direta="NÃO LOCALIZADO", tipo_dado="NÃO LOCALIZADO",
         condicionantes="NÃO LOCALIZADO", trecho_literal="LACUNA DE EVIDÊNCIA", confiabilidade=0.0
@@ -278,32 +284,53 @@ def recuperar_contexto(pergunta: str, file_hash: str, *, db_path: str,
 # ==========================================================================
 # M2: EXTRAÇÃO ONTOLOGICAMENTE RESTRITA
 # ==========================================================================
+# Seed fixo para reduzir não-determinância da extração (reprodutibilidade).
+SEED_EXTRACAO = 7
+
+# Regra de compatibilidade — GENÉRICA, sem termos de domínio. O modelo deve
+# comparar tipo E escopo; o exemplo é abstrato (condição A vs B) de propósito.
+_REGRA_COMPATIBILIDADE = (
+    "DEFINIÇÃO DE COMPATIBILIDADE (vale para qualquer domínio):\n"
+    "Há compatibilidade ontológica APENAS se as duas condições abaixo forem verdadeiras:\n"
+    "  (a) TIPO: o dado encontrado é do mesmo tipo que a pergunta exige.\n"
+    "  (b) ESCOPO: a evidência vale para a MESMA condição/evento/sujeito/recorte que a pergunta pede.\n"
+    "ATENÇÃO: dois valores do MESMO tipo, porém sob CONDIÇÕES diferentes, NÃO são compatíveis.\n"
+    "Exemplo abstrato: se a pergunta pede 'o valor quando ocorre a condição A' e o texto só "
+    "traz 'o valor quando ocorre a condição B' (com A ≠ B), então "
+    "houve_compatibilidade_ontologica = False — mesmo que ambos sejam do mesmo tipo.\n"
+    "Primeiro identifique escopo_da_pergunta e escopo_do_texto_encontrado; só então decida (b)."
+)
+
+
 def extrair_dado(client, texto: str, pergunta: str, *,
                  modelo: str = MODELO_EXTRACAO) -> ExtracaoUniversal:
     """Extrai a resposta tipada, abstendo-se (NÃO LOCALIZADO) quando o texto é
-    ontologicamente incompatível ou viola uma restrição negativa da pergunta.
+    ontologicamente incompatível (tipo OU escopo divergente) ou viola uma
+    restrição negativa da pergunta.
     """
     if not texto.strip():
         return resultado_vazio()
 
     prompt = (
-        "Você é um Extrator Forense Especialista em Editais Governamentais.\n"
+        "Você é um Extrator Forense de Dados Estruturados (qualquer domínio).\n"
         f"PERGUNTA DA AUDITORIA: {pergunta}\n\n"
-        "REGRAS:\n"
+        f"{_REGRA_COMPATIBILIDADE}\n\n"
+        "REGRAS DE PREENCHIMENTO:\n"
         "1. Se a pergunta exigir ignorar algo e o texto tratar disso, 'violou_restricao_do_usuario' = True.\n"
-        "2. Se incompatível ou violado, 'resposta_direta' = 'NÃO LOCALIZADO'.\n"
+        "2. Se incompatível (tipo OU escopo) ou violado, 'resposta_direta' = 'NÃO LOCALIZADO'.\n"
         f"TEXTO:\n{texto[:90000]}"
     )
     try:
         response = client.chat.completions.create(
             model=modelo,
             messages=[
-                {"role": "system", "content": "Você é um auditor forense focado em validação de domínio e restrições negativas."},
+                {"role": "system", "content": "Você é um auditor forense agnóstico de domínio, focado em compatibilidade de tipo E escopo e em restrições negativas."},
                 {"role": "user", "content": prompt},
             ],
             tools=[{"type": "function", "function": {"name": "retornar_extracao", "parameters": ExtracaoUniversal.model_json_schema()}}],
             tool_choice={"type": "function", "function": {"name": "retornar_extracao"}},
             temperature=0.0,
+            seed=SEED_EXTRACAO,
         )
         dados = json.loads(response.choices[0].message.tool_calls[0].function.arguments)
 
@@ -315,7 +342,9 @@ def extrair_dado(client, texto: str, pergunta: str, *,
         resp = str(dados.get("resposta_direta", "NÃO LOCALIZADO")).strip()
         return ExtracaoUniversal(
             natureza_da_pergunta=str(dados.get("natureza_da_pergunta", "N/A")),
+            escopo_da_pergunta=str(dados.get("escopo_da_pergunta", "N/A")),
             natureza_do_texto_encontrado=str(dados.get("natureza_do_texto_encontrado", "N/A")),
+            escopo_do_texto_encontrado=str(dados.get("escopo_do_texto_encontrado", "N/A")),
             houve_compatibilidade_ontologica=True, violou_restricao_do_usuario=False,
             resposta_direta=resp, tipo_dado=str(dados.get("tipo_dado", "NÃO LOCALIZADO")),
             condicionantes=str(dados.get("condicionantes", "NÃO LOCALIZADO")),
