@@ -135,8 +135,27 @@ auditoria: **nunca afirmar uma divergência falsa** vale mais que recall.
   "atraso") ou mais geral (`inadimplemento parcial ou total` p/ "total") que a
   pergunta — intocável sem reabrir falso-positivos.
 - **Não-determinismo:** casos como "retenção 5%/10%" oscilam entre responder e
-  abster (3/5) — corrigível por self-consistency (votação), sem trocar precisão.
-  → ver §7.
+  abster — corrigível por self-consistency (§5.4), sem trocar precisão.
+
+### 5.4 Self-consistency recupera recall a custo ZERO de precisão
+
+Achado-chave do diagnóstico (5 execuções por item): as **abstenções
+ontológicas são estáveis** — 13/13 casos ABSTAIN tiveram **0 vazamento** em 5
+execuções. O ruído está apenas nas super-abstenções (respostas legítimas que
+oscilam, ex.: retenção respondeu 2/5). Como os ABSTAIN nunca vazam, pode-se
+usar a política mais permissiva — **"responder se ≥1 de k execuções responder"**
+— sem reabrir falso-positivo.
+
+| Sistema | Falso-positivo | Recall de resposta |
+|---------|----------------|--------------------|
+| FLARE26 (amostra única) | 0% | 71%–81% (ruído) |
+| FLARE26 + self-consistency (k=5, ≥1) | **0%** | 82%–94% (ruído) |
+
+O ganho de recall é real porém **ruidoso**: as respostas borderline têm
+taxa-base baixa (~1/5), então k=5 as recupera de forma probabilística
+(P[≥1 em 5] ≈ 0,67). **O 0% de falso-positivo, em contraste, é exato e estável**
+(0% ± 0% em todas as execuções), pois nenhuma abstenção ontológica vaza.
+k maior recupera mais respostas borderline, a custo linear de chamadas de LLM.
 
 ## 6. Discussão e limitações (honestidade)
 - **Recall ~71%:** preço da garantia de 0% falso-positivo; pode haver

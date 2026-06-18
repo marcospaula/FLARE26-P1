@@ -89,7 +89,12 @@ def main():
         ctx, _, _ = pipeline.recuperar_contexto(it["pergunta"], fh, db_path=db, vector_store=vs)
 
         base = extrair_baseline(client, ctx, it["pergunta"])
-        flare = pipeline.extrair_dado(client, ctx, it["pergunta"]).resposta_direta
+        # FLARE_CONSENSO=k usa self-consistency (votação) em vez de amostra única.
+        _k = int(os.environ.get("FLARE_CONSENSO", "0"))
+        if _k > 0:
+            flare = pipeline.extrair_dado_consenso(client, ctx, it["pergunta"], k=_k).resposta_direta
+        else:
+            flare = pipeline.extrair_dado(client, ctx, it["pergunta"]).resposta_direta
 
         gold_abstain = it["gold"] == ABSTAIN
         for nome_sys, pred in (("BASELINE", base), ("FLARE26", flare)):
