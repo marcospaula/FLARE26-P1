@@ -102,27 +102,66 @@ extração livre, sem perda relevante de recall sobre respostas existentes.
     secundária.
 
 ## 5. Resultados
-- (placeholder) Tabela principal: baseline vs FLARE26 nas métricas acima.
-- Análise de erros: onde a abstenção falha (respostas textuais ambíguas →
-  limitação do agrupamento simbólico).
+
+### 5.1 Resultado principal (benchmark de abstenção, 30 pares; 13 ABSTAIN, 17 com resposta)
+
+Extrator gpt-4o-mini, temperatura 0, seed fixo. BASELINE = extração livre
+(sem gating ontológico); FLARE26 = extração com gating de tipo+escopo.
+
+| Sistema  | ★ Falso-positivo (alucina em ABSTAIN) | Recall de abstenção | Recall de resposta |
+|----------|---------------------------------------|---------------------|--------------------|
+| BASELINE | 38% (5/13)                            | 62%                 | 100%               |
+| FLARE26  | **0% (0/13)**                         | **100%**            | 71%                |
+
+**Leitura:** a gating ontológica **elimina 100% das divergências falso-positivas**
+(38%→0%) — captura corretamente as distinções juros≠multa, garantia≠pagamento e
+inexecução≠atraso. O custo honesto é ~29% de recall: o sistema às vezes se
+abstém de respostas que existem.
+
+### 5.2 A fronteira precision/recall (ablação da regra de escopo)
+
+| Regra de escopo | Falso-positivo | Recall de resposta |
+|-----------------|----------------|--------------------|
+| Estrita (igualdade de condição) | **0%** | 71% |
+| Por interseção (subconjunto/superconjunto) | 38% | 88% |
+
+Afrouxar o escopo para aceitar sub/superconjuntos recupera recall, mas
+**reabre os falso-positivos** (ex.: "multa por atraso" passa a responder
+"multa por inexecução"). A versão estrita é o ponto de operação adequado a
+auditoria: **nunca afirmar uma divergência falsa** vale mais que recall.
+
+### 5.3 Análise de erros (super-abstenções do FLARE26)
+- **Fronteira legítima:** texto mais específico (`atraso > 10 dias` p/ pergunta
+  "atraso") ou mais geral (`inadimplemento parcial ou total` p/ "total") que a
+  pergunta — intocável sem reabrir falso-positivos.
+- **Não-determinismo:** casos como "retenção 5%/10%" oscilam entre responder e
+  abster (3/5) — corrigível por self-consistency (votação), sem trocar precisão.
+  → ver §7.
 
 ## 6. Discussão e limitações (honestidade)
-- Agrupamento N-way puramente simbólico super-divide texto equivalente.
-- Corpus parcialmente sintético; generalização a outros domínios.
+- **Recall ~71%:** preço da garantia de 0% falso-positivo; pode haver
+  super-abstenção em escopos sub/superconjunto. Trade-off explícito.
+- **Não-determinismo do LLM:** seed reduz mas não elimina; números de uma única
+  execução têm ruído (futuro: média ± desvio sobre k execuções).
+- Corpus parcialmente sintético; generalização a outros domínios a validar.
 - Dependência de um LLM proprietário (gpt-4o-mini) na extração.
 - Não é método novo de ML — é padrão arquitetural; valor está na avaliação.
 
 ## 7. Conclusão e trabalhos futuros
-- Passe neural opcional para fundir grupos textuais equivalentes.
-- Generalização do gating ontológico para outros domínios (config injetável,
-  já iniciada via `GatilhosLexicais`).
+- **Self-consistency (votação em k amostras)** para recuperar recall nos casos
+  não-determinísticos sem afrouxar o gate (não troca precisão). Hipótese
+  principal para empurrar a fronteira.
+- Repetir o benchmark com k execuções e reportar média ± desvio.
+- Ampliar o corpus (incl. editais governamentais reais já presentes) e validar
+  os rótulos com um segundo anotador.
+- Passe neural opcional para fundir grupos textuais equivalentes no juiz N-way.
 
 ---
 
 ## Plano de execução (paper = frente de métricas)
-1. **[próximo]** Refatorar M2/M1.5 para serem chamáveis fora do Streamlit
-   (harness de avaliação sem UI). → `eval/`.
-2. Construir o **dataset ouro** (`eval/gold_dataset.json`) a partir do corpus
-   `documentos/` (já mapeamos quais docs têm atraso/inexecução/multa/prazo).
-3. Implementar baselines e o script de métricas (`eval/run_eval.py`).
-4. Rodar, preencher §5, e escrever o draft EN.
+1. ~~Refatorar M2/M1.5 para serem chamáveis fora do Streamlit~~ ✅ (`flare26_pipeline.py`).
+2. ~~Construir o **dataset ouro**~~ ✅ (`eval/gold_dataset.json`, 30 pares verificados).
+3. ~~Implementar baselines e o script de métricas~~ ✅ (`eval/run_eval.py`).
+4. ~~Rodar e preencher §5~~ ✅ (baseline 38% vs FLARE26 0% falso-positivo).
+5. **[próximo]** Self-consistency (votação) para recuperar recall a 0% FP.
+6. Rodar k repetições (média ± desvio) e escrever o draft EN.

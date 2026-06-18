@@ -2,76 +2,55 @@
   "_schema": {
     "descricao": "Benchmark de abstenção ontológica FLARE26. Ver eval/README.md.",
     "campos": ["id", "pergunta", "documento", "gold", "evidencia", "verificado"],
-    "nota": "gold='ABSTAIN' quando o documento NÃO contém o dado pedido."
+    "nota": "gold='ABSTAIN' quando o documento NÃO contém o dado pedido (tipo OU escopo divergente).",
+    "casos_de_decisao": {
+      "juros_nao_e_multa": "Docs com 'juros de mora' (C/D/E/F) NÃO respondem 'multa por atraso' (instrumentos distintos).",
+      "topico_trocado": "Docs de garantia (I/J) NÃO respondem 'prazo de pagamento'.",
+      "inexecucao_nao_e_atraso": "Multa por atraso NÃO responde 'multa por inexecução total'.",
+      "especializacao": "O/P trazem o valor sob sub-condição ('< 1.000 registros') — é resposta com ressalva, não abstenção."
+    }
   },
   "itens": [
-    {
-      "id": "atraso-A",
-      "pergunta": "Qual a multa por atraso no pagamento?",
-      "documento": "Contrato_A_Multa_Fixa.pdf",
-      "gold": "R$ 5.000,00",
-      "evidencia": "multa fixa de R$ 5.000,00 por evento de atraso",
-      "verificado": true
-    },
-    {
-      "id": "atraso-B",
-      "pergunta": "Qual a multa por atraso no pagamento?",
-      "documento": "Contrato_B_Multa_Diaria.pdf",
-      "gold": "0,5% por dia de atraso, limitada a 10%",
-      "evidencia": "multa de 0,5% (meio por cento) por dia de atraso, limitada a 10% do valor devido",
-      "verificado": true
-    },
-    {
-      "id": "atraso-K",
-      "pergunta": "Qual a multa por atraso no pagamento?",
-      "documento": "Contrato_K_MultaSuspensão.pdf",
-      "gold": "0,5% ao dia até 10 dias; 1% ao dia acima de 10 dias + suspensão",
-      "evidencia": "Para atraso <= 10 dias: multa de 0,5% ao dia. Para atraso > 10 dias: multa de 1% ao dia + suspensão do contrato até regularização.",
-      "verificado": true
-    },
-    {
-      "id": "atraso-L",
-      "pergunta": "Qual a multa por atraso no pagamento?",
-      "documento": "Contrato_L_ApenasMulta.pdf",
-      "gold": "2% ao dia, limitada a 20% do valor do contrato",
-      "evidencia": "multa de 2% ao dia, limitada a 20% do valor do contrato",
-      "verificado": true
-    },
-    {
-      "id": "inexec-A",
-      "pergunta": "Qual o valor da multa por inexecução total do objeto?",
-      "documento": "Contrato_A_Multa_Fixa.pdf",
-      "gold": "ABSTAIN",
-      "evidencia": "",
-      "verificado": true
-    },
-    {
-      "id": "inexec-B",
-      "pergunta": "Qual o valor da multa por inexecução total do objeto?",
-      "documento": "Contrato_B_Multa_Diaria.pdf",
-      "gold": "ABSTAIN",
-      "evidencia": "",
-      "verificado": true
-    },
-    {
-      "id": "multa-C",
-      "pergunta": "Qual a multa por atraso no pagamento?",
-      "documento": "Contrato_C_30Dias.pdf",
-      "gold": "ABSTAIN",
-      "evidencia": "",
-      "verificado": true
-    },
-    {
-      "id": "multa-D",
-      "pergunta": "Qual a multa por atraso no pagamento?",
-      "documento": "Contrato_D_15Dias.pdf",
-      "gold": "ABSTAIN",
-      "evidencia": "",
-      "verificado": true
-    }
+    {"id": "multa-atraso-Afix", "pergunta": "Qual a multa por atraso no pagamento?", "documento": "Contrato_A_Multa_Fixa.pdf", "gold": "R$ 5.000,00", "evidencia": "multa fixa de R$ 5.000,00 por evento de atraso", "verificado": true},
+    {"id": "multa-atraso-Bdia", "pergunta": "Qual a multa por atraso no pagamento?", "documento": "Contrato_B_Multa_Diaria.pdf", "gold": "0,5% por dia de atraso, limitada a 10%", "evidencia": "multa de 0,5% (meio por cento) por dia de atraso, limitada a 10% do valor devido", "verificado": true},
+    {"id": "multa-atraso-K", "pergunta": "Qual a multa por atraso no pagamento?", "documento": "Contrato_K_MultaSuspensão.pdf", "gold": "0,5% ao dia até 10 dias; 1% ao dia acima de 10 dias + suspensão", "evidencia": "Para atraso <= 10 dias: multa de 0,5% ao dia. Para atraso > 10 dias: multa de 1% ao dia + suspensão", "verificado": true},
+    {"id": "multa-atraso-L", "pergunta": "Qual a multa por atraso no pagamento?", "documento": "Contrato_L_ApenasMulta.pdf", "gold": "2% ao dia, limitada a 20% (atraso > 10 dias)", "evidencia": "Para atraso > 10 dias: multa de 2% ao dia, limitada a 20% do valor do contrato", "verificado": true},
+    {"id": "multa-atraso-SRRF", "pergunta": "Qual a multa por atraso no pagamento?", "documento": "Contrato_SRRF01_02_2020.pdf", "gold": "15% sobre a parcela inadimplida", "evidencia": "multa moratória no patamar de 15% (quinze por cento) aplicada exclusivamente sobre a parcela inadimplida", "verificado": true},
+
+    {"id": "multa-atraso-C-juros", "pergunta": "Qual a multa por atraso no pagamento?", "documento": "Contrato_C_30Dias.pdf", "gold": "ABSTAIN", "evidencia": "doc só tem 'juros de 1% ao mês', não multa", "verificado": true},
+    {"id": "multa-atraso-D-juros", "pergunta": "Qual a multa por atraso no pagamento?", "documento": "Contrato_D_15Dias.pdf", "gold": "ABSTAIN", "evidencia": "doc só tem 'juros de mora pela SELIC', não multa", "verificado": true},
+    {"id": "multa-atraso-E-juros", "pergunta": "Qual a multa por atraso no pagamento?", "documento": "Contrato_E_IPCA.pdf", "gold": "ABSTAIN", "evidencia": "cláusula 'DOS JUROS DE MORA' (1% ao mês + IPCA), não multa", "verificado": true},
+    {"id": "multa-atraso-F-juros", "pergunta": "Qual a multa por atraso no pagamento?", "documento": "Contrato_F_SELIC.pdf", "gold": "ABSTAIN", "evidencia": "cláusula 'DOS JUROS DE MORA' (SELIC), não multa", "verificado": true},
+
+    {"id": "juros-C", "pergunta": "Qual a taxa de juros de mora por atraso no pagamento?", "documento": "Contrato_C_30Dias.pdf", "gold": "1% ao mês", "evidencia": "incidirão juros de 1% ao mês", "verificado": true},
+    {"id": "juros-E", "pergunta": "Qual a taxa de juros de mora por atraso no pagamento?", "documento": "Contrato_E_IPCA.pdf", "gold": "1% ao mês, corrigido pelo IPCA", "evidencia": "juros de 1% (um por cento) ao mês, corrigidos pelo IPCA", "verificado": true},
+    {"id": "juros-F", "pergunta": "Qual a taxa de juros de mora por atraso no pagamento?", "documento": "Contrato_F_SELIC.pdf", "gold": "taxa SELIC acumulada", "evidencia": "juros de mora calculados pela taxa SELIC acumulada", "verificado": true},
+    {"id": "juros-Afix-multa", "pergunta": "Qual a taxa de juros de mora por atraso no pagamento?", "documento": "Contrato_A_Multa_Fixa.pdf", "gold": "ABSTAIN", "evidencia": "doc tem multa fixa, não juros de mora", "verificado": true},
+    {"id": "juros-Bdia-multa", "pergunta": "Qual a taxa de juros de mora por atraso no pagamento?", "documento": "Contrato_B_Multa_Diaria.pdf", "gold": "ABSTAIN", "evidencia": "doc tem multa diária, não juros de mora", "verificado": true},
+
+    {"id": "prazo-pgto-C", "pergunta": "Qual o prazo para pagamento das faturas?", "documento": "Contrato_C_30Dias.pdf", "gold": "30 dias corridos", "evidencia": "pagamento das faturas será realizado em 30 (trinta) dias corridos", "verificado": true},
+    {"id": "prazo-pgto-D", "pergunta": "Qual o prazo para pagamento das faturas?", "documento": "Contrato_D_15Dias.pdf", "gold": "15 dias úteis", "evidencia": "pagamento das faturas será realizado em 15 (quinze) dias úteis", "verificado": true},
+    {"id": "prazo-pgto-I-garantia", "pergunta": "Qual o prazo para pagamento das faturas?", "documento": "Contrato_I_90Dias.pdf", "gold": "ABSTAIN", "evidencia": "doc trata de prazo de GARANTIA (90 dias), não de pagamento", "verificado": true},
+    {"id": "prazo-pgto-J-garantia", "pergunta": "Qual o prazo para pagamento das faturas?", "documento": "Contrato_J_6Meses.pdf", "gold": "ABSTAIN", "evidencia": "doc trata de prazo de GARANTIA (6 meses), não de pagamento", "verificado": true},
+
+    {"id": "garantia-I", "pergunta": "Qual o prazo de garantia do serviço?", "documento": "Contrato_I_90Dias.pdf", "gold": "90 dias", "evidencia": "garante o serviço prestado por 90 (noventa) dias", "verificado": true},
+    {"id": "garantia-J", "pergunta": "Qual o prazo de garantia do serviço?", "documento": "Contrato_J_6Meses.pdf", "gold": "6 meses", "evidencia": "garante o serviço prestado por 6 (seis) meses", "verificado": true},
+    {"id": "garantia-C-pgto", "pergunta": "Qual o prazo de garantia do serviço?", "documento": "Contrato_C_30Dias.pdf", "gold": "ABSTAIN", "evidencia": "doc trata de prazo de pagamento, não de garantia", "verificado": true},
+
+    {"id": "retencao-G", "pergunta": "Qual o percentual de retenção sobre as faturas?", "documento": "Contrato_G_5PorCento.pdf", "gold": "5%", "evidencia": "retida a quantia de 5% (cinco por cento) sobre o valor de cada fatura", "verificado": true},
+    {"id": "retencao-H", "pergunta": "Qual o percentual de retenção sobre as faturas?", "documento": "Contrato_H_10PorCento.pdf", "gold": "10%", "evidencia": "retida a quantia de 10% (dez por cento) do valor total do contrato", "verificado": true},
+    {"id": "retencao-E-juros", "pergunta": "Qual o percentual de retenção sobre as faturas?", "documento": "Contrato_E_IPCA.pdf", "gold": "ABSTAIN", "evidencia": "doc trata de juros de mora, não de retenção", "verificado": true},
+
+    {"id": "danos-O", "pergunta": "Qual o valor da indenização por danos morais?", "documento": "Contrato_O_50kDanosMorais.pdf", "gold": "R$ 50.000,00 (se < 1.000 registros afetados)", "evidencia": "Por danos morais ou vazamento de dados: Se < 1.000 registros afetados: R$ 50.000,00", "verificado": true},
+    {"id": "danos-P", "pergunta": "Qual o valor da indenização por danos morais?", "documento": "Contrato_P_100kDanosMorais.pdf", "gold": "R$ 100.000,00 (se < 1.000 registros afetados)", "evidencia": "Por danos morais ou vazamento de dados: Se < 1.000 registros afetados: R$ 100.000,00", "verificado": true},
+    {"id": "danos-Afix", "pergunta": "Qual o valor da indenização por danos morais?", "documento": "Contrato_A_Multa_Fixa.pdf", "gold": "ABSTAIN", "evidencia": "doc trata de multa por atraso, não de danos morais", "verificado": true},
+
+    {"id": "inexec-PGFN", "pergunta": "Qual o valor da multa por inexecução total da obrigação?", "documento": "Edital_PGFN_04_2025.pdf", "gold": "12,5% sobre o valor total atualizado do contrato", "evidencia": "inadimplemento parcial ou total da obrigação assumida ... multa compensatória de 12,5% ... sobre o valor total atualizado", "verificado": true},
+    {"id": "inexec-Afix", "pergunta": "Qual o valor da multa por inexecução total da obrigação?", "documento": "Contrato_A_Multa_Fixa.pdf", "gold": "ABSTAIN", "evidencia": "doc só tem multa por atraso no pagamento, não por inexecução", "verificado": true},
+    {"id": "inexec-Bdia", "pergunta": "Qual o valor da multa por inexecução total da obrigação?", "documento": "Contrato_B_Multa_Diaria.pdf", "gold": "ABSTAIN", "evidencia": "doc só tem multa por atraso no pagamento, não por inexecução", "verificado": true}
   ],
   "_todo": [
-    "Verificar e rotular prazo de pagamento (C/D/I/J), danos morais (O/P), e os editais governamentais com cláusula de inexecução (gold != ABSTAIN).",
-    "Adicionar pares de CONSENSO (mesmo valor em 2+ docs) para medir falso-positivo de divergência."
+    "Pares de comparação (consenso/divergência) para a métrica de divergência falso-positiva ao nível N-way: ex. 'Contrato A.pdf' (R$5.000) vs 'Contrato_A_Multa_Fixa' (R$5.000) = CONSENSO; editais A_Minuta vs B_Publicado = DIVERGÊNCIA.",
+    "Editais governamentais grandes (edital-04-2025, pe-srrf01) ainda não rotulados — exigem leitura cuidadosa de cláusulas específicas."
   ]
 }
