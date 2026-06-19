@@ -18,3 +18,11 @@ flare26_cache_docs.db
 # vive em tests/fixtures, não na raiz.
 flare26_ledger.json
 flare26_ledger_v2.json
+
+# --- Artefatos derivados do paper (regenerados de draft.md/.tex) ---
+paper/draft.pdf
+paper/draft.odt
+paper/draft.txt
+paper/*.aux
+paper/*.log
+paper/*.out
