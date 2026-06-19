@@ -59,22 +59,33 @@ divergence rate as the primary metric.
 
 ## 2. Related Work
 
-**Structured extraction from LLMs.** Tools such as function-calling, Instructor
-and Guardrails coerce LLM outputs into typed schemas. We build on this but add
-an *abstention pre-condition*: the schema's primary job is to decide whether to
-answer at all.
+**Retrieval-augmented generation.** RAG [Lewis et al., 2020; survey: Gao et al.,
+2023] grounds generation in retrieved passages; our pipeline is a RAG system,
+but our concern is the failure mode where generation proceeds despite the absence
+of in-scope evidence.
 
-**Selective prediction / abstention.** Our nearest neighbor: a model that
-refuses to answer below a confidence or eligibility criterion. We frame
-abstention not as a post-hoc QA filter but as a **pre-condition for
-cross-document comparison**.
+**Structured extraction from LLMs.** Function-calling, Instructor [Instructor,
+2023] and Guardrails [Guardrails AI, 2023], and grammar/schema-constrained
+decoding [Willard & Louf, 2023] coerce outputs into typed schemas. We build on
+this but make the schema's *primary* job an **abstention pre-condition**: decide
+whether to answer at all.
 
-**Faithfulness / groundedness in RAG.** Much work measures whether an answer is
-supported by retrieved text. We focus on the dual failure: answering when *no*
-in-scope evidence exists.
+**Selective prediction / abstention.** Selective classification trades coverage
+for reliability by abstaining [Geifman & El-Yaniv, 2017]; LLMs exhibit partial
+self-knowledge of correctness [Kadavath et al., 2022]. The reading-comprehension
+analogue is answerability — detecting unanswerable questions, as in SQuAD 2.0
+[Rajpurkar et al., 2018] — closest in spirit to our gate. We frame abstention
+not as a post-hoc QA filter but as a **pre-condition for cross-document
+comparison**.
 
-**Legal NLP / document comparison.** Applied work on clause extraction and
-contract analytics; we contribute an evaluation centered on abstention in
+**Faithfulness / hallucination.** Hallucination is well documented [Ji et al.,
+2023; Maynez et al., 2020], and RAG-specific evaluation measures groundedness
+[Es et al., 2024]. These largely ask whether an answer is *supported*; we target
+the dual failure: answering when *no* in-scope evidence exists.
+
+**Legal NLP / document comparison.** Contract-review datasets and models
+[Hendrycks et al., 2021 (CUAD); Chalkidis et al., 2020 (LEGAL-BERT)] address
+clause extraction; we contribute an evaluation centered on **abstention** in
 Brazilian Portuguese public-procurement documents.
 
 *Gap.* Abstention treated as the gate that prevents false-positive divergences
@@ -221,5 +232,21 @@ recall × cost curve, and replicate with an open LLM.
 
 ## References
 
-*(to be added — RAG, structured extraction (Instructor/Guardrails), selective
-prediction/abstention, RAG faithfulness, legal NLP / contract analytics.)*
+> **Note:** real references to the best of the authors' knowledge; verify all
+> bibliographic details (author lists, pages, DOIs, venues) before submission.
+> BibTeX entries in `paper/references.bib`.
+
+- Chalkidis, I., Fergadiotis, M., Malakasiotis, P., Aletras, N., & Androutsopoulos, I. (2020). *LEGAL-BERT: The Muppets straight out of Law School.* Findings of EMNLP.
+- Es, S., James, J., Espinosa-Anke, L., & Schockaert, S. (2024). *RAGAS: Automated Evaluation of Retrieval Augmented Generation.* EACL (System Demonstrations).
+- Gao, Y., Xiong, Y., Gao, X., et al. (2023). *Retrieval-Augmented Generation for Large Language Models: A Survey.* arXiv:2312.10997.
+- Geifman, Y., & El-Yaniv, R. (2017). *Selective Classification for Deep Neural Networks.* NeurIPS.
+- Guardrails AI (2023). *Guardrails.* Software. https://github.com/guardrails-ai/guardrails
+- Hendrycks, D., Burns, C., Chen, A., & Ball, S. (2021). *CUAD: An Expert-Annotated NLP Dataset for Legal Contract Review.* NeurIPS Datasets and Benchmarks.
+- Instructor (2023). *Instructor: Structured Outputs for LLMs.* Software. https://github.com/jxnl/instructor
+- Ji, Z., Lee, N., Frieske, R., et al. (2023). *Survey of Hallucination in Natural Language Generation.* ACM Computing Surveys.
+- Kadavath, S., Conerly, T., Askell, A., et al. (2022). *Language Models (Mostly) Know What They Know.* arXiv:2207.05221.
+- Lewis, P., Perez, E., Piktus, A., et al. (2020). *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.* NeurIPS.
+- Maynez, J., Narayan, S., Bohnet, B., & McDonald, R. (2020). *On Faithfulness and Factuality in Abstractive Summarization.* ACL.
+- Rajpurkar, P., Jia, R., & Liang, P. (2018). *Know What You Don't Know: Unanswerable Questions for SQuAD.* ACL.
+- Wang, X., Wei, J., Schuurmans, D., et al. (2023). *Self-Consistency Improves Chain of Thought Reasoning in Language Models.* ICLR.
+- Willard, B. T., & Louf, R. (2023). *Efficient Guided Generation for Large Language Models.* arXiv:2307.09702.

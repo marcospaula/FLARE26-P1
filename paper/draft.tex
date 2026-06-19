@@ -64,15 +64,23 @@ ontological abstention on Brazilian legal documents, and the finding that
 ontological abstentions are stable.
 
 \section{Related Work}
-\textbf{Structured extraction from LLMs} (function-calling, Instructor,
-Guardrails) coerces outputs into typed schemas; we add an \emph{abstention
-pre-condition}---the schema's primary job is to decide whether to answer at all.
-\textbf{Selective prediction / abstention} is our nearest neighbor; we frame
+\textbf{Retrieval-augmented generation} \cite{lewis2020rag,gao2023ragsurvey}
+grounds generation in retrieved passages; our concern is the failure mode where
+generation proceeds despite absent in-scope evidence. \textbf{Structured
+extraction from LLMs} (function-calling, Instructor \cite{instructor}, Guardrails
+\cite{guardrails}, constrained decoding \cite{willard2023guided}) coerces outputs
+into typed schemas; we make the schema's primary job an \emph{abstention
+pre-condition}. \textbf{Selective prediction / abstention}
+\cite{geifman2017selective} trades coverage for reliability; LLMs partially know
+what they know \cite{kadavath2022know}; the reading-comprehension analogue is
+answerability \cite{rajpurkar2018squad2}, closest in spirit to our gate. We frame
 abstention as a \emph{pre-condition for cross-document comparison} rather than a
-post-hoc QA filter. \textbf{Faithfulness / groundedness in RAG} measures whether
-an answer is supported; we focus on the dual failure of answering when no
-in-scope evidence exists. \textbf{Legal NLP} provides clause extraction and
-contract analytics; we contribute an abstention-centered evaluation in Brazilian
+post-hoc QA filter. \textbf{Faithfulness / hallucination}
+\cite{ji2023survey,maynez2020faithfulness} and RAG evaluation \cite{es2024ragas}
+ask whether an answer is supported; we target the dual failure of answering when
+no in-scope evidence exists. \textbf{Legal NLP}
+\cite{hendrycks2021cuad,chalkidis2020legalbert} provides contract-review datasets
+and models; we contribute an abstention-centered evaluation in Brazilian
 Portuguese public-procurement text.
 
 \section{Method}
@@ -209,5 +217,26 @@ downstream comparison, \textbf{eliminates false-positive divergences};
 self-consistency then \textbf{recovers recall at no precision cost}. Future work:
 expand and double-annotate the corpus, sweep $k$ for the recall\,$\times$\,cost
 curve, and replicate with an open LLM.
+
+% NOTE: references real to the authors' best knowledge (cutoff Jan/2026);
+% verify all bibliographic details before submission. BibTeX in references.bib.
+% To use BibTeX instead of the manual list below: \bibliographystyle{plain}
+% \bibliography{references}
+\begin{thebibliography}{99}
+\bibitem{chalkidis2020legalbert} Chalkidis, I., Fergadiotis, M., Malakasiotis, P., Aletras, N., \& Androutsopoulos, I. (2020). LEGAL-BERT: The Muppets straight out of Law School. \emph{Findings of EMNLP}.
+\bibitem{es2024ragas} Es, S., James, J., Espinosa-Anke, L., \& Schockaert, S. (2024). RAGAS: Automated Evaluation of Retrieval Augmented Generation. \emph{EACL (System Demonstrations)}.
+\bibitem{gao2023ragsurvey} Gao, Y., Xiong, Y., Gao, X., et al. (2023). Retrieval-Augmented Generation for Large Language Models: A Survey. \emph{arXiv:2312.10997}.
+\bibitem{geifman2017selective} Geifman, Y., \& El-Yaniv, R. (2017). Selective Classification for Deep Neural Networks. \emph{NeurIPS}.
+\bibitem{guardrails} Guardrails AI (2023). \emph{Guardrails}. Software. \url{https://github.com/guardrails-ai/guardrails}
+\bibitem{hendrycks2021cuad} Hendrycks, D., Burns, C., Chen, A., \& Ball, S. (2021). CUAD: An Expert-Annotated NLP Dataset for Legal Contract Review. \emph{NeurIPS Datasets and Benchmarks}.
+\bibitem{instructor} Instructor (2023). \emph{Instructor: Structured Outputs for LLMs}. Software. \url{https://github.com/jxnl/instructor}
+\bibitem{ji2023survey} Ji, Z., Lee, N., Frieske, R., et al. (2023). Survey of Hallucination in Natural Language Generation. \emph{ACM Computing Surveys}.
+\bibitem{kadavath2022know} Kadavath, S., Conerly, T., Askell, A., et al. (2022). Language Models (Mostly) Know What They Know. \emph{arXiv:2207.05221}.
+\bibitem{lewis2020rag} Lewis, P., Perez, E., Piktus, A., et al. (2020). Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks. \emph{NeurIPS}.
+\bibitem{maynez2020faithfulness} Maynez, J., Narayan, S., Bohnet, B., \& McDonald, R. (2020). On Faithfulness and Factuality in Abstractive Summarization. \emph{ACL}.
+\bibitem{rajpurkar2018squad2} Rajpurkar, P., Jia, R., \& Liang, P. (2018). Know What You Don't Know: Unanswerable Questions for SQuAD. \emph{ACL}.
+\bibitem{wang2023selfconsistency} Wang, X., Wei, J., Schuurmans, D., et al. (2023). Self-Consistency Improves Chain of Thought Reasoning in Language Models. \emph{ICLR}.
+\bibitem{willard2023guided} Willard, B. T., \& Louf, R. (2023). Efficient Guided Generation for Large Language Models. \emph{arXiv:2307.09702}.
+\end{thebibliography}
 
 \end{document}
