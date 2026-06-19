@@ -107,16 +107,19 @@ extração livre, sem perda relevante de recall sobre respostas existentes.
 
 Extrator gpt-4o-mini, temperatura 0, seed fixo. BASELINE = extração livre
 (sem gating ontológico); FLARE26 = extração com gating de tipo+escopo.
+Números agregados (média ± desvio): BASELINE sobre 3 execuções, FLARE26
+estrita sobre 8 execuções, self-consistency por bootstrap (k=5, 300 reamostras).
 
-| Sistema  | ★ Falso-positivo (alucina em ABSTAIN) | Recall de abstenção | Recall de resposta |
-|----------|---------------------------------------|---------------------|--------------------|
-| BASELINE | 38% (5/13)                            | 62%                 | 100%               |
-| FLARE26  | **0% (0/13)**                         | **100%**            | 71%                |
+| Sistema | ★ Falso-positivo | Recall de abstenção | Recall de resposta |
+|---------|------------------|---------------------|--------------------|
+| BASELINE (extração livre)            | 38% ± 0% | 62% ± 0%  | 100% ± 0% |
+| FLARE26 (gating estrita)             | **0% ± 0%** | **100% ± 0%** | 82% ± 4% |
+| FLARE26 + self-consistency (k=5)     | **0% ± 0%** | **100% ± 0%** | **92% ± 3%** |
 
-**Leitura:** a gating ontológica **elimina 100% das divergências falso-positivas**
-(38%→0%) — captura corretamente as distinções juros≠multa, garantia≠pagamento e
-inexecução≠atraso. O custo honesto é ~29% de recall: o sistema às vezes se
-abstém de respostas que existem.
+**Leitura:** a gating ontológica **elimina as divergências falso-positivas**
+(38%→0%, ± 0% — estável, não é sorte de uma execução), capturando as distinções
+juros≠multa, garantia≠pagamento e inexecução≠atraso. A self-consistency
+**recupera o recall a 92% ± 3% mantendo 0% de falso-positivo** (§5.4).
 
 ### 5.2 A fronteira precision/recall (ablação da regra de escopo)
 
@@ -148,31 +151,31 @@ usar a política mais permissiva — **"responder se ≥1 de k execuções respo
 
 | Sistema | Falso-positivo | Recall de resposta |
 |---------|----------------|--------------------|
-| FLARE26 (amostra única) | 0% | 71%–81% (ruído) |
-| FLARE26 + self-consistency (k=5, ≥1) | **0%** | 82%–94% (ruído) |
+| FLARE26 (amostra única, 8 execuções) | 0% ± 0% | 82% ± 4% |
+| FLARE26 + self-consistency (k=5, ≥1) | **0% ± 0%** | **92% ± 3%** |
 
-O ganho de recall é real porém **ruidoso**: as respostas borderline têm
-taxa-base baixa (~1/5), então k=5 as recupera de forma probabilística
-(P[≥1 em 5] ≈ 0,67). **O 0% de falso-positivo, em contraste, é exato e estável**
-(0% ± 0% em todas as execuções), pois nenhuma abstenção ontológica vaza.
-k maior recupera mais respostas borderline, a custo linear de chamadas de LLM.
+O ganho de recall (82%→92%) é real e o desvio é pequeno (± 3-4%). As respostas
+borderline têm taxa-base baixa, então k=5 as recupera de forma probabilística;
+**o 0% de falso-positivo, em contraste, é exato e estável** (0% ± 0% em todas as
+execuções), pois nenhuma abstenção ontológica vaza. k maior recupera mais
+respostas borderline, a custo linear de chamadas de LLM.
 
 ## 6. Discussão e limitações (honestidade)
-- **Recall ~71%:** preço da garantia de 0% falso-positivo; pode haver
-  super-abstenção em escopos sub/superconjunto. Trade-off explícito.
-- **Não-determinismo do LLM:** seed reduz mas não elimina; números de uma única
-  execução têm ruído (futuro: média ± desvio sobre k execuções).
+- **Recall < 100%:** preço da garantia de 0% falso-positivo. Com self-consistency
+  (k=5) o recall sobe a 92% ± 3%; super-abstenção residual em escopos
+  sub/superconjunto é a fronteira legítima. Trade-off explícito.
+- **Não-determinismo do LLM:** mitigado por seed + self-consistency; resultados
+  já reportados como média ± desvio (3-8 execuções + bootstrap).
 - Corpus parcialmente sintético; generalização a outros domínios a validar.
 - Dependência de um LLM proprietário (gpt-4o-mini) na extração.
 - Não é método novo de ML — é padrão arquitetural; valor está na avaliação.
 
 ## 7. Conclusão e trabalhos futuros
-- **Self-consistency (votação em k amostras)** para recuperar recall nos casos
-  não-determinísticos sem afrouxar o gate (não troca precisão). Hipótese
-  principal para empurrar a fronteira.
-- Repetir o benchmark com k execuções e reportar média ± desvio.
 - Ampliar o corpus (incl. editais governamentais reais já presentes) e validar
   os rótulos com um segundo anotador.
+- Caracterizar custo: chamadas de LLM economizadas pelo juiz simbólico vs
+  o custo 5x da self-consistency; varrer k para a curva recall × custo.
+- Replicar com LLM aberto (não-proprietário) para reprodutibilidade.
 - Passe neural opcional para fundir grupos textuais equivalentes no juiz N-way.
 
 ---
@@ -182,5 +185,7 @@ k maior recupera mais respostas borderline, a custo linear de chamadas de LLM.
 2. ~~Construir o **dataset ouro**~~ ✅ (`eval/gold_dataset.json`, 30 pares verificados).
 3. ~~Implementar baselines e o script de métricas~~ ✅ (`eval/run_eval.py`).
 4. ~~Rodar e preencher §5~~ ✅ (baseline 38% vs FLARE26 0% falso-positivo).
-5. **[próximo]** Self-consistency (votação) para recuperar recall a 0% FP.
-6. Rodar k repetições (média ± desvio) e escrever o draft EN.
+5. ~~Self-consistency (votação) para recuperar recall a 0% FP~~ ✅ (k=5 → 92% recall, 0% FP).
+6. ~~Rodar k repetições (média ± desvio)~~ ✅ (`eval/run_eval_agg.py`; tabela em §5.1).
+7. **[próximo]** Escrever o draft EN a partir deste outline.
+8. Ampliar/validar corpus (2º anotador; editais grandes) e curva recall × custo (varredura de k).
