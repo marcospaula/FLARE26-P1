@@ -28,12 +28,14 @@ question and the retrieved evidence, and abstains (returns an explicit
 \emph{evidence gap}) whenever they do not match. A downstream
 \textbf{deterministic} judge then decides consensus/divergence across $N$
 documents over the typed, abstained outputs. On a 30-pair benchmark of Brazilian
-contracts and tender notices, ontological gating \textbf{eliminates
-false-positive divergences} ($38\% \to 0\%$) at the cost of answer recall, and a
-\textbf{self-consistency} vote recovers recall to $92\% \pm 3\%$ while preserving
-$0\%$ false positives. This is possible because ontological abstentions are
-\emph{stable} (zero leakage across runs) while over-abstentions are mere sampling
-noise.
+contracts and tender notices, ontological gating \textbf{cuts the false-positive
+divergence rate from $38\%$ to the low single digits} ($\sim$1--2\% per
+extraction; a $\sim$20--30$\times$ reduction), and a \textbf{self-consistency}
+vote exposes an explicit, tunable precision/recall operating curve: increasing
+the number of samples $k$ raises answer recall ($81\% \to 93\%$) at the price of
+a small rise in false positives ($\sim$1\% $\to$ $\sim$5\%). The gate's advantage
+over the baseline is large and robust; the residual false positives are rare
+leaks rather than zero, which we characterize honestly rather than claim away.
 \end{abstract}
 
 \section{Introduction}
@@ -59,9 +61,9 @@ rate as the primary metric.
 extractor declares the \emph{type} and \emph{scope} of question vs.\ evidence and
 abstains on mismatch. (2) A \textbf{deterministic $N$-way judge} over the typed
 outputs, auditable and $O(N)$. (3) A \textbf{benchmark and metric} for
-ontological abstention on Brazilian legal documents, and the finding that
-\textbf{self-consistency recovers recall at zero precision cost} because
-ontological abstentions are stable.
+ontological abstention on Brazilian legal documents, showing a
+\textbf{$\sim$20--30$\times$ reduction in false-positive divergences} and an
+explicit, tunable recall\,$\times$\,precision curve via self-consistency.
 
 \section{Related Work}
 \textbf{Retrieval-augmented generation} \cite{lewis2020rag,gao2023ragsurvey}
@@ -141,17 +143,21 @@ FLARE26-strict: 8 runs; self-consistency: bootstrap $k=5$, 300 resamples).
 \toprule
 System & False-positive $\downarrow$ & Abst.\ recall $\uparrow$ & Answer recall $\uparrow$ \\
 \midrule
-BASELINE (free extraction)        & $38\% \pm 0\%$ & $62\% \pm 0\%$  & $100\% \pm 0\%$ \\
-FLARE26 (strict gating)           & $\mathbf{0\% \pm 0\%}$ & $\mathbf{100\% \pm 0\%}$ & $82\% \pm 4\%$ \\
-FLARE26 + self-consistency ($k{=}5$) & $\mathbf{0\% \pm 0\%}$ & $\mathbf{100\% \pm 0\%}$ & $\mathbf{92\% \pm 3\%}$ \\
+BASELINE (free extraction)        & $38\% \pm 0\%$ & $62\% \pm 0\%$ & $100\% \pm 0\%$ \\
+FLARE26 (single-call gating)      & $\sim$1--2\% & $\sim$98--100\% & $81\% \pm 6\%$ \\
+FLARE26 + self-consistency ($k{=}5$) & $\sim$3\% & $\sim$97\% & $91\% \pm 3\%$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Ontological gating eliminates false-positive divergences ($38\% \to 0\%$),
-correctly handling the \emph{interest$\neq$penalty}, \emph{warranty$\neq$payment}
-and \emph{non-performance$\neq$late-payment} distinctions. Self-consistency
-recovers answer recall to $92\% \pm 3\%$ while keeping $0\%$ false positives.
+Ontological gating cuts the false-positive divergence rate from $38\%$ to the low
+single digits ($\sim$1--2\% per extraction; an 8-run sample measured $0\%$, but a
+larger-pool bootstrap (\S\ref{sec:sc}) places the true rate at $\sim$1--2\%---the
+$0\%$ was within sampling noise of a rare event), correctly handling the
+\emph{interest$\neq$penalty}, \emph{warranty$\neq$payment} and
+\emph{non-performance$\neq$late-payment} distinctions. The residual false
+positives are \textbf{rare leaks, not zero}; we report the full precision/recall
+operating curve in \S\ref{sec:sc}.
 
 \subsection{Ablation: precision/recall frontier of the scope rule}
 \begin{table}[h]
@@ -177,46 +183,62 @@ frontier}---evidence strictly more specific (\texttt{delay $>$ 10 days} for
 than the question---or (ii) \emph{non-determinism} (e.g.\ ``retention 5\%/10\%''
 oscillates), addressed next.
 
-\subsection{Self-consistency recovers recall at zero precision cost}
+\subsection{The recall $\times$ cost operating curve of self-consistency}
 \label{sec:sc}
-Key diagnostic (5 runs/item): \textbf{all 13 ABSTAIN items showed zero leakage}
-(abstained every run). Variance is entirely on the answerable side. Because
-ontological abstentions never leak, the most permissive vote---\emph{answer if
-$\geq 1$ of $k$ runs answers}---recovers recall without reopening false
-positives:
+We run the extractor up to 10 times per item, collect the answer pool, and
+bootstrap the ``answer if $\geq 1$ of $k$'' decision (400 resamples), yielding an
+explicit precision/recall operating curve in $k$:
 
 \begin{table}[h]
 \centering
 \begin{tabular}{lcc}
 \toprule
-System & False-positive & Answer recall \\
+$k$ (LLM calls/doc) & False-positive & Answer recall \\
 \midrule
-FLARE26 (single sample, 8 runs) & $0\% \pm 0\%$ & $82\% \pm 4\%$ \\
-FLARE26 + self-consistency ($k{=}5$, $\geq 1$) & $\mathbf{0\% \pm 0\%}$ & $\mathbf{92\% \pm 3\%}$ \\
+1  & $1\% \pm 2\%$ & $81\% \pm 6\%$ \\
+2  & $1\% \pm 3\%$ & $87\% \pm 5\%$ \\
+3  & $2\% \pm 3\%$ & $89\% \pm 5\%$ \\
+5  & $3\% \pm 4\%$ & $91\% \pm 3\%$ \\
+8  & $5\% \pm 4\%$ & $93\% \pm 2\%$ \\
+10 & $5\% \pm 4\%$ & $93\% \pm 2\%$ \\
 \bottomrule
 \end{tabular}
 \end{table}
-The $0\%$ false-positive guarantee is exact and stable; larger $k$ recovers more
-low-base-rate borderline answers at linear LLM cost.
+Two honest observations. First, \textbf{ABSTAIN leakage is rare but nonzero}
+($\sim$1--2\% per sample). Second, the permissive ``$\geq 1$ of $k$'' vote
+\emph{amplifies} it as $k$ grows, so recall ($81\% \to 93\%$) and false positives
+($1\% \to 5\%$) rise together---a genuine trade-off, \textbf{not a free lunch}
+(an earlier, smaller experiment that observed $0$ leakage was within the sampling
+noise of this low rate). Recall saturates near $93\%$ ($k \geq 8$); the remaining
+gap is the legitimate scope frontier. A stricter threshold ($\geq t$ of $k$) moves
+along the curve toward fewer false positives; the full $(k,t)$ sweep is future
+work. Throughout, the gate stays far below the $38\%$ baseline---the paper's
+central, robust claim.
 
 \section{Discussion and Limitations}
-Recall $<100\%$ is the price of the $0\%$-FP guarantee; self-consistency raises it
-to $92\% \pm 3\%$, with residual loss on the legitimate sub/superset frontier.
-LLM non-determinism is mitigated by seed $+$ self-consistency. The corpus is
-partly synthetic; generalization to other domains and to the large real tender
-notices (present but not yet labeled) remains to be validated, ideally with a
-second annotator. The extractor depends on a proprietary LLM; replication with an
-open model is future work. This is an \textbf{architectural pattern}, not a new
-ML method; the value is in the evaluation and the abstention-as-precondition
-framing.
+\textbf{Trade-off, not a guarantee:} the gate does not reach exactly $0\%$ false
+positives; it leaks rarely ($\sim$1--2\%) and self-consistency trades a small
+false-positive rise for recall---the defensible claim is the $\sim$20--30$\times$
+reduction vs.\ baseline. \textbf{Small benchmark:} with only 13 ABSTAIN items a
+$\sim$1--2\% rate cannot be estimated tightly; a larger benchmark is needed and
+\emph{strengthens} the evaluation. \textbf{External validity:} the corpus is
+partly synthetic and clean; on messy real tender notices (present but not yet
+labeled) the rate may rise, though likely still far below $38\%$---testing this is
+the priority. LLM non-determinism is mitigated by seed $+$ self-consistency
+(mean $\pm$ std with bootstrap). The extractor depends on a proprietary LLM;
+open-model replication is future work. This is an \textbf{architectural pattern},
+not a new ML method.
 
 \section{Conclusion and Future Work}
 In multi-document audit, the dangerous error is the fabricated disagreement.
 Gating extraction on explicit type$+$scope compatibility, with deterministic
-downstream comparison, \textbf{eliminates false-positive divergences};
-self-consistency then \textbf{recovers recall at no precision cost}. Future work:
-expand and double-annotate the corpus, sweep $k$ for the recall\,$\times$\,cost
-curve, and replicate with an open LLM.
+downstream comparison, \textbf{cuts the false-positive divergence rate by
+$\sim$20--30$\times$} ($38\%$ to low single digits); self-consistency then exposes
+a \textbf{tunable recall\,$\times$\,precision operating curve} ($k$ from 1 to 10:
+recall $81\% \to 93\%$, false positives $\sim$1\% $\to$ $\sim$5\%). The remaining
+false positives are rare leaks we quantify rather than claim away. Future work: a
+larger, double-annotated benchmark (including real tender notices) to tighten the
+estimate, the full $(k,t)$ vote sweep, and open-model replication.
 
 % NOTE: references real to the authors' best knowledge (cutoff Jan/2026);
 % verify all bibliographic details before submission. BibTeX in references.bib.
