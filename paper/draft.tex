@@ -1,0 +1,213 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\title{Knowing When the Answer Isn't There:\\
+Ontology-Gated Extraction for False-Positive-Free Multi-Document Audit}
+\author{Marcos de Paula \\ FLARE26 Project}
+\date{Working draft --- applied / systems paper}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Retrieval-augmented generation (RAG) systems applied to document comparison tend
+to \emph{hallucinate} an answer when the requested information is simply absent,
+producing \textbf{false-positive divergences} that erode trust in audit
+settings---where the costliest error is not getting a value wrong, but inventing
+a disagreement that does not exist. We present FLARE26, a neuro-symbolic
+``glass-box'' auditor whose extraction step is \textbf{ontologically gated}: the
+model must explicitly declare the \emph{type} and the \emph{scope} of both the
+question and the retrieved evidence, and abstains (returns an explicit
+\emph{evidence gap}) whenever they do not match. A downstream
+\textbf{deterministic} judge then decides consensus/divergence across $N$
+documents over the typed, abstained outputs. On a 30-pair benchmark of Brazilian
+contracts and tender notices, ontological gating \textbf{eliminates
+false-positive divergences} ($38\% \to 0\%$) at the cost of answer recall, and a
+\textbf{self-consistency} vote recovers recall to $92\% \pm 3\%$ while preserving
+$0\%$ false positives. This is possible because ontological abstentions are
+\emph{stable} (zero leakage across runs) while over-abstentions are mere sampling
+noise.
+\end{abstract}
+
+\section{Introduction}
+Organizations increasingly compare large numbers of structured-but-unstructured
+documents---contracts, tender notices (\emph{editais}), financial
+statements---to detect discrepancies. A natural approach is RAG: retrieve
+relevant passages and ask an LLM to extract the answer per document, then
+compare. This breaks down in a specific, costly way: \textbf{standard RAG prefers
+answering to abstaining.} When a contract is asked ``what is the penalty for
+\emph{total non-performance}?'' but only contains a clause about
+\emph{late-payment} penalty, a naive extractor returns the late-payment
+value---fabricating an answer to a question the document never addresses. Across
+documents, such fabrications manifest as \textbf{false-positive divergences}: a
+flagged disagreement that is an artifact of hallucination.
+
+In auditing, the cost structure differs from open-domain QA. A false positive
+triggers unnecessary legal review or a wrong decision; it is worse than an honest
+``not found, please verify.'' We therefore target the false-positive divergence
+rate as the primary metric.
+
+\paragraph{Contributions.}
+(1) \textbf{Ontologically-gated extraction} with explicit abstention: the
+extractor declares the \emph{type} and \emph{scope} of question vs.\ evidence and
+abstains on mismatch. (2) A \textbf{deterministic $N$-way judge} over the typed
+outputs, auditable and $O(N)$. (3) A \textbf{benchmark and metric} for
+ontological abstention on Brazilian legal documents, and the finding that
+\textbf{self-consistency recovers recall at zero precision cost} because
+ontological abstentions are stable.
+
+\section{Related Work}
+\textbf{Structured extraction from LLMs} (function-calling, Instructor,
+Guardrails) coerces outputs into typed schemas; we add an \emph{abstention
+pre-condition}---the schema's primary job is to decide whether to answer at all.
+\textbf{Selective prediction / abstention} is our nearest neighbor; we frame
+abstention as a \emph{pre-condition for cross-document comparison} rather than a
+post-hoc QA filter. \textbf{Faithfulness / groundedness in RAG} measures whether
+an answer is supported; we focus on the dual failure of answering when no
+in-scope evidence exists. \textbf{Legal NLP} provides clause extraction and
+contract analytics; we contribute an abstention-centered evaluation in Brazilian
+Portuguese public-procurement text.
+
+\section{Method}
+FLARE26 is a pipeline: hybrid retrieval (M1.5) $\to$ ontologically-gated
+extraction (M2) $\to$ deterministic $N$-way judge (M4) $\to$ executive synthesis
+(M5). Every verdict carries provenance to the source span (``glass box'').
+
+\subsection{Ontologically-gated extraction (M2)}
+The extractor emits a typed record separating \textbf{two independent checks}:
+\textbf{Type/instrument} (the named instrument the question asks about, e.g.\ a
+\emph{penalty} vs.\ \emph{interest}---distinct instruments even when both are
+percentages; must match) and \textbf{Scope/condition} (the specific
+condition/event the value applies to; mismatched scopes $\Rightarrow$ abstain).
+If either check fails, or a negative user restriction is violated, the record
+collapses to an explicit evidence gap with confidence $0$. The compatibility rule
+is \textbf{domain-agnostic}: stated over abstract instruments $P/Q$ and
+conditions $A/B$, with no hard-coded legal terms.
+
+\subsection{Deterministic $N$-way judge (M4)}
+Given the typed answer per document, the judge groups documents by
+\textbf{equivalent answer} (Brazilian number normalization: \texttt{R\$
+1.200.000,50} $\to$ \texttt{1200000.5}; \texttt{12,5\%} $\equiv$ \texttt{12.5}).
+The verdict is \emph{consensus} (one group), \emph{divergence} (multiple
+groups), or \emph{evidence gap}, in $O(N)$ with no LLM call. Since the judge sees
+only abstained/typed outputs, an upstream hallucination is the only way to create
+a false-positive divergence---exactly what the gate suppresses.
+
+\subsection{Self-consistency (optional)}
+The extractor is run $k$ times; the system answers if \textbf{any} run answers,
+abstaining only if all $k$ abstain, returning the most frequent value.
+Section~\ref{sec:sc} explains why this asymmetric policy is safe.
+
+\section{Evaluation}
+\paragraph{Corpus \& gold.} 30 (question, document) pairs over 16 documents and 7
+questions, from Brazilian service contracts and public tender notices. Each pair
+is labeled with the correct answer \textbf{or} \texttt{ABSTAIN} when the document
+lacks the requested datum (13 ABSTAIN, 17 answerable); labels verified against
+source text. Discriminating cases are included by design: \emph{interest $\neq$
+penalty}, \emph{warranty term $\neq$ payment term}, \emph{total non-performance
+$\neq$ late payment}.
+
+\paragraph{Systems.} (i) BASELINE: free extraction, no gate. (ii) FLARE26: gated
+extraction (strict scope). (iii) FLARE26 + self-consistency ($k=5$). Extractor:
+gpt-4o-mini, temperature $0$, fixed seed.
+
+\paragraph{Metrics.} (a) \textbf{False-positive rate}: fraction of ABSTAIN items
+the system answers (headline). (b) \textbf{Abstention recall}: fraction of
+ABSTAIN items correctly abstained. (c) \textbf{Answer recall}: fraction of
+answerable items answered. Numbers are mean $\pm$ std (BASELINE: 3 runs;
+FLARE26-strict: 8 runs; self-consistency: bootstrap $k=5$, 300 resamples).
+
+\section{Results}
+
+\begin{table}[h]
+\centering
+\caption{Main result (30 pairs; 13 ABSTAIN, 17 answerable). Mean $\pm$ std.}
+\begin{tabular}{lccc}
+\toprule
+System & False-positive $\downarrow$ & Abst.\ recall $\uparrow$ & Answer recall $\uparrow$ \\
+\midrule
+BASELINE (free extraction)        & $38\% \pm 0\%$ & $62\% \pm 0\%$  & $100\% \pm 0\%$ \\
+FLARE26 (strict gating)           & $\mathbf{0\% \pm 0\%}$ & $\mathbf{100\% \pm 0\%}$ & $82\% \pm 4\%$ \\
+FLARE26 + self-consistency ($k{=}5$) & $\mathbf{0\% \pm 0\%}$ & $\mathbf{100\% \pm 0\%}$ & $\mathbf{92\% \pm 3\%}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Ontological gating eliminates false-positive divergences ($38\% \to 0\%$),
+correctly handling the \emph{interest$\neq$penalty}, \emph{warranty$\neq$payment}
+and \emph{non-performance$\neq$late-payment} distinctions. Self-consistency
+recovers answer recall to $92\% \pm 3\%$ while keeping $0\%$ false positives.
+
+\subsection{Ablation: precision/recall frontier of the scope rule}
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+Scope rule & False-positive & Answer recall \\
+\midrule
+Strict (condition equality) & $\mathbf{0\%}$ & $71$--$82\%$ \\
+Intersection (subset/superset) & $38\%$ & $88\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+Loosening scope to accept sub/superset conditions recovers recall but
+\textbf{reopens false positives} (a ``late-payment penalty'' is returned for a
+``non-performance penalty'' question). The strict rule is the correct operating
+point: never asserting a false divergence outweighs recall.
+
+\subsection{Error analysis}
+Residual abstentions on answerable items are either (i) a \emph{legitimate
+frontier}---evidence strictly more specific (\texttt{delay $>$ 10 days} for
+``delay'') or more general (\texttt{partial or total default} for ``total'')
+than the question---or (ii) \emph{non-determinism} (e.g.\ ``retention 5\%/10\%''
+oscillates), addressed next.
+
+\subsection{Self-consistency recovers recall at zero precision cost}
+\label{sec:sc}
+Key diagnostic (5 runs/item): \textbf{all 13 ABSTAIN items showed zero leakage}
+(abstained every run). Variance is entirely on the answerable side. Because
+ontological abstentions never leak, the most permissive vote---\emph{answer if
+$\geq 1$ of $k$ runs answers}---recovers recall without reopening false
+positives:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+System & False-positive & Answer recall \\
+\midrule
+FLARE26 (single sample, 8 runs) & $0\% \pm 0\%$ & $82\% \pm 4\%$ \\
+FLARE26 + self-consistency ($k{=}5$, $\geq 1$) & $\mathbf{0\% \pm 0\%}$ & $\mathbf{92\% \pm 3\%}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+The $0\%$ false-positive guarantee is exact and stable; larger $k$ recovers more
+low-base-rate borderline answers at linear LLM cost.
+
+\section{Discussion and Limitations}
+Recall $<100\%$ is the price of the $0\%$-FP guarantee; self-consistency raises it
+to $92\% \pm 3\%$, with residual loss on the legitimate sub/superset frontier.
+LLM non-determinism is mitigated by seed $+$ self-consistency. The corpus is
+partly synthetic; generalization to other domains and to the large real tender
+notices (present but not yet labeled) remains to be validated, ideally with a
+second annotator. The extractor depends on a proprietary LLM; replication with an
+open model is future work. This is an \textbf{architectural pattern}, not a new
+ML method; the value is in the evaluation and the abstention-as-precondition
+framing.
+
+\section{Conclusion and Future Work}
+In multi-document audit, the dangerous error is the fabricated disagreement.
+Gating extraction on explicit type$+$scope compatibility, with deterministic
+downstream comparison, \textbf{eliminates false-positive divergences};
+self-consistency then \textbf{recovers recall at no precision cost}. Future work:
+expand and double-annotate the corpus, sweep $k$ for the recall\,$\times$\,cost
+curve, and replicate with an open LLM.
+
+\end{document}
