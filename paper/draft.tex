@@ -243,10 +243,15 @@ positives; it leaks rarely ($\sim$1--2\%) and self-consistency trades a small
 false-positive rise for recall---the defensible claim is the $\sim$20--30$\times$
 reduction vs.\ baseline. \textbf{Small benchmark:} with only 13 ABSTAIN items a
 $\sim$1--2\% rate cannot be estimated tightly; a larger benchmark is needed and
-\emph{strengthens} the evaluation. \textbf{External validity:} the corpus is
-partly synthetic and clean; on messy real tender notices (present but not yet
-labeled) the rate may rise, though likely still far below $38\%$---testing this is
-the priority. LLM non-determinism is mitigated by seed $+$ self-consistency
+\emph{strengthens} the evaluation. \textbf{External validity is not yet established:} a pilot on two real tender
+notices showed the binding constraint is \emph{reliable ABSTAIN annotation}, not
+the model---inferring ``the document lacks $X$'' from the absence of keyword $X$
+is invalid on real legal text, which paraphrases concepts (\emph{juros de mora}
+as \emph{compensação financeira}; ``payment term'' as ``payment within 30
+days''). Three of our first real-doc ABSTAIN labels were wrong for this reason
+(the gate had answered correctly); retrieval scaled fine (it surfaced the clause
+in a 116k-char document). We thus make no claim about real-document
+false-positive rates; establishing them needs domain-grade absence annotation. LLM non-determinism is mitigated by seed $+$ self-consistency
 (mean $\pm$ std with bootstrap). The extractor depends on a proprietary LLM;
 open-model replication is future work. This is an \textbf{architectural pattern},
 not a new ML method.

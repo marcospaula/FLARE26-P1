@@ -47,10 +47,19 @@
 
     {"id": "inexec-PGFN", "pergunta": "Qual o valor da multa por inexecução total da obrigação?", "documento": "Edital_PGFN_04_2025.pdf", "gold": "12,5% sobre o valor total atualizado do contrato", "evidencia": "inadimplemento parcial ou total da obrigação assumida ... multa compensatória de 12,5% ... sobre o valor total atualizado", "verificado": true},
     {"id": "inexec-Afix", "pergunta": "Qual o valor da multa por inexecução total da obrigação?", "documento": "Contrato_A_Multa_Fixa.pdf", "gold": "ABSTAIN", "evidencia": "doc só tem multa por atraso no pagamento, não por inexecução", "verificado": true},
-    {"id": "inexec-Bdia", "pergunta": "Qual o valor da multa por inexecução total da obrigação?", "documento": "Contrato_B_Multa_Diaria.pdf", "gold": "ABSTAIN", "evidencia": "doc só tem multa por atraso no pagamento, não por inexecução", "verificado": true}
+    {"id": "inexec-Bdia", "pergunta": "Qual o valor da multa por inexecução total da obrigação?", "documento": "Contrato_B_Multa_Diaria.pdf", "gold": "ABSTAIN", "evidencia": "doc só tem multa por atraso no pagamento, não por inexecução", "verificado": true},
+
+    {"id": "real-srrf-inexec", "pergunta": "Qual o valor da multa por inexecução total da obrigação?", "documento": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf", "gold": "20% sobre o valor total do contrato", "evidencia": "13.2.3. multa compensatória de 20% (vinte por cento) sobre o valor total do contrato, no caso de inexecução total do objeto", "verificado": true},
+    {"id": "real-srrf-moratoria", "pergunta": "Qual a multa moratória por atraso injustificado no cumprimento da obrigação?", "documento": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf", "gold": "1% por dia de atraso, até o limite de 15 dias", "evidencia": "13.2.2. multa moratória de 1% (um por cento) por dia de atraso injustificado sobre o valor da parcela inadimplida, até o limite de 15 (quinze) dias", "verificado": true},
+    {"id": "real-srrf-vigencia", "pergunta": "Qual o prazo de vigência do contrato?", "documento": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf", "gold": "6 (seis) meses", "evidencia": "16.4. O prazo de vigência da contratação é de 06 (seis) meses prorrogável", "verificado": true},
+    {"id": "real-srrf-juros", "pergunta": "Qual a taxa de juros de mora por atraso no pagamento?", "documento": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf", "gold": "ABSTAIN", "evidencia": "AMBÍGUO — sem 'juros de mora' literal, MAS há 'compensação financeira de 6% por atraso de pagamento' (mesmo instituto econômico?). Pendente revisão de domínio.", "verificado": false},
+    {"id": "real-srrf-prazopag", "pergunta": "Qual o prazo para pagamento das faturas?", "documento": "pe-srrf01-02_2020-uasg-170018-epis-coronavirus.pdf", "gold": "até 30 (trinta) dias", "evidencia": "CORRIGIDO (rótulo ABSTAIN era erro meu): 'o pagamento será realizado no prazo máximo de até 30 (trinta) dias' — o doc parafraseia, não usa 'prazo de pagamento'", "verificado": true},
+
+    {"id": "real-ed04-prazopag", "pergunta": "Qual o prazo para pagamento das faturas?", "documento": "edital-04-2025-e-seus-anexos.pdf", "gold": "até dez dias úteis", "evidencia": "7.32. O pagamento será efetuado no prazo máximo de até dez dias úteis, contados da finalização da liquidação da despesa", "verificado": true},
+    {"id": "real-ed04-juros", "pergunta": "Qual a taxa de juros de mora por atraso no pagamento?", "documento": "edital-04-2025-e-seus-anexos.pdf", "gold": "ABSTAIN", "evidencia": "doc prevê correção monetária pelo IPCA, mas não cláusula de juros de mora (0 ocorrências)", "verificado": true}
   ],
   "_todo": [
-    "Pares de comparação (consenso/divergência) para a métrica de divergência falso-positiva ao nível N-way: ex. 'Contrato A.pdf' (R$5.000) vs 'Contrato_A_Multa_Fixa' (R$5.000) = CONSENSO; editais A_Minuta vs B_Publicado = DIVERGÊNCIA.",
-    "Editais governamentais grandes (edital-04-2025, pe-srrf01) ainda não rotulados — exigem leitura cuidadosa de cláusulas específicas."
+    "Pares de comparação (consenso/divergência) para a métrica de divergência falso-positiva ao nível N-way.",
+    "edital-04-2025: multa em faixa/placeholder (0,5%-15%, range) — não rotulado por ambiguidade do gold."
   ]
 }

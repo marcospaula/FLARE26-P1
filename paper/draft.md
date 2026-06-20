@@ -249,10 +249,17 @@ throughout, which is the paper's central, robust claim.
   false-positive rate cannot be estimated tightly (± a few points). A larger,
   more balanced benchmark is needed to pin the rate down — this *strengthens*
   the evaluation rather than threatening the thesis.
-- **External validity.** The corpus is partly synthetic and clean; on messy,
-  real tender notices (present in the corpus but not yet labeled) the
-  false-positive rate may rise. Testing this is the priority next step; even a
-  higher rate would likely remain far below the 38% baseline.
+- **External validity is not yet established.** A pilot on two real Brazilian
+  tender notices surfaced that the binding constraint is *reliable ABSTAIN
+  annotation*, not the model: inferring "the document lacks X" from the absence
+  of keyword X is invalid on real legal text, which paraphrases concepts (e.g.,
+  *juros de mora* appears as *compensação financeira*; "payment term" as
+  "payment within 30 days"). Three of our first real-doc ABSTAIN labels were
+  wrong for this reason — the gate had answered correctly. Retrieval, by
+  contrast, scaled fine (it surfaced the relevant clause in a 116k-character
+  document). We therefore make **no claim about real-document false-positive
+  rates**; establishing them requires domain-grade absence annotation and is the
+  priority next step.
 - **LLM non-determinism** is mitigated by seed + self-consistency; results are
   reported as mean ± std with bootstrap.
 - The extractor depends on a proprietary LLM (gpt-4o-mini); replication with an
