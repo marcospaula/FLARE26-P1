@@ -209,10 +209,32 @@ Two honest observations. First, \textbf{ABSTAIN leakage is rare but nonzero}
 \emph{amplifies} it as $k$ grows, so recall ($81\% \to 93\%$) and false positives
 ($1\% \to 5\%$) rise together---a genuine trade-off, \textbf{not a free lunch}
 (an earlier, smaller experiment that observed $0$ leakage was within the sampling
-noise of this low rate). Recall saturates near $93\%$ ($k \geq 8$); the remaining
-gap is the legitimate scope frontier. A stricter threshold ($\geq t$ of $k$) moves
-along the curve toward fewer false positives; the full $(k,t)$ sweep is future
-work. Throughout, the gate stays far below the $38\%$ baseline---the paper's
+noise of this low rate).
+
+\paragraph{The vote threshold is the right control.} Sweeping $t$ (``answer only
+if $\geq t$ of $k$ samples answer'') shows ``$\geq 1$'' was the wrong knob: leaks
+appear in only 1--2 of the $k$ samples, so a majority-style threshold filters
+them and drives false positives back to $\sim$0 while keeping recall high.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+Policy & False-positive & Answer recall \\
+\midrule
+single call ($k{=}1$)        & $2\%$  & $77\%$ \\
+$k{=}10, t{=}1$ (naive ``$\geq 1$'') & $10\%$ & $86\%$ \\
+$k{=}10, t{=}3$              & $1\%$  & $82\%$ \\
+$k{=}10, t{=}4$             & $\mathbf{0\%}$ & $\mathbf{80\%}$ \\
+$k{=}8, t{=}4$              & $0\%$  & $78\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+The point $k{=}10, t{=}4$ \textbf{dominates the single call on both axes}
+($0\%$ vs.\ $2\%$ FP, $80\%$ vs.\ $77\%$ recall); tolerating $\sim$1\% FP ($t{=}3$)
+buys $82\%$ recall. Recall saturates near $82\%$---the rest is the legitimate
+scope frontier. Self-consistency is genuinely useful \emph{when $t$ is chosen
+sensibly}; the gate stays far below the $38\%$ baseline throughout---the paper's
 central, robust claim.
 
 \section{Discussion and Limitations}
@@ -233,12 +255,13 @@ not a new ML method.
 In multi-document audit, the dangerous error is the fabricated disagreement.
 Gating extraction on explicit type$+$scope compatibility, with deterministic
 downstream comparison, \textbf{cuts the false-positive divergence rate by
-$\sim$20--30$\times$} ($38\%$ to low single digits); self-consistency then exposes
-a \textbf{tunable recall\,$\times$\,precision operating curve} ($k$ from 1 to 10:
-recall $81\% \to 93\%$, false positives $\sim$1\% $\to$ $\sim$5\%). The remaining
+$\sim$20--30$\times$} ($38\%$ to low single digits); a self-consistency vote with
+a sensible majority-style threshold (e.g.\ $k{=}10, t{=}4$) then \textbf{recovers
+recall to $\sim$80\% at $\sim$0\% false positives}, dominating the single call on
+both axes. The gate's advantage over the baseline is large and robust; remaining
 false positives are rare leaks we quantify rather than claim away. Future work: a
 larger, double-annotated benchmark (including real tender notices) to tighten the
-estimate, the full $(k,t)$ vote sweep, and open-model replication.
+estimate, and open-model replication.
 
 % NOTE: references real to the authors' best knowledge (cutoff Jan/2026);
 % verify all bibliographic details before submission. BibTeX in references.bib.

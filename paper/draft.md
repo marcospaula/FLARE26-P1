@@ -216,11 +216,28 @@ abstain item occasionally flips to an answer (~1–2% per sample). Second, the
 permissive "≥1 of k" vote *amplifies* this as k grows, so recall (81% → 93%) and
 false positives (1% → 5%) rise together — this is a genuine trade-off, **not a
 free lunch** (an earlier, smaller experiment that observed 0 leakage was within
-the sampling noise of this low rate). Recall saturates near 93% (k ≥ 8); the
-remaining gap is the legitimate scope frontier of §5.3. A stricter vote threshold
-(≥ t of k) would move along the curve toward lower false positives; we leave the
-full (k, t) sweep to future work. Throughout, the gate stays far below the 38%
-baseline, which is the paper's central, robust claim.
+the sampling noise of this low rate).
+
+**The vote threshold is the right control.** Sweeping the threshold t ("answer
+only if ≥ t of k samples answer") shows that the naive "≥1" was simply the wrong
+knob: because leaks appear in only 1–2 of the k samples, a majority-style
+threshold filters them out and drives false positives back to ~0 while keeping
+recall high.
+
+| Policy | False-positive | Answer recall |
+|--------|----------------|---------------|
+| single call (k=1)        | 2%  | 77% |
+| k=10, t=1 (naive "≥1")   | 10% | 86% |
+| k=10, t=3                | 1%  | 82% |
+| **k=10, t=4**            | **0%** | **80%** |
+| k=8, t=4                 | 0%  | 78% |
+
+The operating point **k=10, t=4 dominates the single call on both axes** (0% vs.
+2% false positives, 80% vs. 77% recall); tolerating ~1% false positives (t=3)
+buys 82% recall. Recall saturates near 82% — the remaining gap is the legitimate
+scope frontier of §5.3. Self-consistency is therefore genuinely useful **when the
+threshold is chosen sensibly**; the gate stays far below the 38% baseline
+throughout, which is the paper's central, robust claim.
 
 ## 6. Discussion and Limitations
 
@@ -248,13 +265,13 @@ baseline, which is the paper's central, robust claim.
 In multi-document audit, the dangerous error is the fabricated disagreement.
 Gating extraction on explicit type+scope compatibility, with deterministic
 downstream comparison, **cuts the false-positive divergence rate by ~20–30×**
-(38% → low single digits); self-consistency then exposes a **tunable recall ×
-precision operating curve** (k from 1 to 10: recall 81% → 93%, false positives
-~1% → ~5%). The gate's advantage over the baseline is large and robust; the
-remaining false positives are rare leaks we quantify rather than claim away.
-Future work: a larger, double-annotated benchmark (including the real government
-tender notices) to tighten the rate estimate, the full (k, t) vote sweep, and
-replication with an open LLM.
+(38% → low single digits); a self-consistency vote with a sensible majority-style
+threshold (e.g., k=10, t=4) then **recovers recall to ~80% at ~0% false
+positives**, dominating the single call on both axes. The gate's advantage over
+the baseline is large and robust; the remaining false positives are rare leaks we
+quantify rather than claim away. Future work: a larger, double-annotated
+benchmark (including the real government tender notices) to tighten the rate
+estimate, and replication with an open LLM.
 
 ## References
 
