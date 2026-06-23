@@ -257,14 +257,18 @@ throughout, which is the paper's central, robust claim.
   "payment within 30 days"). Three of our first real-doc ABSTAIN labels were
   wrong for this reason — the gate had answered correctly. After re-annotating
   absence by **concept** (exhausting synonyms), a 10-pair pilot (4 genuine
-  absences, 6 answerable) gives FLARE 0% false positives and 67% recall vs. the
+  absences, 6 answerable) gives FLARE 0% false positives and 83% recall vs. the
   baseline's 0% and 50%. Two honest caveats temper this: (i) the genuine
   absences are *easy* (the concept is wholly missing, so even the baseline
   abstains — 0% FP for both); the *hard* real cases (a similar-but-wrong concept
   is present, the source of the synthetic benchmark's 38% baseline FP) coincide
-  with the ambiguous ones still awaiting domain adjudication; and (ii) recall is
-  capped partly by **retrieval** — on the 116k-character notice, the penalty
-  clauses were not reliably retrieved. Retrieval scaling and hard real-doc
+  with the ambiguous ones still awaiting domain adjudication; and (ii) recall on
+  large documents is gated by **retrieval**: diagnosing one failure revealed a
+  bug — the context assembler truncated an unordered set, occasionally dropping
+  the *highest-ranked* lexical block (the exact penalty clause); fixing it to a
+  relevance-ordered merge raised real-doc recall from 67% to 83% at unchanged
+  0% FP. A residual weakness remains when query terms are common across the
+  document ("contract *term*" matches many clauses). Hard real-doc
   ABSTAINs are the priority next steps; we make no strong real-document claim.
 - **LLM non-determinism** is mitigated by seed + self-consistency; results are
   reported as mean ± std with bootstrap.

@@ -251,14 +251,18 @@ mora} as \emph{compensação financeira}; ``payment term'' as ``payment within 3
 days''). Three of our first real-doc ABSTAIN labels were wrong for this reason
 (the gate had answered correctly). After re-annotating absence by \emph{concept}
 (exhausting synonyms), a 10-pair pilot (4 genuine absences, 6 answerable) gives
-FLARE $0\%$ false positives and $67\%$ recall vs.\ the baseline's $0\%$ and
+FLARE $0\%$ false positives and $83\%$ recall vs.\ the baseline's $0\%$ and
 $50\%$. Two caveats temper this: (i) the genuine absences are \emph{easy} (the
 concept is wholly missing, so even the baseline abstains---$0\%$ FP for both);
 the \emph{hard} real cases (a similar-but-wrong concept is present, the source of
 the synthetic $38\%$ baseline FP) coincide with the ambiguous ones awaiting
-domain adjudication; and (ii) recall is partly capped by \textbf{retrieval}---on
-the 116k-char notice the penalty clauses were not reliably retrieved. We make no
-strong real-document claim. LLM non-determinism is mitigated by seed $+$ self-consistency
+domain adjudication; and (ii) recall on large documents is gated by
+\textbf{retrieval}: diagnosing one failure revealed a bug---the context assembler
+truncated an unordered set, occasionally dropping the highest-ranked lexical
+block (the exact penalty clause); a relevance-ordered merge raised real-doc
+recall from $67\%$ to $83\%$ at unchanged $0\%$ FP, with a residual weakness when
+query terms are common across the document. We make no strong real-document
+claim. LLM non-determinism is mitigated by seed $+$ self-consistency
 (mean $\pm$ std with bootstrap). The extractor depends on a proprietary LLM;
 open-model replication is future work. This is an \textbf{architectural pattern},
 not a new ML method.

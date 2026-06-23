@@ -44,6 +44,11 @@ TOP_K_RETRIEVAL = 20
 # parte para o retrieval híbrido (vetor + léxico).
 LIMIAR_BYPASS_CHARS = 80000
 
+# Nº de blocos-pai no contexto final (valores originais; aumentá-los não trouxe
+# ganho no piloto real e seria tuning contra amostra pequena).
+MAX_BLOCOS_CONTEXTO = 8
+MAX_BLOCOS_LEXICOS = 6
+
 COLUNAS_DOCSTORE = {"parent_id", "nome_doc", "file_hash", "conteudo"}
 
 
@@ -243,8 +248,11 @@ def recuperar_contexto(pergunta: str, file_hash: str, *, db_path: str,
     nao_pct = [t for t in termos if t != "%"]
     ancora = sorted(nao_pct, key=len, reverse=True)[0] if nao_pct else ""
 
-    contextos = set()
-    chunks = []
+    # Candidatos rankeados por prioridade (NÃO usar set + truncamento arbitrário:
+    # isso descartava o bloco mais relevante em docs grandes). Léxico exato é
+    # sinal de precisão forte → prioridade acima da vetorial.
+    candidatos = []  # (prioridade, conteudo, chunk_meta)
+    vistos = set()
 
     res_vetor = vector_store.similarity_search_with_score(
         pergunta, k=top_k, filter={"file_hash": file_hash})
@@ -254,13 +262,15 @@ def recuperar_contexto(pergunta: str, file_hash: str, *, db_path: str,
         conn = sqlite3.connect(db_path, check_same_thread=False)
         cur = conn.cursor()
         for doc, dist in res_vetor:
-            if 1.0 - dist >= limite:
+            score_v = 1.0 - dist
+            if score_v >= limite:
                 row = cur.execute(
                     "SELECT conteudo FROM docstore_pai WHERE parent_id = ?",
                     (doc.metadata.get("parent_id"),)).fetchone()
-                if row and row[0] not in contextos:
-                    contextos.add(row[0])
-                    chunks.append({"texto": row[0][:200] + "... [VETOR]", "score": 1.0 - dist})
+                if row and row[0] not in vistos:
+                    vistos.add(row[0])
+                    candidatos.append((score_v, row[0],
+                                       {"texto": row[0][:200] + "... [VETOR]", "score": score_v}))
         conn.close()
 
     lexicos = []
@@ -271,13 +281,18 @@ def recuperar_contexto(pergunta: str, file_hash: str, *, db_path: str,
         if score >= 15:
             lexicos.append((score, conteudo))
     lexicos.sort(key=lambda x: x[0], reverse=True)
-    for score, conteudo in lexicos[:6]:
-        if conteudo not in contextos:
-            contextos.add(conteudo)
-            chunks.append({"texto": conteudo[:200] + "... [LÉXICO]", "score": min(0.99, score / 100.0)})
+    for score, conteudo in lexicos[:MAX_BLOCOS_LEXICOS]:
+        if conteudo not in vistos:
+            vistos.add(conteudo)
+            # prioridade > 1.0 garante que o léxico exato fique acima da vetorial.
+            candidatos.append((1.0 + score / 100.0, conteudo,
+                               {"texto": conteudo[:200] + "... [LÉXICO]", "score": min(0.99, score / 100.0)}))
 
-    telemetria = {"estrategia": "Parent-Child RAG", "total_blocos": len(contextos)}
-    contexto = "\n\n--- [BLOCO PAI] ---\n\n".join(list(contextos)[:8])
+    candidatos.sort(key=lambda x: x[0], reverse=True)
+    top = candidatos[:MAX_BLOCOS_CONTEXTO]
+    chunks = [meta for _, _, meta in top]
+    telemetria = {"estrategia": "Parent-Child RAG", "total_blocos": len(top)}
+    contexto = "\n\n--- [BLOCO PAI] ---\n\n".join(conteudo for _, conteudo, _ in top)
     return contexto, chunks, telemetria
 
 
