@@ -249,17 +249,23 @@ throughout, which is the paper's central, robust claim.
   false-positive rate cannot be estimated tightly (± a few points). A larger,
   more balanced benchmark is needed to pin the rate down — this *strengthens*
   the evaluation rather than threatening the thesis.
-- **External validity is not yet established.** A pilot on two real Brazilian
-  tender notices surfaced that the binding constraint is *reliable ABSTAIN
-  annotation*, not the model: inferring "the document lacks X" from the absence
-  of keyword X is invalid on real legal text, which paraphrases concepts (e.g.,
-  *juros de mora* appears as *compensação financeira*; "payment term" as
+- **External validity: a cautious pilot.** On two real Brazilian tender notices
+  (116k and 198k characters), reliable ABSTAIN annotation — not the model —
+  proved to be the binding constraint: inferring "the document lacks X" from the
+  absence of *keyword* X is invalid on real legal text, which paraphrases
+  concepts (*juros de mora* as *compensação financeira*; "payment term" as
   "payment within 30 days"). Three of our first real-doc ABSTAIN labels were
-  wrong for this reason — the gate had answered correctly. Retrieval, by
-  contrast, scaled fine (it surfaced the relevant clause in a 116k-character
-  document). We therefore make **no claim about real-document false-positive
-  rates**; establishing them requires domain-grade absence annotation and is the
-  priority next step.
+  wrong for this reason — the gate had answered correctly. After re-annotating
+  absence by **concept** (exhausting synonyms), a 10-pair pilot (4 genuine
+  absences, 6 answerable) gives FLARE 0% false positives and 67% recall vs. the
+  baseline's 0% and 50%. Two honest caveats temper this: (i) the genuine
+  absences are *easy* (the concept is wholly missing, so even the baseline
+  abstains — 0% FP for both); the *hard* real cases (a similar-but-wrong concept
+  is present, the source of the synthetic benchmark's 38% baseline FP) coincide
+  with the ambiguous ones still awaiting domain adjudication; and (ii) recall is
+  capped partly by **retrieval** — on the 116k-character notice, the penalty
+  clauses were not reliably retrieved. Retrieval scaling and hard real-doc
+  ABSTAINs are the priority next steps; we make no strong real-document claim.
 - **LLM non-determinism** is mitigated by seed + self-consistency; results are
   reported as mean ± std with bootstrap.
 - The extractor depends on a proprietary LLM (gpt-4o-mini); replication with an
