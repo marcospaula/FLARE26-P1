@@ -26,12 +26,13 @@ Brazilian contracts and government tender notices, we surface \textbf{three
 pitfalls}, each illustrated by a concrete mistake we made and corrected: (i) a
 \textbf{single-sample illusion}, where a rare false-positive rate reads as
 ``0\%'' until bootstrapped, and a self-consistency ``free lunch'' turns out to be
-sampling noise; (ii) an \textbf{easy-vs-hard absence} confound, where a naive
-baseline \emph{ties} an abstaining system on absences where the concept is wholly
-missing, so only \emph{hard} absences---a similar-but-wrong concept is
-present---are discriminative; and (iii) a \textbf{keyword-absence annotation
-trap}, where labeling \texttt{ABSTAIN} from a missing keyword is invalid on real
-legal text that paraphrases concepts. We distill the lessons into a checklist for
+sampling noise; (ii) that \textbf{``hard'' is defined by the model, not the
+taxonomy}---a naive baseline ties an abstaining system not only on wholly-missing
+concepts but even on taxonomically-adjacent ones (an engineering benchmark we
+built to discriminate did not), so a gate helps only where the model actually
+conflates a concept pair; and (iii) a \textbf{keyword-absence annotation trap},
+where labeling \texttt{ABSTAIN} from a missing keyword is invalid on real legal
+text that paraphrases concepts. We distill the lessons into a checklist for
 evaluating abstention in document audit, and release the system, benchmark, and
 harnesses.
 \end{abstract}
@@ -59,10 +60,11 @@ caught later:
   runs showed ``$0\% \pm 0\%$'' false positives; bootstrapping revealed
   $\sim$1--2\%. The zero was sampling noise, and it made a permissive
   self-consistency vote look like free recall.
-  \item \textbf{Pitfall B --- easy vs.\ hard absences} (\S\ref{sec:pb}). Where the
-  asked concept is \emph{wholly absent}, even the naive baseline abstains---it
-  ties our gate at $0\%$ false positives. Only \emph{hard} absences (a
-  similar-but-wrong concept is present) are discriminative.
+  \item \textbf{Pitfall B --- ``hard'' is the model's, not the taxonomy's}
+  (\S\ref{sec:pb}). A baseline ties our gate not only where a concept is wholly
+  absent but even on taxonomically-adjacent pairs (a 21-case engineering
+  benchmark we built to discriminate did not). A gate helps only where the
+  \emph{model} conflates a pair.
   \item \textbf{Pitfall C --- keyword-absence annotation trap}
   (\S\ref{sec:pc}). We labeled \texttt{ABSTAIN} from a missing keyword; three
   labels were wrong because the concept was present under another name. The gate
@@ -113,14 +115,16 @@ threshold $t$ is a precision/recall knob (\S\ref{sec:pa}).
 
 \section{Evaluation and Three Pitfalls}
 \label{sec:eval}
-\textbf{Benchmark.} 40 verified (question, document) pairs: \textbf{30 synthetic}
-over small hand-built contracts (13 \texttt{ABSTAIN}, 17 answerable) and
-\textbf{10 real} over two Brazilian tender notices (4 \texttt{ABSTAIN}, 6
-answerable). Discriminating distinctions by design: \emph{interest $\neq$
-penalty}, \emph{warranty $\neq$ payment}, \emph{total non-performance $\neq$ late
-payment}. Extractor: gpt-4o-mini, temperature $0$, fixed seed. Metrics:
-false-positive rate (fraction of \texttt{ABSTAIN} answered), abstention recall,
-answer recall.
+\textbf{Benchmark.} 61 verified (question, document) pairs across two domains and
+two languages: a \textbf{legal} split---30 synthetic Brazilian contracts (13
+\texttt{ABSTAIN}, 17 answerable) and 10 real tender notices (4 \texttt{ABSTAIN},
+6 answerable), in Portuguese---and an \textbf{engineering} split---21 English
+reliability/mechanical spec sheets (12 \texttt{ABSTAIN}, 9 answerable), with both
+\emph{type} near-neighbors (MTBF vs.\ MTTR, tensile vs.\ yield) and \emph{scope}
+near-neighbors (same metric, different condition: tensile at 20\,$^\circ$C vs.\
+200\,$^\circ$C; torque for bolt class 8.8 vs.\ 10.9). Extractor: gpt-4o-mini,
+temperature $0$, fixed seed. Metrics: false-positive rate (fraction of
+\texttt{ABSTAIN} answered), abstention recall, answer recall.
 
 \subsection{The synthetic result (what we wanted to report)}
 \begin{table}[h]\centering
@@ -176,18 +180,37 @@ noise this section is about.) The point $k{=}10, t{=}4$ dominates the single cal
 on both axes. \textbf{Lesson:} report rare-event metrics as mean $\pm$ std over
 repeated runs; sweep the vote threshold; never trust a single ``$0\%$''.
 
-\subsection{Pitfall B --- easy vs.\ hard absences}
+\subsection{Pitfall B --- ``hard'' is defined by the model, not the taxonomy}
 \label{sec:pb}
-The synthetic $38\%$ baseline false-positive rate comes from \textbf{hard}
-absences: the \texttt{ABSTAIN} item has a \emph{similar-but-wrong concept present}
-(asked for a \emph{penalty}, the document has \emph{interest}), which the baseline
-grabs. On real documents our first genuine \texttt{ABSTAIN} cases were
-\textbf{easy}: the concept is \emph{wholly missing}, retrieval returns nothing,
-and \textbf{even the baseline abstains}---tying the gate at $0\%$ false positives.
-A 10-pair real pilot (4 easy absences, 6 answerable) gives FLARE $0\%$ false
-positives and $83\%$ recall vs.\ the baseline's $0\%$ and $50\%$: the gate wins on
-recall, but the false-positive comparison is uninformative because the absences
-are easy. \textbf{Lesson:} include hard absences and report easy/hard separately.
+The legal $38\%$ baseline false-positive rate comes from absences where a
+\emph{similar-but-wrong concept is present}---asked for a \emph{penalty}, the
+document has \emph{interest}. It is tempting to call these ``hard'' because the
+concepts are taxonomically adjacent; they are hard rather because \textbf{the
+model conflates the pair}. Two controls make this precise.
+
+\textbf{Wholly-absent concepts are easy---even for the baseline.} Our first real
+\texttt{ABSTAIN} cases had the concept wholly missing; retrieval returns nothing
+and \textbf{even the baseline abstains}, tying the gate at $0\%$. A 10-pair real
+pilot (4 such absences, 6 answerable) gives FLARE $0\%$ / $83\%$ recall vs.\
+baseline $0\%$ / $50\%$: the gate wins on recall, the false-positive comparison is
+uninformative.
+
+\textbf{Taxonomically-adjacent $\neq$ hard.} We built 21 engineering cases with
+\emph{type} near-neighbors (MTBF vs.\ MTTR, tensile vs.\ yield) and \emph{scope}
+near-neighbors (20\,$^\circ$C vs.\ 200\,$^\circ$C; class 8.8 vs.\ 10.9). We
+expected the baseline to leak; \textbf{it did not}---on all 12 engineering
+\texttt{ABSTAIN} cases it abstained correctly ($0\%$ false positives), matching
+the gate. The model does not confuse these crisp concepts. A control isolates the
+cause: the legal \emph{interest-for-penalty} leak persists when the case is
+translated to English, so it is the \textbf{concept pair}, not the language or
+domain, that the model treats as interchangeable.
+
+\textbf{Consequences.} An abstention gate helps \emph{only where the baseline
+leaks}, which depends on the model's concept-confusability---not the annotator's
+taxonomy, the domain, or the language. In crisp domains the baseline is already
+careful, so the gate does no harm (the engineering split: $0\%$ false positives,
+$100\%$ recall) but adds nothing. \textbf{Lesson:} establish concept-difficulty
+empirically (does the baseline leak?), not by assuming adjacency implies it.
 
 \subsection{Pitfall C --- the keyword-absence annotation trap}
 \label{sec:pc}
