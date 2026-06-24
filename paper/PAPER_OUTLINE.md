@@ -1,5 +1,10 @@
 # Paper — Outline / Esqueleto de Trabalho
 
+> **⚠️ SUPERADO (2026-06-22):** o paper foi reenquadrado no ângulo metodológico
+> ("pitfalls de avaliação de abstenção"). O texto vigente está em `draft.md` /
+> `draft.tex` (título: *When the Baseline Also Abstains*). Este outline fica como
+> registro histórico do raciocínio.
+
 > **Status:** rascunho inicial (2026-06-14). Língua de redação final: **inglês**
 > (alvo são venues internacionais); este outline está em PT para alinhamento.
 > **Tipo de paper (honesto):** aplicado / de sistemas — *não* é paper de método
