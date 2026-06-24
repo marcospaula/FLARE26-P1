@@ -157,7 +157,7 @@ $k$ (LLM calls/doc) & False-positive & Answer recall \\
 \end{table}
 The gate leaks rarely ($\sim$1--2\% per sample), and ``$\geq 1$'' \emph{amplifies}
 it with $k$. Sweeping the vote threshold $t$ shows ``$\geq 1$'' was the wrong
-knob; a majority-style $t$ filters the leaks:
+knob \cite{wang2023selfconsistency}; a majority-style $t$ filters the leaks:
 \begin{table}[h]\centering
 \begin{tabular}{lcc}
 \toprule
@@ -170,9 +170,11 @@ $k{=}10, t{=}4$           & $\mathbf{0\%}$ & $\mathbf{80\%}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
-The point $k{=}10, t{=}4$ dominates the single call on both axes.
-\textbf{Lesson:} report rare-event metrics as mean $\pm$ std over repeated runs;
-sweep the vote threshold; never trust a single ``$0\%$''.
+(The two tables are independent bootstrap runs; the small disagreement at
+$k{=}1$---$1\%$ vs.\ $2\%$ FP, $81\%$ vs.\ $77\%$ recall---is itself the sampling
+noise this section is about.) The point $k{=}10, t{=}4$ dominates the single call
+on both axes. \textbf{Lesson:} report rare-event metrics as mean $\pm$ std over
+repeated runs; sweep the vote threshold; never trust a single ``$0\%$''.
 
 \subsection{Pitfall B --- easy vs.\ hard absences}
 \label{sec:pb}

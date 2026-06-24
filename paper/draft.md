@@ -67,8 +67,8 @@ each one a mistake we made first and caught later:
 **Contributions.** (1) An ontology-gated auditor with explicit abstention and a
 deterministic comparison judge (the case study, Section 3). (2) Three evaluation
 pitfalls for abstention in document audit, each demonstrated on a real failure
-(Section 4). (3) A checklist for evaluating abstention, plus a released benchmark
-and harnesses (Sections 6, and the repository).
+(Section 4). (3) A checklist for evaluating abstention (Section 5), plus a
+released benchmark and harnesses.
 
 ## 2. Related Work
 
@@ -131,7 +131,7 @@ the headline), abstention recall, answer recall.
 | FLARE26 (gated)            | ~1–2%    | 81% ± 6% |
 
 Ontological gating cuts false-positive divergences ~20–30× on the synthetic set.
-The ablation that the strict scope rule matters: relaxing scope to accept
+An ablation confirms the strict scope rule matters: relaxing scope to accept
 sub/superset conditions recovers recall but **reopens** false positives (0% →
 38%), so the strict rule is the operating point.
 
@@ -151,7 +151,7 @@ sample pool exposes the truth:
 The gate leaks rarely (~1–2% per sample), and the permissive "≥1" vote
 *amplifies* it as k grows — recall and false positives rise together. Sweeping
 the **vote threshold** t ("answer only if ≥ t of k") shows "≥1" was the wrong
-knob; a majority-style t filters the rare leaks:
+knob [Wang et al., 2023]; a majority-style t filters the rare leaks:
 
 | Policy | False-positive | Answer recall |
 |--------|----------------|---------------|
@@ -160,9 +160,11 @@ knob; a majority-style t filters the rare leaks:
 | k=10, t=3              | 1%  | 82% |
 | **k=10, t=4**          | **0%** | **80%** |
 
-The point k=10, t=4 dominates the single call on both axes. **Lesson:** report
-rare-event metrics as mean ± std over repeated runs; sweep the vote threshold;
-never trust a single "0%".
+(The two tables are independent bootstrap runs; the small disagreement at k=1 —
+1% vs. 2% false positives, 81% vs. 77% recall — is itself the sampling noise this
+section is about.) The point k=10, t=4 dominates the single call on both axes.
+**Lesson:** report rare-event metrics as mean ± std over repeated runs; sweep the
+vote threshold; never trust a single "0%".
 
 ### 4.3 Pitfall B — easy vs. hard absences
 
