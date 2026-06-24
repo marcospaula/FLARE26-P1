@@ -116,5 +116,6 @@ soffice --headless --convert-to pdf --outdir paper /tmp/draft.html && mv paper/d
 
 ## License
 
-_To be decided (a permissive license such as MIT or Apache-2.0 is recommended for
-a research artifact)._
+[MIT](LICENSE) © 2026 Marcos de Paula. The sample documents in `documentos/`
+are synthetic or public Brazilian procurement notices, included for
+reproducibility.
