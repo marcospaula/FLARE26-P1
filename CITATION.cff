@@ -16,6 +16,11 @@ authors:
     family-names: de Paula
 repository-code: "https://github.com/marcospaula/FLARE26-P1"
 url: "https://github.com/marcospaula/FLARE26-P1"
+doi: "10.5281/zenodo.20881699"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.20881699"
+    description: "Zenodo archive of the preprint (CC BY 4.0)"
 license: MIT
 version: v0.1.0
 date-released: "2026-06-24"

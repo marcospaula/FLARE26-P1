@@ -57,7 +57,7 @@ flare26_pipeline.py    # Headless RAG (M1.5/M2) — callable without a UI
 app_flare26_pdf.py     # Streamlit "glass-box" app (UI shell over the pipeline)
 tests/                 # pytest suite (42 tests; regression over a ledger snapshot)
 eval/                  # Benchmark + reproducible evaluation harnesses (see eval/README.md)
-  gold_dataset.json    #   40 labeled (question, document) pairs (30 synthetic + 10 real)
+  gold_dataset.json    #   61 verified (question, document) pairs, two domains/two languages
   run_eval*.py         #   metrics, k-repetition, (k,t) vote sweep, recall×cost curve
 paper/                 # Paper draft (Markdown + LaTeX), references, build script
 documentos/            # Sample contracts and tender notices (PDF)
@@ -87,11 +87,13 @@ streamlit run app_flare26_pdf.py
 ## Benchmark
 
 The evaluation benchmark ([`eval/gold_dataset.json`](eval/gold_dataset.json)) has
-40 verified `(question, document)` pairs, each labeled with the correct answer
-**or** `ABSTAIN`. It deliberately includes *discriminating* cases — e.g.
-*interest ≠ penalty*, *warranty term ≠ payment term*, *total non-performance ≠
-late payment* — where a naive extractor hallucinates. See
-[`eval/README.md`](eval/README.md) for the annotation protocol.
+**61 verified** `(question, document)` pairs across **two domains and two
+languages** — Brazilian legal contracts and tender notices (Portuguese: 30
+synthetic + 10 real) and English reliability/mechanical engineering specs (21) —
+each labeled with the correct answer **or** `ABSTAIN`. It deliberately includes
+*discriminating* cases — e.g. *interest ≠ penalty*, *warranty term ≠ payment
+term*, *MTBF ≠ MTTR*, *tensile ≠ yield* — where a naive extractor may
+hallucinate. See [`eval/README.md`](eval/README.md) for the annotation protocol.
 
 ## Status & limitations (read this)
 
@@ -106,12 +108,31 @@ late payment* — where a naive extractor hallucinates. See
 
 ## Paper
 
-A working draft is in [`paper/`](paper/) (Markdown and LaTeX). Regenerate the
-reading PDF with:
+The preprint **"When the Baseline Also Abstains: Pitfalls in Evaluating
+Abstention for Document Audit"** is published on Zenodo (CC BY 4.0):
+**[doi:10.5281/zenodo.20881699](https://doi.org/10.5281/zenodo.20881699)**.
+Source (Markdown + LaTeX) and the compiled PDF are in [`paper/`](paper/).
+Regenerate the reading PDF with:
 
 ```bash
 python paper/md_to_html.py paper/draft.md /tmp/draft.html
 soffice --headless --convert-to pdf --outdir paper /tmp/draft.html && mv paper/draft.pdf paper/
+```
+
+## Citation
+
+If you use FLARE26 or its benchmark, please cite the preprint:
+
+```bibtex
+@misc{depaula2026flare26,
+  author       = {de Paula, Marcos},
+  title        = {When the Baseline Also Abstains: Pitfalls in Evaluating
+                  Abstention for Document Audit},
+  year         = {2026},
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.20881699},
+  url          = {https://doi.org/10.5281/zenodo.20881699}
+}
 ```
 
 ## License
