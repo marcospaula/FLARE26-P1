@@ -26,3 +26,6 @@ paper/draft.txt
 paper/*.aux
 paper/*.log
 paper/*.out
+
+# binário LaTeX local (Tectonic) — não versionar
+.tooling/
