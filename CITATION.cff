@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use FLARE26 or its benchmark, please cite this work."
+title: "FLARE26: An Ontology-Gated Document Auditor and an Abstention-Evaluation Benchmark"
+abstract: >-
+  FLARE26 is a glass-box, neuro-symbolic document auditor whose extraction step
+  is ontology-gated: it answers only when the retrieved evidence matches the
+  question's type and scope, otherwise emitting an explicit evidence gap. The
+  repository also releases a benchmark of verified (question, document) pairs
+  across two domains and two languages (Brazilian legal contracts and tender
+  notices in Portuguese; English reliability and mechanical engineering
+  specifications) and the evaluation harnesses used to study three pitfalls in
+  evaluating abstention for document audit.
+type: software
+authors:
+  - given-names: Marcos
+    family-names: de Paula
+repository-code: "https://github.com/marcospaula/FLARE26-P1"
+url: "https://github.com/marcospaula/FLARE26-P1"
+license: MIT
+version: v0.1.0
+date-released: "2026-06-24"
+keywords:
+  - retrieval-augmented generation
+  - abstention
+  - selective prediction
+  - document audit
+  - evaluation
+  - legal NLP
+  - reliability engineering
