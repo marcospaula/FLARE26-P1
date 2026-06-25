@@ -275,9 +275,9 @@ open-model replication.
 
 ## References
 
-> **Note:** real references to the authors' best knowledge; verify all
-> bibliographic details (author lists, pages, DOIs, venues) before submission.
-> BibTeX entries in `paper/references.bib`.
+> **Note:** bibliographic details (pages, DOIs, arXiv IDs, venues) verified
+> against official sources (ACL Anthology, NeurIPS Proceedings, ACM DL, arXiv)
+> on 2026-06-24. BibTeX entries in `paper/references.bib`.
 
 - Chalkidis, I., Fergadiotis, M., Malakasiotis, P., Aletras, N., & Androutsopoulos, I. (2020). *LEGAL-BERT: The Muppets straight out of Law School.* Findings of EMNLP.
 - Es, S., James, J., Espinosa-Anke, L., & Schockaert, S. (2024). *RAGAS: Automated Evaluation of Retrieval Augmented Generation.* EACL (System Demonstrations).
@@ -285,7 +285,7 @@ open-model replication.
 - Geifman, Y., & El-Yaniv, R. (2017). *Selective Classification for Deep Neural Networks.* NeurIPS.
 - Guardrails AI (2023). *Guardrails.* Software. https://github.com/guardrails-ai/guardrails
 - Hendrycks, D., Burns, C., Chen, A., & Ball, S. (2021). *CUAD: An Expert-Annotated NLP Dataset for Legal Contract Review.* NeurIPS Datasets and Benchmarks.
-- Instructor (2023). *Instructor: Structured Outputs for LLMs.* Software. https://github.com/jxnl/instructor
+- Liu, J. (2023). *Instructor: Structured Outputs for LLMs.* Software. https://github.com/567-labs/instructor
 - Ji, Z., Lee, N., Frieske, R., et al. (2023). *Survey of Hallucination in Natural Language Generation.* ACM Computing Surveys.
 - Kadavath, S., Conerly, T., Askell, A., et al. (2022). *Language Models (Mostly) Know What They Know.* arXiv:2207.05221.
 - Lewis, P., Perez, E., Piktus, A., et al. (2020). *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.* NeurIPS.
