@@ -1,7 +1,7 @@
 # When the Baseline Also Abstains: Pitfalls in Evaluating Abstention for Document Audit
 
 **Authors:** Marcos de Paula (FLARE26 Project)
-**Status:** Working draft (applied / evaluation-methodology paper). The
+**Status:** Preprint, June 2026 (applied / evaluation-methodology paper). The
 contribution is an empirical study and a set of evaluation lessons, with an
 ontology-gated auditor as the case study.
 
@@ -74,7 +74,8 @@ each one a mistake we made first and caught later:
 deterministic comparison judge (the case study, Section 3). (2) Three evaluation
 pitfalls for abstention in document audit, each demonstrated on a real failure
 (Section 4). (3) A checklist for evaluating abstention (Section 5), plus a
-released benchmark and harnesses.
+released benchmark and harnesses (code, benchmark, and evaluation harnesses:
+https://github.com/marcospaula/FLARE26-P1).
 
 ## 2. Related Work
 
