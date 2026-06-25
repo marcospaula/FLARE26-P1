@@ -236,8 +236,10 @@ extraction before blaming the gate.
 \begin{enumerate}
   \item \textbf{Repeat and bootstrap.} Report false positives as mean $\pm$ std
   over $k$ runs; a single ``$0\%$'' on a rare event is an illusion.
-  \item \textbf{Include hard absences.} Cover cases where a similar-but-wrong
-  concept is present, not only wholly-absent ones; report easy vs.\ hard.
+  \item \textbf{Establish difficulty empirically.} Cover cases where a
+  similar-but-wrong concept is present, but treat an absence as ``hard'' only
+  where the baseline actually leaks---adjacency does not imply difficulty; report
+  easy vs.\ hard.
   \item \textbf{Annotate by concept, not keyword.} Confirm absence by exhausting
   paraphrases; prefer a second annotator on real text.
   \item \textbf{Sweep the vote threshold.} ``Answer if any'' inflates false
@@ -261,8 +263,10 @@ An ontology-gated auditor does cut false-positive divergences $\sim$20--30$\time
 on a synthetic benchmark. But the more durable contribution is a caution:
 evaluating abstention in document audit is easy to get wrong. A rare
 false-positive rate looks like zero until you bootstrap; a naive baseline ties an
-abstaining system on easy absences; and labeling absence by keyword silently
-corrupts a benchmark on real legal text. We hope the checklist, benchmark, and
+abstaining system not only on wholly-missing concepts but on taxonomically-adjacent
+ones too---so ``hard'' is the model's to define, not the taxonomy's, and a gate
+helps only where the model actually conflates a pair; and labeling absence by
+keyword silently corrupts a benchmark on real legal text. We hope the checklist, benchmark, and
 harnesses help others measure abstention honestly. Future work: hard
 real-document absences, a second annotator, and open-model replication.
 
