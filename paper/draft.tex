@@ -6,6 +6,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath}
 \usepackage{booktabs}
+\usepackage{indentfirst} % recua também o 1º parágrafo de cada seção (uniformidade)
 \usepackage{hyperref}
 
 \title{When the Baseline Also Abstains:\\
@@ -39,7 +40,8 @@ harnesses.
 
 \section{Introduction}
 Organizations compare many structured-but-unstructured documents---contracts,
-tender notices (\emph{editais}), financial statements---to find discrepancies. A
+tender notices (\emph{editais}), financial statements, engineering specification
+sheets---to find discrepancies. A
 natural approach is RAG: retrieve passages and ask an LLM to extract the answer
 per document, then compare. This fails in a specific, costly way:
 \textbf{standard RAG prefers answering to abstaining.} Asked ``what is the
@@ -50,7 +52,10 @@ documents these become \textbf{false-positive divergences}: flagged
 disagreements that are artifacts of hallucination, and in auditing the costliest
 error.
 
-The obvious fix is to make the system abstain. We do (Section~\ref{sec:system}).
+The obvious fix is to make the system abstain. We do (Section~\ref{sec:system}),
+and evaluate it across \textbf{two domains}---Brazilian legal contracts and tender
+notices (Portuguese), and English reliability and mechanical engineering
+specification sheets---so the lessons do not hinge on one domain.
 But our main finding is methodological: \textbf{whether an abstaining system is
 actually better is surprisingly hard to measure}, and the natural ways to measure
 it quietly mislead. We report three pitfalls, each a mistake we made first and

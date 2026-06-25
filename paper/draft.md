@@ -33,7 +33,8 @@ audit, and release the system, benchmark, and evaluation harnesses.
 ## 1. Introduction
 
 Organizations compare many structured-but-unstructured documents — contracts,
-tender notices (*editais*), financial statements — to find discrepancies. A
+tender notices (*editais*), financial statements, engineering specification
+sheets — to find discrepancies. A
 natural approach is RAG: retrieve relevant passages and ask an LLM to extract the
 answer per document, then compare. This fails in a specific, costly way:
 **standard RAG prefers answering to abstaining.** Asked "what is the penalty for
@@ -46,7 +47,10 @@ found, please verify."
 
 The obvious fix is to make the system abstain. We do: Section 3 describes an
 **ontology-gated** extractor that answers only when the evidence matches the
-question's *type* and *scope*. But our main finding is methodological. **Whether
+question's *type* and *scope*. We evaluate it across **two domains** — Brazilian
+legal contracts and tender notices (Portuguese), and English reliability and
+mechanical engineering specification sheets — precisely so the lessons do not
+hinge on one domain. But our main finding is methodological. **Whether
 an abstaining system is actually better is surprisingly hard to measure**, and
 the natural ways to measure it quietly mislead. We report three such pitfalls,
 each one a mistake we made first and caught later:
