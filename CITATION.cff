@@ -14,6 +14,7 @@ type: software
 authors:
   - given-names: Marcos
     family-names: de Paula
+    orcid: "https://orcid.org/0009-0001-9105-6100"
 repository-code: "https://github.com/marcospaula/FLARE26-P1"
 url: "https://github.com/marcospaula/FLARE26-P1"
 doi: "10.5281/zenodo.20881699"

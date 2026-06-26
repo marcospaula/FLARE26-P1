@@ -1,6 +1,6 @@
 # When the Baseline Also Abstains: Pitfalls in Evaluating Abstention for Document Audit
 
-**Authors:** Marcos de Paula (FLARE26 Project)
+**Authors:** Marcos de Paula (FLARE26 Project) · ORCID [0009-0001-9105-6100](https://orcid.org/0009-0001-9105-6100)
 **Status:** Preprint, June 2026 (applied / evaluation-methodology paper). The
 contribution is an empirical study and a set of evaluation lessons, with an
 ontology-gated auditor as the case study.
