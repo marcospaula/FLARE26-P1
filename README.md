@@ -1,5 +1,8 @@
 # FLARE26 — Ontology-Gated Abstention for Document Audit
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20881699.svg)](https://doi.org/10.5281/zenodo.20881699)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 **A neuro-symbolic "glass-box" auditor that compares documents and knows when *not* to answer.**
 
 FLARE26 extracts a typed answer from each document, **abstains** when the
