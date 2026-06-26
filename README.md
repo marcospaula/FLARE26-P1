@@ -55,11 +55,12 @@ flowchart TB
 Ontological gating cuts the false-positive divergence rate **~20–30×** vs. the
 baseline. Self-consistency exposes a tunable recall × precision operating curve
 (a **majority-style vote** keeps false positives near zero). See
-[`paper/draft.md`](paper/draft.md) §5.
+[`paper/draft.md`](paper/draft.md) §4.
 
-**A real-document pilot** (two Brazilian government tender notices) is preliminary
-and reported with caveats in §6 — chiefly that *reliable absence annotation* on
-real legal text (keyword-absence ≠ concept-absence) is the binding constraint.
+**A real-document pilot** (10 labeled pairs from real Brazilian government
+procurement documents) is preliminary and discussed in §4.3–4.4 and §6 — chiefly
+that *reliable absence annotation* on real legal text (keyword-absence ≠
+concept-absence) is the binding constraint.
 
 ---
 
@@ -145,10 +146,14 @@ hallucinate. See [`eval/README.md`](eval/README.md) for the annotation protocol.
 
 ## Status & limitations (read this)
 
-- The strong result is on a **small, partly synthetic** benchmark (30 pairs).
+- The strong result is on a **small, synthetic** benchmark (30 pairs).
   Error bars on a ~1–2% false-positive rate are wide.
 - The gate **leaks rarely** (it is not a 0% guarantee); the defensible claim is
   the large reduction vs. baseline.
+- The gate helps **only where the baseline actually leaks** (model-confusable
+  concept pairs). In crisp domains it adds no measurable benefit — the 21-case
+  engineering split shows the baseline already abstains (0% false positives). See
+  paper §4.3 ("*hard* is the model's, not the taxonomy's").
 - **Real-document external validity is not established.** The binding constraint
   is domain-grade *absence* annotation; this is the priority next step.
 - Depends on a proprietary LLM (`gpt-4o-mini`); open-model replication is future
