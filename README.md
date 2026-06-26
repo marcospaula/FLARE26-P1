@@ -29,6 +29,29 @@ Extractor: `gpt-4o-mini`, temperature 0, fixed seed. Mean ± std.
 | FLARE26 (ontology-gated)   | **~1–2%** | 81% ± 6% |
 | FLARE26 + self-consistency (k=10, t=4) | **~0%** | 80% |
 
+**Why the gap?** Same question, same document — only the gate differs:
+
+```mermaid
+flowchart TB
+    subgraph BASE["Baseline · free extraction"]
+        direction LR
+        QB([Q: penalty for<br/>total non-performance?]) --> EB["Doc only defines a<br/>late-payment penalty"]
+        EB --> AB["Returns the<br/>late-payment value"]
+        AB --> DB["FALSE-POSITIVE<br/>DIVERGENCE"]
+    end
+    subgraph FLARE["FLARE26 · ontology-gated"]
+        direction LR
+        QF([Q: penalty for<br/>total non-performance?]) --> EF["Doc only defines a<br/>late-payment penalty"]
+        EF --> GF{"type AND<br/>scope match?"}
+        GF -- no --> AF["Evidence gap →<br/>ABSTAIN"]
+        AF --> DF["No fabricated<br/>divergence"]
+    end
+    classDef bad fill:#ffe0e0,stroke:#d98a8a,color:#000;
+    classDef good fill:#e8f5e9,stroke:#4caf82,color:#000;
+    class DB bad;
+    class AF,DF good;
+```
+
 Ontological gating cuts the false-positive divergence rate **~20–30×** vs. the
 baseline. Self-consistency exposes a tunable recall × precision operating curve
 (a **majority-style vote** keeps false positives near zero). See
