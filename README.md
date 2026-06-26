@@ -42,6 +42,28 @@ real legal text (keyword-absence ≠ concept-absence) is the binding constraint.
 
 ## How it works
 
+```mermaid
+flowchart LR
+    Q([Question]) --> M15
+    DOCS([Documents]) --> M15["M1.5 · Hybrid retrieval<br/>dense + lexical"]
+    M15 --> M2{"M2 · Ontology-gated extraction<br/>evidence matches<br/>type AND scope?"}
+    M2 -- yes --> ANS["Typed answer"]
+    M2 -- "no / wrong type or scope" --> GAP["Evidence gap → ABSTAIN<br/>prevents a false-positive divergence"]
+    ANS --> M4["M4 · Deterministic N-way judge<br/>consensus / divergence / gap, O(N)"]
+    GAP --> M4
+    M4 --> M5["M5 · Executive summary<br/>anchored to source provenance"]
+
+    classDef gate fill:#fff3e0,stroke:#e0a96d,color:#000;
+    classDef abstain fill:#ffe0e0,stroke:#d98a8a,color:#000;
+    class M2 gate;
+    class GAP abstain;
+```
+
+*The whole point is the **M2 gate**: when the retrieved evidence does not match
+the question's type **and** scope, the system emits an explicit **evidence gap**
+instead of hallucinating an answer — which is what stops a fabricated
+(false-positive) divergence downstream.*
+
 | Module | Role |
 |--------|------|
 | **M1.5** | Hybrid retrieval (dense vectors + lexical), parent/child chunking |
