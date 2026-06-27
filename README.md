@@ -2,8 +2,11 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20881699.svg)](https://doi.org/10.5281/zenodo.20881699)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://flare26-p1-j5gahqx45gwp7h4ksdohxn.streamlit.app/)
 
 **A neuro-symbolic "glass-box" auditor that compares documents and knows when *not* to answer.**
+
+▶️ **Live demo (zero-cost, offline):** https://flare26-p1-j5gahqx45gwp7h4ksdohxn.streamlit.app/ — explore the benchmark and the baseline-vs-FLARE result, no API key needed.
 
 FLARE26 extracts a typed answer from each document, **abstains** when the
 requested information is genuinely absent or of the wrong *type/scope*, and then
