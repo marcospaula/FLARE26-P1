@@ -6,7 +6,7 @@
 
 **A neuro-symbolic "glass-box" auditor that compares documents and knows when *not* to answer.**
 
-▶️ **Live demo (zero-cost, offline):** https://flare26-p1-j5gahqx45gwp7h4ksdohxn.streamlit.app/ — explore the benchmark and the baseline-vs-FLARE result, no API key needed.
+▶️ **[Live demo](https://flare26-p1-j5gahqx45gwp7h4ksdohxn.streamlit.app/)** (zero-cost, offline) — explore the benchmark and the baseline-vs-FLARE result, no API key needed.
 
 FLARE26 extracts a typed answer from each document, **abstains** when the
 requested information is genuinely absent or of the wrong *type/scope*, and then
