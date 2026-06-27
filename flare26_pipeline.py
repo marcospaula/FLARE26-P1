@@ -372,14 +372,19 @@ def extrair_dado(client, texto: str, pergunta: str, *,
 
 def extrair_dado_consenso(client, texto: str, pergunta: str, *,
                           k: int = 5, modelo: str = MODELO_EXTRACAO) -> ExtracaoUniversal:
-    """Self-consistency: roda extrair_dado k vezes e RESPONDE se qualquer execução
-    responder; abstém só se TODAS abstiverem.
+    """Self-consistency com limiar t=1: roda extrair_dado k vezes e RESPONDE se
+    QUALQUER execução responder; abstém só se TODAS abstiverem. Entre as que
+    responderam, devolve o valor mais frequente.
 
-    Justificativa empírica (benchmark de 30 itens): as abstenções ontológicas são
-    estáveis (0 vazamento em 5 execuções), enquanto as super-abstenções oscilam.
-    Logo, "responder se ≥1 responde" recupera recall (71%→94%) SEM reabrir
-    falso-positivo (mantém 0%). Entre as execuções que responderam, devolve a do
-    valor mais frequente.
+    ATENÇÃO (ver paper §4.2 — "single-sample illusion"): t=1 ("≥1") NÃO é o ponto
+    de operação recomendado. Medições com bootstrap mostram que o gate vaza
+    raramente (~1–2% por amostra) e que t=1 AMPLIFICA esse vazamento conforme k
+    cresce (≈10% de falso-positivo em k=10, t=1). Para recuperar recall sem
+    reabrir falso-positivo, prefira um limiar de maioria (o ponto k=10, t=4 a que
+    o paper chega). A varredura (k,t) está em eval/run_eval_grid.py.
+
+    (Uma versão anterior desta docstring afirmava que "≥1" recuperava recall
+    "sem reabrir falso-positivo (0%)" — exatamente a ilusão que o paper desmonta.)
     """
     if not texto.strip():
         return resultado_vazio()
