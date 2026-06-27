@@ -158,6 +158,10 @@ hallucinate. See [`eval/README.md`](eval/README.md) for the annotation protocol.
   is domain-grade *absence* annotation; this is the priority next step.
 - Depends on a proprietary LLM (`gpt-4o-mini`); open-model replication is future
   work.
+- The synthetic headline exercises the **gate, not retrieval**: short documents
+  (< 80k chars) take a *full-context bypass* (M1.5 ranking is skipped and the
+  whole text goes to the extractor). The retrieval fix (§4.5) only matters for
+  large real documents.
 
 ## Paper
 
