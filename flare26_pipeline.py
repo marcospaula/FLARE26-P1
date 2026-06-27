@@ -355,6 +355,15 @@ def extrair_dado(client, texto: str, pergunta: str, *,
             return resultado_vazio()
 
         resp = str(dados.get("resposta_direta", "NÃO LOCALIZADO")).strip()
+        # Confiabilidade vem do MODELO (auto-reportada, NÃO calibrada). Antes era
+        # fixada em 0.95 — campo morto que enganava a UI "caixa de vidro". Agora
+        # usa o valor real, com guarda de tipo/intervalo; 0.0 se não localizou.
+        try:
+            conf = max(0.0, min(1.0, float(dados.get("confiabilidade", 0.0))))
+        except (TypeError, ValueError):
+            conf = 0.0
+        if resp == "NÃO LOCALIZADO":
+            conf = 0.0
         return ExtracaoUniversal(
             natureza_da_pergunta=str(dados.get("natureza_da_pergunta", "N/A")),
             escopo_da_pergunta=str(dados.get("escopo_da_pergunta", "N/A")),
@@ -364,7 +373,7 @@ def extrair_dado(client, texto: str, pergunta: str, *,
             resposta_direta=resp, tipo_dado=str(dados.get("tipo_dado", "NÃO LOCALIZADO")),
             condicionantes=str(dados.get("condicionantes", "NÃO LOCALIZADO")),
             trecho_literal=str(dados.get("trecho_literal", "LACUNA DE EVIDÊNCIA")),
-            confiabilidade=0.95 if resp != "NÃO LOCALIZADO" else 0.0,
+            confiabilidade=conf,
         )
     except Exception:
         return resultado_vazio()
