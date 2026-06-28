@@ -22,6 +22,52 @@ hallucinating an answer that the document never gave.
 
 ---
 
+## Project map (knowledge graph)
+
+A bird's-eye view of how the problem, the system, the evaluation, and the
+released artifacts connect.
+
+```mermaid
+graph TD
+    AUD["Multi-document audit"] -->|costliest error| FPD["False-positive divergence<br/>(an invented disagreement)"]
+    FPD -->|comes from| HALL["Hallucinating an answer<br/>the document never gave"]
+
+    SYS["FLARE26<br/>glass-box auditor"] -->|prevents| FPD
+    SYS -->|pipeline| M15["M1.5 · hybrid retrieval"]
+    M15 --> M2["M2 · ontology-gated extraction"]
+    M2 --> M4["M4 · deterministic N-way judge"]
+    M4 --> M5["M5 · summary + provenance"]
+    M2 -->|implements| GATE["Abstention gate<br/>type AND scope must match"]
+    GATE -->|on mismatch| GAP["Evidence gap → abstains"]
+
+    SYS -->|evaluated on| BENCH["Benchmark<br/>61 pairs · 2 domains · 2 languages"]
+    BENCH --> LEGAL["Legal contracts &amp; tenders (PT)"]
+    BENCH --> ENG["Engineering specs (EN)"]
+    BENCH -->|surfaces| PA["Pitfall A<br/>single-sample illusion"]
+    BENCH -->|surfaces| PB["Pitfall B<br/>'hard' is the model's, not the taxonomy's"]
+    BENCH -->|surfaces| PC["Pitfall C<br/>missing keyword is not missing concept"]
+    PA -->|distilled into| CHK["Evaluation checklist"]
+    PB --> CHK
+    PC --> CHK
+
+    CHK -->|published in| PAPER["Preprint · DOI (Zenodo)"]
+    BENCH -->|released as| CODE["Code + benchmark · MIT"]
+    SYS -->|shown in| DEMO["Live demo (offline)"]
+
+    classDef problem fill:#ffe0e0,stroke:#d98a8a,color:#000;
+    classDef system fill:#e3f2fd,stroke:#6699cc,color:#000;
+    classDef eval fill:#fff3e0,stroke:#e0a96d,color:#000;
+    classDef artifact fill:#e8f5e9,stroke:#4caf82,color:#000;
+    class AUD,FPD,HALL problem;
+    class SYS,M15,M2,M4,M5,GATE,GAP system;
+    class BENCH,LEGAL,ENG,PA,PB,PC,CHK eval;
+    class PAPER,CODE,DEMO artifact;
+```
+
+Legend: 🟥 problem · 🟦 system · 🟧 evaluation · 🟩 released artifacts.
+
+---
+
 ## Key result (synthetic benchmark, 30 pairs)
 
 Extractor: `gpt-4o-mini`, temperature 0, fixed seed. Mean ± std.
