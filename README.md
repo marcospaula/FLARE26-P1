@@ -54,10 +54,10 @@ graph TD
     BENCH -->|released as| CODE["Code + benchmark · MIT"]
     SYS -->|shown in| DEMO["Live demo (offline)"]
 
-    classDef problem fill:#ffe0e0,stroke:#d98a8a,color:#000;
-    classDef system fill:#e3f2fd,stroke:#6699cc,color:#000;
-    classDef eval fill:#fff3e0,stroke:#e0a96d,color:#000;
-    classDef artifact fill:#e8f5e9,stroke:#4caf82,color:#000;
+    classDef problem fill:#ffcdd2,stroke:#e57373,color:#000;
+    classDef system fill:#bbdefb,stroke:#64b5f6,color:#000;
+    classDef eval fill:#ffe0b2,stroke:#ffb74d,color:#000;
+    classDef artifact fill:#c8e6c9,stroke:#81c784,color:#000;
     class AUD,FPD,HALL problem;
     class SYS,M15,M2,M4,M5,GATE,GAP system;
     class BENCH,LEGAL,ENG,PA,PB,PC,CHK eval;
@@ -95,8 +95,8 @@ flowchart TB
         GF -- no --> AF["Evidence gap →<br/>ABSTAIN"]
         AF --> DF["No fabricated<br/>divergence"]
     end
-    classDef bad fill:#ffe0e0,stroke:#d98a8a,color:#000;
-    classDef good fill:#e8f5e9,stroke:#4caf82,color:#000;
+    classDef bad fill:#ffcdd2,stroke:#e57373,color:#000;
+    classDef good fill:#c8e6c9,stroke:#81c784,color:#000;
     class DB bad;
     class AF,DF good;
 ```
@@ -126,8 +126,8 @@ flowchart LR
     GAP --> M4
     M4 --> M5["M5 · Executive summary<br/>anchored to source provenance"]
 
-    classDef gate fill:#fff3e0,stroke:#e0a96d,color:#000;
-    classDef abstain fill:#ffe0e0,stroke:#d98a8a,color:#000;
+    classDef gate fill:#ffe0b2,stroke:#ffb74d,color:#000;
+    classDef abstain fill:#c8e6c9,stroke:#81c784,color:#000;
     class M2 gate;
     class GAP abstain;
 ```
