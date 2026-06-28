@@ -70,6 +70,9 @@ graph TD
     class SYS,M15,M2,M4,M5,GATE,GAP system;
     class BENCH,LEGAL,ENG,PA,PB,PC,CHK eval;
     class PAPER,CODE,DEMO artifact;
+
+    %% legenda neutra (transparente + borda cinza) p/ funcionar em light e dark mode
+    style LEGEND fill:transparent,stroke:#888888,stroke-width:1px,color:#888888
 ```
 
 The four colors group the layers — problem, system, evaluation, released
