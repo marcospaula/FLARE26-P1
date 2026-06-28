@@ -119,6 +119,10 @@ flowchart TB
     classDef good fill:#c8e6c9,stroke:#81c784,color:#000;
     class DB bad;
     class AF,DF good;
+
+    %% containers transparentes (dark-mode safe); borda vermelha = caminho que alucina, verde = caminho que se abstém
+    style BASE fill:transparent,stroke:#e57373,stroke-width:2px
+    style FLARE fill:transparent,stroke:#81c784,stroke-width:2px
 ```
 
 Ontological gating cuts the false-positive divergence rate **~20–30×** vs. the
