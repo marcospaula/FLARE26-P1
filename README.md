@@ -28,6 +28,7 @@ A bird's-eye view of how the problem, the system, the evaluation, and the
 released artifacts connect.
 
 ```mermaid
+%%{init: {'flowchart': {'curve': 'basis'}}}%%
 graph TD
     subgraph P["① The problem"]
         AUD["Multi-document audit"] -->|costliest error| FPD["False-positive divergence<br/>(an invented disagreement)"]
@@ -101,6 +102,7 @@ Extractor: `gpt-4o-mini`, temperature 0, fixed seed. Mean ± std.
 **Why the gap?** Same question, same document — only the gate differs:
 
 ```mermaid
+%%{init: {'flowchart': {'curve': 'basis'}}}%%
 flowchart TB
     subgraph BASE["Baseline · free extraction"]
         direction LR
@@ -140,6 +142,7 @@ concept-absence) is the binding constraint.
 ## How it works
 
 ```mermaid
+%%{init: {'flowchart': {'curve': 'basis'}}}%%
 flowchart LR
     Q([Question]) --> M15
     DOCS([Documents]) --> M15["M1.5 · Hybrid retrieval<br/>dense + lexical"]
