@@ -22,61 +22,69 @@ hallucinating an answer that the document never gave.
 
 ---
 
-## Project map (knowledge graph)
+## Project map
 
 A bird's-eye view of how the problem, the system, the evaluation, and the
 released artifacts connect.
 
 ```mermaid
 graph TD
-    AUD["Multi-document audit"] -->|costliest error| FPD["False-positive divergence<br/>(an invented disagreement)"]
-    FPD -->|comes from| HALL["Hallucinating an answer<br/>the document never gave"]
-
-    SYS["FLARE26<br/>glass-box auditor"] -->|prevents| FPD
-    SYS -->|pipeline| M15["M1.5 · hybrid retrieval"]
-    M15 --> M2["M2 · ontology-gated extraction"]
-    M2 --> M4["M4 · deterministic N-way judge"]
-    M4 --> M5["M5 · summary + provenance"]
-    M2 -->|implements| GATE["Abstention gate<br/>type AND scope must match"]
-    GATE -->|on mismatch| GAP["Evidence gap → abstains"]
-
-    SYS -->|evaluated on| BENCH["Benchmark<br/>61 pairs · 2 domains · 2 languages"]
-    BENCH --> LEGAL["Legal contracts &amp; tenders (PT)"]
-    BENCH --> ENG["Engineering specs (EN)"]
-    BENCH -->|surfaces| PA["Pitfall A<br/>single-sample illusion"]
-    BENCH -->|surfaces| PB["Pitfall B<br/>'hard' is the model's, not the taxonomy's"]
-    BENCH -->|surfaces| PC["Pitfall C<br/>missing keyword is not missing concept"]
-    PA -->|distilled into| CHK["Evaluation checklist"]
-    PB --> CHK
-    PC --> CHK
-
-    CHK -->|published in| PAPER["Preprint · DOI (Zenodo)"]
-    BENCH -->|released as| CODE["Code + benchmark · MIT"]
-    SYS -->|shown in| DEMO["Live demo (offline)"]
-
-    subgraph LEGEND["Legend"]
-        direction LR
-        L1["Problem"]:::problem
-        L2["System"]:::system
-        L3["Evaluation"]:::eval
-        L4["Artifacts"]:::artifact
+    subgraph P["① The problem"]
+        AUD["Multi-document audit"] -->|costliest error| FPD["False-positive divergence<br/>(an invented disagreement)"]
+        FPD -->|comes from| HALL["Hallucinating an answer<br/>the document never gave"]
     end
+
+    subgraph S["② The system · FLARE26 (glass-box)"]
+        M15["M1.5 · hybrid retrieval"] --> M2["M2 · ontology-gated extraction"]
+        M2 --> M4["M4 · deterministic N-way judge"]
+        M4 --> M5["M5 · summary + provenance"]
+        M2 -->|implements| GATE["Abstention gate<br/>type AND scope must match"]
+        GATE -->|on mismatch| GAP["Evidence gap → abstains"]
+    end
+
+    subgraph E["③ The evaluation"]
+        BENCH["Benchmark<br/>61 pairs · 2 domains · 2 languages"]
+        BENCH --> LEGAL["Legal contracts &amp; tenders (PT)"]
+        BENCH --> ENG["Engineering specs (EN)"]
+        BENCH -->|surfaces| PA["Pitfall A<br/>single-sample illusion"]
+        BENCH -->|surfaces| PB["Pitfall B<br/>'hard' is the model's, not the taxonomy's"]
+        BENCH -->|surfaces| PC["Pitfall C<br/>missing keyword is not missing concept"]
+        PA -->|distilled into| CHK["Evaluation checklist"]
+        PB --> CHK
+        PC --> CHK
+    end
+
+    subgraph A["④ Released artifacts"]
+        PAPER["Preprint · DOI (Zenodo)"]
+        CODE["Code + benchmark · MIT"]
+        DEMO["Live demo (offline)"]
+    end
+
+    %% narrative across the four acts
+    GAP -->|prevents| FPD
+    M4 -->|evaluated on| BENCH
+    CHK -->|published in| PAPER
+    BENCH -->|released as| CODE
+    GATE -->|shown live in| DEMO
 
     classDef problem fill:#ffcdd2,stroke:#e57373,color:#000;
     classDef system fill:#bbdefb,stroke:#64b5f6,color:#000;
     classDef eval fill:#ffe0b2,stroke:#ffb74d,color:#000;
     classDef artifact fill:#c8e6c9,stroke:#81c784,color:#000;
     class AUD,FPD,HALL problem;
-    class SYS,M15,M2,M4,M5,GATE,GAP system;
+    class M15,M2,M4,M5,GATE,GAP system;
     class BENCH,LEGAL,ENG,PA,PB,PC,CHK eval;
     class PAPER,CODE,DEMO artifact;
 
-    %% legenda neutra (transparente + borda cinza) p/ funcionar em light e dark mode
-    style LEGEND fill:transparent,stroke:#888888,stroke-width:1px,color:#888888
+    %% cluster borders carry the layer color (self-legend); transparent fill = dark-mode safe
+    style P fill:transparent,stroke:#e57373,stroke-width:2px
+    style S fill:transparent,stroke:#64b5f6,stroke-width:2px
+    style E fill:transparent,stroke:#ffb74d,stroke-width:2px
+    style A fill:transparent,stroke:#81c784,stroke-width:2px
 ```
 
-The four colors group the layers — problem, system, evaluation, released
-artifacts — as shown in the **Legend** box inside the graph.
+Read it top to bottom as four acts — ① problem → ② system → ③ evaluation →
+④ released artifacts — each color-coded by its labeled cluster.
 
 ---
 
