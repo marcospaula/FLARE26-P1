@@ -54,6 +54,14 @@ graph TD
     BENCH -->|released as| CODE["Code + benchmark · MIT"]
     SYS -->|shown in| DEMO["Live demo (offline)"]
 
+    subgraph LEGEND["Legend"]
+        direction LR
+        L1["Problem"]:::problem
+        L2["System"]:::system
+        L3["Evaluation"]:::eval
+        L4["Artifacts"]:::artifact
+    end
+
     classDef problem fill:#ffcdd2,stroke:#e57373,color:#000;
     classDef system fill:#bbdefb,stroke:#64b5f6,color:#000;
     classDef eval fill:#ffe0b2,stroke:#ffb74d,color:#000;
@@ -64,7 +72,8 @@ graph TD
     class PAPER,CODE,DEMO artifact;
 ```
 
-Legend: 🟥 problem · 🟦 system · 🟧 evaluation · 🟩 released artifacts.
+The four colors group the layers — problem, system, evaluation, released
+artifacts — as shown in the **Legend** box inside the graph.
 
 ---
 
