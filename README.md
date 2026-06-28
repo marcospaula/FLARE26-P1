@@ -150,8 +150,12 @@ flowchart LR
     GAP --> M4
     M4 --> M5["M5 · Executive summary<br/>anchored to source provenance"]
 
+    classDef io fill:#eceff1,stroke:#90a4ae,color:#000;
+    classDef mod fill:#bbdefb,stroke:#64b5f6,color:#000;
     classDef gate fill:#ffe0b2,stroke:#ffb74d,color:#000;
     classDef abstain fill:#c8e6c9,stroke:#81c784,color:#000;
+    class Q,DOCS,ANS io;
+    class M15,M4,M5 mod;
     class M2 gate;
     class GAP abstain;
 ```
