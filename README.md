@@ -30,12 +30,12 @@ released artifacts connect.
 ```mermaid
 %%{init: {'flowchart': {'curve': 'basis'}}}%%
 graph TD
-    subgraph P["① The problem"]
+    subgraph P["① PROBLEM"]
         AUD["Multi-document audit"] -->|costliest error| FPD["False-positive divergence<br/>(an invented disagreement)"]
         FPD -->|comes from| HALL["Hallucinating an answer<br/>the document never gave"]
     end
 
-    subgraph S["② The system · FLARE26 (glass-box)"]
+    subgraph S["② SYSTEM · FLARE26 (GLASS-BOX)"]
         M15["M1.5 · hybrid retrieval"] --> M2["M2 · ontology-gated extraction"]
         M2 --> M4["M4 · deterministic N-way judge"]
         M4 --> M5["M5 · summary + provenance"]
@@ -43,7 +43,7 @@ graph TD
         GATE -->|on mismatch| GAP["Evidence gap → abstains"]
     end
 
-    subgraph E["③ The evaluation"]
+    subgraph E["③ EVALUATION"]
         BENCH["Benchmark<br/>61 pairs · 2 domains · 2 languages"]
         BENCH --> LEGAL["Legal contracts &amp; tenders (PT)"]
         BENCH --> ENG["Engineering specs (EN)"]
@@ -55,7 +55,7 @@ graph TD
         PC --> CHK
     end
 
-    subgraph A["④ Released artifacts"]
+    subgraph A["④ RELEASED ARTIFACTS"]
         PAPER["Preprint · DOI (Zenodo)"]
         CODE["Code + benchmark · MIT"]
         DEMO["Live demo (offline)"]
@@ -104,13 +104,13 @@ Extractor: `gpt-4o-mini`, temperature 0, fixed seed. Mean ± std.
 ```mermaid
 %%{init: {'flowchart': {'curve': 'basis'}}}%%
 flowchart TB
-    subgraph BASE["Baseline · free extraction"]
+    subgraph BASE["BASELINE · FREE EXTRACTION"]
         direction LR
         QB([Q: penalty for<br/>total non-performance?]) --> EB["Doc only defines a<br/>late-payment penalty"]
         EB --> AB["Returns the<br/>late-payment value"]
         AB --> DB["FALSE-POSITIVE<br/>DIVERGENCE"]
     end
-    subgraph FLARE["FLARE26 · ontology-gated"]
+    subgraph FLARE["FLARE26 · ONTOLOGY-GATED"]
         direction LR
         QF([Q: penalty for<br/>total non-performance?]) --> EF["Doc only defines a<br/>late-payment penalty"]
         EF --> GF{"type AND<br/>scope match?"}
