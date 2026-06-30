@@ -28,7 +28,7 @@ A bird's-eye view of how the problem, the system, the evaluation, and the
 released artifacts connect.
 
 ```mermaid
-%%{init: {'flowchart': {'curve': 'basis'}}}%%
+%%{init: {'flowchart': {'curve': 'basis'}, 'themeVariables': {'fontSize': '20px'}}}%%
 graph TD
     subgraph P["① The problem"]
         AUD["Multi-document audit"] -->|costliest error| FPD["False-positive divergence<br/>(an invented disagreement)"]
