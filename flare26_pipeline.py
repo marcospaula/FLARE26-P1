@@ -72,9 +72,14 @@ class ExtracaoUniversal(BaseModel):
     condicionantes: str = Field(description="Regras da resposta. Se incompatível/violado, retorne 'NÃO LOCALIZADO'.")
     trecho_literal: str = Field(description="Cópia literal do texto. Se incompatível/violado, retorne 'LACUNA DE EVIDÊNCIA'.")
     confiabilidade: float = Field(description="Score de 0.0 a 1.0. Se incompatível/violado, OBRIGATORIAMENTE 0.0.")
+    # Sentinela de INFRAESTRUTURA (não é decisão do gate): True quando a extração
+    # falhou por erro de API/parse — NÃO por abstenção ontológica. Fica FORA do
+    # schema enviado ao LLM (ver _SCHEMA_LLM): o modelo nunca o vê nem o preenche.
+    erro_infra: bool = False
 
 
 def resultado_vazio() -> ExtracaoUniversal:
+    """Abstenção genuína: o gate decidiu que não há evidência compatível."""
     return ExtracaoUniversal(
         natureza_da_pergunta="N/A", escopo_da_pergunta="N/A",
         natureza_do_texto_encontrado="N/A", escopo_do_texto_encontrado="N/A",
@@ -82,6 +87,23 @@ def resultado_vazio() -> ExtracaoUniversal:
         resposta_direta="NÃO LOCALIZADO", tipo_dado="NÃO LOCALIZADO",
         condicionantes="NÃO LOCALIZADO", trecho_literal="LACUNA DE EVIDÊNCIA", confiabilidade=0.0
     )
+
+
+def resultado_erro() -> ExtracaoUniversal:
+    """ERRO DE INFRAESTRUTURA (API/parse falhou), distinto de abstenção.
+    O harness de avaliação NÃO deve contá-lo como abstenção (ver eval/run_eval.py):
+    um erro de infra não é uma decisão do gate."""
+    r = resultado_vazio()
+    r.erro_infra = True
+    return r
+
+
+# Schema de function-calling SEM o campo sentinela `erro_infra` (controle interno
+# de infraestrutura, não um dado a extrair). Computado uma vez no import.
+_SCHEMA_LLM = ExtracaoUniversal.model_json_schema()
+_SCHEMA_LLM.get("properties", {}).pop("erro_infra", None)
+if "required" in _SCHEMA_LLM:
+    _SCHEMA_LLM["required"] = [r for r in _SCHEMA_LLM["required"] if r != "erro_infra"]
 
 
 # ==========================================================================
@@ -342,7 +364,7 @@ def extrair_dado(client, texto: str, pergunta: str, *,
                 {"role": "system", "content": "Você é um auditor forense agnóstico de domínio, focado em compatibilidade de tipo E escopo e em restrições negativas."},
                 {"role": "user", "content": prompt},
             ],
-            tools=[{"type": "function", "function": {"name": "retornar_extracao", "parameters": ExtracaoUniversal.model_json_schema()}}],
+            tools=[{"type": "function", "function": {"name": "retornar_extracao", "parameters": _SCHEMA_LLM}}],
             tool_choice={"type": "function", "function": {"name": "retornar_extracao"}},
             temperature=0.0,
             seed=SEED_EXTRACAO,
@@ -376,7 +398,9 @@ def extrair_dado(client, texto: str, pergunta: str, *,
             confiabilidade=conf,
         )
     except Exception:
-        return resultado_vazio()
+        # Erro de API/parse: NÃO é abstenção do gate. Devolve sentinela de erro
+        # para que o harness não o confunda com uma decisão de abster.
+        return resultado_erro()
 
 
 def extrair_dado_consenso(client, texto: str, pergunta: str, *,
@@ -399,7 +423,12 @@ def extrair_dado_consenso(client, texto: str, pergunta: str, *,
         return resultado_vazio()
 
     amostras = [extrair_dado(client, texto, pergunta, modelo=modelo) for _ in range(max(1, k))]
-    responderam = [e for e in amostras if e.resposta_direta != "NÃO LOCALIZADO"]
+    # Amostras com erro de infraestrutura não votam (não são nem resposta nem
+    # abstenção). Se TODAS falharam, o resultado é erro — não abstenção.
+    validas = [e for e in amostras if not e.erro_infra]
+    if not validas:
+        return resultado_erro()
+    responderam = [e for e in validas if e.resposta_direta != "NÃO LOCALIZADO"]
     if not responderam:
         return resultado_vazio()
 

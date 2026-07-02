@@ -37,8 +37,10 @@ def eh_abstencao(resposta: str) -> bool:
     return (resposta or "").strip().upper() in {s.upper() for s in SENTINELAS_ABSTENCAO}
 
 
-def extrair_baseline(client, texto: str, pergunta: str) -> str:
-    """Baseline SEM gating ontológico: responde com o que achar no contexto."""
+def extrair_baseline(client, texto: str, pergunta: str) -> str | None:
+    """Baseline SEM gating ontológico: responde com o que achar no contexto.
+    Retorna "" para abstenção genuína (nada no texto) e None para ERRO DE
+    INFRAESTRUTURA (API/parse) — que não deve ser contado como abstenção."""
     if not texto.strip():
         return ""
     prompt = (
@@ -55,7 +57,7 @@ def extrair_baseline(client, texto: str, pergunta: str) -> str:
         )
         return str(json.loads(r.choices[0].message.content).get("resposta", "")).strip()
     except Exception:
-        return ""
+        return None
 
 
 def main():
@@ -78,7 +80,8 @@ def main():
             caminho.read_bytes(), nome, db_path=db, vector_store=vs)
 
     # Acumuladores por sistema
-    stats = {s: {"fp": 0, "abst_ok": 0, "ans_ok": 0} for s in ("BASELINE", "FLARE26")}
+    stats = {s: {"fp": 0, "abst_ok": 0, "ans_ok": 0, "erro_abst": 0, "erro_ans": 0}
+             for s in ("BASELINE", "FLARE26")}
     n_abstain = sum(1 for i in itens if i["gold"] == ABSTAIN)
     n_answer = len(itens) - n_abstain
 
@@ -89,15 +92,22 @@ def main():
         ctx, _, _ = pipeline.recuperar_contexto(it["pergunta"], fh, db_path=db, vector_store=vs)
 
         base = extrair_baseline(client, ctx, it["pergunta"])
+        base_erro = base is None
         # FLARE_CONSENSO=k usa self-consistency (votação) em vez de amostra única.
         _k = int(os.environ.get("FLARE_CONSENSO", "0"))
         if _k > 0:
-            flare = pipeline.extrair_dado_consenso(client, ctx, it["pergunta"], k=_k).resposta_direta
+            flare_ext = pipeline.extrair_dado_consenso(client, ctx, it["pergunta"], k=_k)
         else:
-            flare = pipeline.extrair_dado(client, ctx, it["pergunta"]).resposta_direta
+            flare_ext = pipeline.extrair_dado(client, ctx, it["pergunta"])
+        flare, flare_erro = flare_ext.resposta_direta, flare_ext.erro_infra
 
         gold_abstain = it["gold"] == ABSTAIN
-        for nome_sys, pred in (("BASELINE", base), ("FLARE26", flare)):
+        for nome_sys, pred, erro in (("BASELINE", base, base_erro),
+                                     ("FLARE26", flare, flare_erro)):
+            if erro:
+                # Erro de infra ≠ abstenção: fica fora do numerador E do denominador.
+                stats[nome_sys]["erro_abst" if gold_abstain else "erro_ans"] += 1
+                continue
             pred_abstain = eh_abstencao(pred)
             if gold_abstain:
                 if pred_abstain:
@@ -109,20 +119,27 @@ def main():
                     stats[nome_sys]["ans_ok"] += 1
 
         marca = "ABSTAIN" if gold_abstain else "tem-resp"
-        print(f"{it['id']:12} {marca:9} {(base or '∅')[:26]:28} {(flare or '∅')[:26]:28}")
+        base_disp = "ERRO" if base_erro else (base or "∅")
+        flare_disp = "ERRO" if flare_erro else (flare or "∅")
+        print(f"{it['id']:12} {marca:9} {base_disp[:26]:28} {flare_disp[:26]:28}")
 
     print("\n" + "=" * 60)
     print(f"Itens: {len(itens)} | gold ABSTAIN: {n_abstain} | gold com resposta: {n_answer}")
     print("=" * 60)
     for s in ("BASELINE", "FLARE26"):
         st = stats[s]
-        fp_rate = st["fp"] / n_abstain if n_abstain else 0.0
-        abst_rec = st["abst_ok"] / n_abstain if n_abstain else 0.0
-        ans_rec = st["ans_ok"] / n_answer if n_answer else 0.0
+        # Denominadores excluem itens que erraram por infra (não são decisões).
+        den_abst = n_abstain - st["erro_abst"]
+        den_ans = n_answer - st["erro_ans"]
+        fp_rate = st["fp"] / den_abst if den_abst else 0.0
+        abst_rec = st["abst_ok"] / den_abst if den_abst else 0.0
+        ans_rec = st["ans_ok"] / den_ans if den_ans else 0.0
         print(f"\n[{s}]")
-        print(f"  ★ Taxa de falso-positivo (alucinou em ABSTAIN): {fp_rate:.0%} ({st['fp']}/{n_abstain})")
+        print(f"  ★ Taxa de falso-positivo (alucinou em ABSTAIN): {fp_rate:.0%} ({st['fp']}/{den_abst})")
         print(f"  Recall de abstenção (acertou o ABSTAIN):        {abst_rec:.0%}")
         print(f"  Recall de resposta (achou quando existia):      {ans_rec:.0%}")
+        if st["erro_abst"] or st["erro_ans"]:
+            print(f"  ⚠ Erros de infra excluídos: {st['erro_abst']} em ABSTAIN, {st['erro_ans']} em com-resposta")
 
 
 if __name__ == "__main__":
