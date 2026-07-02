@@ -29,3 +29,7 @@ paper/*.out
 
 # binário LaTeX local (Tectonic) — não versionar
 .tooling/
+
+# --- Submissão NLLP 2026 (anonimizada, double-blind) — manter LOCAL até publicar ---
+# Bundle de submissão ao workshop; fica privado enquanto está sob revisão.
+paper/nllp2026/
